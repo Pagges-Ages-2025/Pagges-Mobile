@@ -10,15 +10,15 @@ Pagges mobile repository
 
 - Instalar [VSCode](https://code.visualstudio.com/);
 
-- Instalar Extensão Prettier no VSCode;
+- Instalar Extensão ```Prettier``` no VSCode;
 
-- Instalar Extensão ES7+ React/Redux/React-Native snippets no VSCode.
+- Instalar Extensão ```ES7+ React/Redux/React-Native``` snippets no VSCode.
  
 ## Clonar repositório
 
 - Criar uma pasta para o repositório;
 
-- Abrir um terminal dentro da pasta e clonar o repositporio ```git clone https://tools.ages.pucrs.br/pagges/pagges-mobile.git```;
+- Abrir um terminal dentro da pasta e clonar o repositporio: ```git clone https://tools.ages.pucrs.br/pagges/pagges-mobile.git```;
 
 - Se for clonar o repositório no Linux, usar SSH.
 
