@@ -8,10 +8,13 @@ import {
   Animated, 
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  GestureResponderEvent
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import CustomButton from "../components/Buttons/CustomButton";
+import NunitoText from "../components/Texts/NunitoText";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -65,7 +68,7 @@ export default function RegisterScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} scrollEnabled={false}>
         <View style={styles.container}>
           <Animated.View
             style={[
@@ -76,12 +79,13 @@ export default function RegisterScreen() {
               },
             ]}
           >
-            <Text style={styles.welcomeText}>Bem-vindo à</Text>
-            <Text style={styles.title}>Pagges</Text>
+            <NunitoText style={styles.welcomeText}>Bem-vindo à</NunitoText>
+            <NunitoText style={styles.title}>Pagges</NunitoText>
             
             <View style={styles.form}>
+            <View style={styles.inputsContainer}>
               <View style={styles.inputContainer}>
-                <Ionicons name="person" size={20} color="#9C0F5F" style={styles.inputIcon} />
+                <Ionicons name="person" size={20} color="#A9A8A9" style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   placeholder="Nome Completo"
@@ -92,7 +96,7 @@ export default function RegisterScreen() {
               </View>
               
               <View style={styles.inputContainer}>
-                <Ionicons name="at" size={20} color="#9C0F5F" style={styles.inputIcon} />
+                <Ionicons name="at" size={20} color="#A9A8A9" style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   placeholder="Nome de usuário"
@@ -102,37 +106,10 @@ export default function RegisterScreen() {
                   autoCapitalize="none"
                 />
               </View>
-              
-              <View style={styles.radioContainer}>
-                <TouchableOpacity 
-                  style={styles.radioOption} 
-                  onPress={() => setUserType("reader")}
-                >
-                  <View style={[
-                    styles.radioButton, 
-                    userType === "reader" && styles.radioButtonSelected
-                  ]}>
-                    {userType === "reader" && <View style={styles.radioButtonInner} />}
-                  </View>
-                  <Text style={styles.radioLabel}>Sou leitor(a)</Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={styles.radioOption} 
-                  onPress={() => setUserType("author")}
-                >
-                  <View style={[
-                    styles.radioButton, 
-                    userType === "author" && styles.radioButtonSelected
-                  ]}>
-                    {userType === "author" && <View style={styles.radioButtonInner} />}
-                  </View>
-                  <Text style={styles.radioLabel}>Sou autor(a)</Text>
-                </TouchableOpacity>
-              </View>
+            
               
               <View style={styles.inputContainer}>
-                <Ionicons name="mail-outline" size={20} color="#9C0F5F" style={styles.inputIcon} />
+                <Ionicons name="mail-outline" size={20} color="#A9A8A9" style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   placeholder="E-mail"
@@ -145,7 +122,7 @@ export default function RegisterScreen() {
               </View>
               
               <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed-outline" size={20} color="#9C0F5F" style={styles.inputIcon} />
+                <Ionicons name="lock-closed-outline" size={20} color="#A9A8A9" style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   placeholder="Senha"
@@ -161,13 +138,13 @@ export default function RegisterScreen() {
                   <Ionicons 
                     name={showPassword ? "eye-outline" : "eye-off-outline"} 
                     size={20} 
-                    color="#9C0F5F" 
+                    color="#A9A8A9" 
                   />
                 </TouchableOpacity>
               </View>
               
               <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed-outline" size={20} color="#9C0F5F" style={styles.inputIcon} />
+                <Ionicons name="lock-closed-outline" size={20} color="#A9A8A9" style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   placeholder="Confirmar senha"
@@ -183,9 +160,38 @@ export default function RegisterScreen() {
                   <Ionicons 
                     name={showConfirmPassword ? "eye-outline" : "eye-off-outline"} 
                     size={20} 
-                    color="#9C0F5F" 
+                    color="#A9A8A9" 
                   />
                 </TouchableOpacity>
+              </View>
+
+              <View style={styles.radioContainer}>
+                <TouchableOpacity 
+                  style={styles.radioOption} 
+                  onPress={() => setUserType("reader")}
+                >
+                  <View style={[
+                    styles.radioButton, 
+                    userType === "reader" && styles.radioButtonSelected
+                  ]}>
+                    {userType === "reader" && <View style={styles.radioButtonInner} />}
+                  </View>
+                  <NunitoText style={styles.radioLabel}>Sou leitor(a)</NunitoText>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.radioOption} 
+                  onPress={() => setUserType("author")}
+                >
+                  <View style={[
+                    styles.radioButton, 
+                    userType === "author" && styles.radioButtonSelected
+                  ]}>
+                    {userType === "author" && <View style={styles.radioButtonInner} />}
+                  </View>
+                  <NunitoText style={styles.radioLabel}>Sou autor(a)</NunitoText>
+                </TouchableOpacity>
+              </View>
               </View>
               
               <TouchableOpacity 
@@ -198,24 +204,24 @@ export default function RegisterScreen() {
                 ]}>
                   {termsAccepted && <Ionicons name="checkmark" size={14} color="white" />}
                 </View>
-                <Text style={styles.termsText}>
+                <NunitoText style={styles.termsText}>
                   Declaro que li e concordo com os{" "}
-                  <Text style={styles.termsLink}>Termos de Uso</Text> e a{" "}
-                  <Text style={styles.termsLink}>Política de Privacidade</Text>
-                </Text>
+                  <NunitoText style={styles.termsLink}>Termos de Uso</NunitoText> e a{" "}
+                  <NunitoText style={styles.termsLink}>Política de Privacidade</NunitoText>
+                </NunitoText>
               </TouchableOpacity>
-              
-              <TouchableOpacity style={styles.button} onPress={() => {}}>
-                <Text style={styles.buttonText}>Cadastrar</Text>
-              </TouchableOpacity>
+
+              <View style={{marginTop:30}}>
+              <CustomButton title={"Cadastrar"}  onPress={() => {}} />
+              </View>
               
               <TouchableOpacity 
                 style={styles.loginLink} 
                 onPress={() => navigateTo("login")}
               >
-                <Text style={styles.loginLinkText}>
-                  Já possui uma conta? <Text style={styles.loginLinkHighlight}>Login</Text>
-                </Text>
+                <NunitoText style={styles.loginLinkText}>
+                  Já possui uma conta? <NunitoText style={styles.loginLinkHighlight}>Login</NunitoText>
+                </NunitoText>
               </TouchableOpacity>
             </View>
           </Animated.View>
@@ -247,7 +253,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   title: {
-    fontSize: 42,
+    fontSize: 48,
     fontWeight: "bold",
     color: "#9C0F5F",
     marginBottom: 30,
@@ -255,13 +261,18 @@ const styles = StyleSheet.create({
   form: {
     width: "100%",
   },
+  inputsContainer:{
+    display:"flex",
+    flexDirection:"column",
+    gap: 10,
+  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    height: 56,
+    height: 50,
     borderWidth: 1,
-    borderColor: "#9C0F5F",
+    borderColor: "#A9A8A9",
     borderRadius: 30,
     marginBottom: 16,
     paddingHorizontal: 16,
@@ -274,6 +285,7 @@ const styles = StyleSheet.create({
     height: "100%",
     color: "#333",
     fontSize: 16,
+    fontFamily:"Nunito"
   },
   eyeIcon: {
     padding: 10,
@@ -282,7 +294,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
-    marginBottom: 16,
+    marginBottom: 30,
     paddingHorizontal: 10,
   },
   radioOption: {
@@ -294,7 +306,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#9C0F5F",
+    borderColor: "#A9A8A9",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 8,
@@ -323,7 +335,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: "#9C0F5F",
+    borderColor: "#A9A8A9",
     marginRight: 10,
     marginTop: 2,
     justifyContent: "center",

@@ -4,10 +4,14 @@ import {
   Text,
   StyleSheet,
   Animated,
+  Image,
+  TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import CustomButton from "../components/Buttons/CustomButton";
+import ImageCartoon from "../assets/images/backgroundWelcome.png"; // Importação do logo
+import NunitoText from "../components/Texts/NunitoText";
 
 export default function WelcomeScreen() {
   const router = useRouter();
@@ -54,24 +58,25 @@ export default function WelcomeScreen() {
       <Animated.View
         style={[
           styles.content,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          },
+          { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
         ]}
       >
-        <Text style={styles.title}>Pagges</Text>
-        <Text style={styles.subtitle}>
-          Descubra um mundo de histórias ao seu alcance
-        </Text>
+        <NunitoText style={styles.logotitle}>Pagges</NunitoText>
+        <Image source={ImageCartoon} style={styles.logo} />
+        <NunitoText style={styles.title}>Sua nova comunidade de leitura</NunitoText>
+        <NunitoText style={styles.subtitle}>
+          Leia, escreva, comente e interaja sempre que desejar
+        </NunitoText>
 
         <View style={styles.buttonContainer}>
           <CustomButton title={"Entrar"} onPress={() => navigateTo("login")} />
-          <CustomButton
-            title={"Cadastrar"}
+          <TouchableOpacity
+            style={styles.registerLink}
             onPress={() => navigateTo("register")}
-            type="outlined"
-          />
+          >
+            <NunitoText style={styles.registerLinkText}>Não possui uma conta?</NunitoText>
+            <NunitoText style={[styles.registerLinkText, {fontWeight: 'bold'}]}>Inscreva-se</NunitoText>
+          </TouchableOpacity>
         </View>
       </Animated.View>
     </View>
@@ -86,54 +91,49 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
+  logo: {
+    width: 320,
+    height: 320,
+    resizeMode: "contain",
+    marginBottom: 20,
+  },
   content: {
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
   },
-  title: {
+  logotitle: {
     fontSize: 48,
     fontWeight: "bold",
     color: "#9C0F5F",
     marginBottom: 20,
   },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#474545",
+    textAlign: "center",
+    marginBottom: 20,
+  },
   subtitle: {
-    fontSize: 18,
-    color: "#333",
+    fontSize: 16,
+    color: "#474545",
     textAlign: "center",
     marginBottom: 40,
     lineHeight: 24,
   },
-  lottie: {
-    width: 250,
-    height: 250,
-    marginBottom: 20,
+  registerLink: {
+    display:"flex",
+    flexDirection:'row',
+    alignSelf: 'center',
+    gap: 4
+  },
+  registerLinkText: {
+    color: "#666",
+    fontSize: 14,
   },
   buttonContainer: {
     width: "100%",
     gap: 15,
-  },
-  button: {
-    backgroundColor: "#9C0F5F",
-    borderRadius: 30,
-    height: 56,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  outlineButton: {
-    backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: "#9C0F5F",
-  },
-  outlineButtonText: {
-    color: "#9C0F5F",
-    fontSize: 16,
-    fontWeight: "600",
   },
 });
