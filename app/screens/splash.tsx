@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Animated } from "react-native";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
+import NunitoText from "../components/Texts/NunitoText";
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -33,7 +34,7 @@ export default function SplashScreen() {
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-        <Text style={styles.title}>Pagges</Text>
+        <NunitoText style={styles.title}>Pagges</NunitoText>
       </Animated.View>
     </View>
   );
@@ -42,7 +43,7 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#9C0F5F", 
+    backgroundColor: "#9C0F5F",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -51,14 +52,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    fontSize: 64,
+    fontSize: 90,
     fontWeight: "bold",
-    color: "white",
+    color: "#F5E2C8",
     marginBottom: 40,
-    fontFamily: "System",
+    fontFamily: "Nunito", 
   },
   lottie: {
     width: 200,
     height: 200,
   },
 });
+

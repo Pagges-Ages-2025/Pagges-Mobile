@@ -1,16 +1,29 @@
 import { useEffect } from "react";
 import { useRouter } from "expo-router";
+import { View, ActivityIndicator } from "react-native";
+import useLoadFonts from "./hooks/useLoadFonts";
 
 export default function Index() {
   const router = useRouter();
+  const fontsLoaded = useLoadFonts();
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      router.replace("/screens/splash");
-    }, 50); 
+    if (fontsLoaded) {
+      const timeout = setTimeout(() => {
+        router.replace("/screens/splash");
+      }, 50);
 
-    return () => clearTimeout(timeout);
-  }, [router]);
+      return () => clearTimeout(timeout);
+    }
+  }, [fontsLoaded, router]);
+
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#9C0F5F" />
+      </View>
+    );
+  }
 
   return null;
 }

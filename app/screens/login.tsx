@@ -1,18 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TextInput, 
-  TouchableOpacity, 
-  Animated, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Animated,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  GestureResponderEvent,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
+import CustomButton from "../components/Buttons/CustomButton";
+import NunitoText from "../components/Texts/NunitoText";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -60,7 +63,7 @@ export default function LoginScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} scrollEnabled={false}>
         <View style={styles.container}>
           <Animated.View
             style={[
@@ -71,21 +74,23 @@ export default function LoginScreen() {
               },
             ]}
           >
-            <Text style={styles.title}>Pagges</Text>
-            <Text style={styles.subtitle}>Bem-vindo de volta, leitor(a)!</Text>
-            
-           <LottieView
-                     ref={lottieRef}
-                     source={require("../assets/animations/login.json")}
-                     style={styles.lottie}
-                     autoPlay={true}
-                     loop={true}
-                   />
+            <NunitoText style={styles.title}>Pagges</NunitoText>
+            <NunitoText style={styles.subtitle}>Bem-vindo de volta, leitor(a)!</NunitoText>
 
-            
-            
+            <LottieView
+              ref={lottieRef}
+              source={require("../assets/animations/login.json")}
+              style={styles.lottie}
+              autoPlay={true}
+              loop={true}
+            />
             <View style={styles.inputContainer}>
-              <Ionicons name="person-outline" size={20} color="#9C0F5F" style={styles.inputIcon} />
+              <Ionicons
+                name="person-outline"
+                size={20}
+                color="#A9A8A9"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="E-mail ou nome de usuário"
@@ -95,9 +100,14 @@ export default function LoginScreen() {
                 autoCapitalize="none"
               />
             </View>
-            
+
             <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color="#9C0F5F" style={styles.inputIcon} />
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color="#A9A8A9"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="Senha"
@@ -106,33 +116,29 @@ export default function LoginScreen() {
                 value={password}
                 onChangeText={setPassword}
               />
-              <TouchableOpacity 
-                style={styles.eyeIcon} 
+              <TouchableOpacity
+                style={styles.eyeIcon}
                 onPress={() => setShowPassword(!showPassword)}
               >
-                <Ionicons 
-                  name={showPassword ? "eye-outline" : "eye-off-outline"} 
-                  size={20} 
-                  color="#9C0F5F" 
+                <Ionicons
+                  name={showPassword ? "eye-outline" : "eye-off-outline"}
+                  size={20}
+                  color="#A9A8A9"
                 />
               </TouchableOpacity>
             </View>
-            
+
             <TouchableOpacity style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
+              <NunitoText style={styles.forgotPasswordText}>Esqueceu a senha?</NunitoText>
             </TouchableOpacity>
-            
-            <TouchableOpacity style={styles.button} onPress={() => {}}>
-              <Text style={styles.buttonText}>Entrar</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.registerLink} 
+
+            <CustomButton title={"Entrar"} onPress={() => {}} />
+
+            <TouchableOpacity
+              style={styles.registerLink}
               onPress={() => navigateTo("register")}
             >
-              <Text style={styles.registerLinkText}>
-                Não possui uma conta?
-              </Text>
+              <NunitoText style={styles.registerLinkText}>Não possui uma conta?</NunitoText>
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -163,7 +169,7 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   title: {
-    fontSize: 42,
+    fontSize: 48,
     fontWeight: "bold",
     color: "#9C0F5F",
     marginBottom: 10,
@@ -179,14 +185,15 @@ const styles = StyleSheet.create({
     height: 150,
     marginBottom: 30,
   },
+
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    height: 56,
+    height: 50,
     borderWidth: 1,
-    borderColor: "#9C0F5F",
-    borderRadius: 30,
+    borderColor: "#A9A8A9",
+    borderRadius: 15,
     marginBottom: 16,
     paddingHorizontal: 16,
   },
@@ -198,6 +205,7 @@ const styles = StyleSheet.create({
     height: "100%",
     color: "#333",
     fontSize: 16,
+    fontFamily: "Nunito"
   },
   eyeIcon: {
     padding: 10,

@@ -7,6 +7,7 @@ import {
   ViewStyle,
   TextStyle,
 } from "react-native";
+import NunitoText from "../Texts/NunitoText";
 
 type ButtonType = "primary" | "outlined" | "secondary";
 
@@ -47,7 +48,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <Text style={[buttonTextStyle, textStyle]}>{title}</Text>
+      <NunitoText style={[buttonTextStyle, textStyle]}>{title}</NunitoText>
     </TouchableOpacity>
   );
 };
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
   filledButton: {
     backgroundColor: "#9C0F5F",
     borderRadius: 30,
-    height: 56,
+    height: 50,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
