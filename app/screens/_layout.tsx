@@ -52,7 +52,6 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
               gestureEnabled: true,
             }}
           >
-            <Stack.Screen name="index" />
             <Stack.Screen name="login" />
             <Stack.Screen name="register" />
             <Stack.Screen name="tests/teste" />
