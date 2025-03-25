@@ -21,11 +21,9 @@ export default function WelcomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      // Reset valores
       fadeAnim.setValue(0);
       slideAnim.setValue(50);
 
-      // Executa animações ao focar
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 1,
@@ -41,7 +39,6 @@ export default function WelcomeScreen() {
 
       lottieRef.current?.play();
 
-      // Opcional: reset ao desfocar
       return () => {
         fadeAnim.setValue(0);
         slideAnim.setValue(50);
