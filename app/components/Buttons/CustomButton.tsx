@@ -1,101 +1,118 @@
 import React from "react";
 import {
   TouchableOpacity,
-  Text,
   StyleSheet,
   GestureResponderEvent,
+  StyleProp,
   ViewStyle,
   TextStyle,
 } from "react-native";
 import NunitoText from "../Texts/NunitoText";
+import { useTheme } from "../../context/ThemeContext";
 
 type ButtonType = "primary" | "outlined" | "secondary";
+type ButtonSize = "small" | "medium" | "large";
+type FontWeight = "light" | "regular" | "semibold" | "bold";
 
 interface CustomButtonProps {
-  /** Tipo do botão:
-   * primary - Botão preenchido (default)
-   * outlined - Botão contornado (outline)
-   * secondary - Botão secundário (ex.: fundo branco com borda verde)
-   */
   type?: ButtonType;
+  size?: ButtonSize;
+  fontWeight?: FontWeight;
   title: string;
   onPress: (event: GestureResponderEvent) => void;
-  containerStyle?: ViewStyle;
-  textStyle?: TextStyle;
+  containerStyle?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
   type = "primary",
+  size = "medium",
+  fontWeight = "regular",
   title,
   onPress,
   containerStyle,
   textStyle,
 }) => {
-  let buttonStyle = styles.filledButton;
-  let buttonTextStyle = styles.filledButtonText;
+  const { theme, themeName } = useTheme();
 
-  if (type === "outlined") {
-    buttonStyle = styles.outlineButton;
-    buttonTextStyle = styles.outlineButtonText;
-  } else if (type === "secondary") {
-    buttonStyle = styles.secondaryButton;
-    buttonTextStyle = styles.secondaryButtonText;
-  }
+
+  // Tipos de botão
+  const isOutlined = type === "outlined";
+  const isSecondary = type === "secondary";
+
+  // Tamanho do Botão
+  const sizeStyles = {
+    small: {
+      height: 40,
+      paddingHorizontal: 20,
+      fontSize: 14,
+    },
+    medium: {
+      height: 50,
+      paddingHorizontal: 24,
+      fontSize: 16,
+    },
+    large: {
+      height: 60,
+      paddingHorizontal: 28,
+      fontSize: 18,
+    },
+  }[size];
+
+  // Fontes do botão
+  const fontWeightMap: Record<FontWeight, TextStyle["fontWeight"]> = {
+    light: "300",
+    regular: "500",
+    semibold: "700",
+    bold: "900",
+  };
+
+  // Estilos dinâmicos do botão
+  const dynamicButtonStyle: ViewStyle = {
+    backgroundColor: isOutlined
+      ? "transparent"
+      : isSecondary
+      ? theme.secondary
+      : theme.primary,
+    borderColor: isOutlined ? theme.primary : undefined,
+    borderWidth: isOutlined ? 2 : undefined,
+    height: sizeStyles.height,
+    paddingHorizontal: sizeStyles.paddingHorizontal,
+  };
+
+  const dynamicTextStyle: TextStyle = {
+    color: isOutlined
+      ? themeName === "dark"
+        ? theme.primaryText
+        : theme.primary
+      : "white",
+    fontSize: sizeStyles.fontSize,
+    fontWeight: fontWeightMap[fontWeight],
+  };
+  
 
   return (
     <TouchableOpacity
-      style={[buttonStyle, containerStyle]}
+      style={[styles.baseButton, dynamicButtonStyle, containerStyle]}
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <NunitoText style={[buttonTextStyle, textStyle]}>{title}</NunitoText>
+      <NunitoText style={[styles.baseText, dynamicTextStyle, textStyle]}>
+        {title}
+      </NunitoText>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  filledButton: {
-    backgroundColor: "#9C0F5F",
+  baseButton: {
     borderRadius: 30,
-    height: 50,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
   },
-  filledButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  outlineButton: {
-    backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: "#9C0F5F",
-    borderRadius: 30,
-    height: 56,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-  },
-  outlineButtonText: {
-    color: "#9C0F5F",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  secondaryButton: {
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "green",
-    borderRadius: 30,
-    height: 56,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-  },
-  secondaryButtonText: {
-    color: "#9C0F5F",
-    fontSize: 16,
-    fontWeight: "600",
+  baseText: {
+    textAlign: "center",
   },
 });
 
