@@ -1,16 +1,16 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef, useCallback } from "react";
 import {
   View,
-  Text,
   StyleSheet,
   Animated,
   Image,
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import LottieView from "lottie-react-native";
 import CustomButton from "../components/Buttons/CustomButton";
-import ImageCartoon from "../assets/images/backgroundWelcome.png"; // Importação do logo
+import ImageCartoon from "../assets/images/backgroundWelcome.png";
 import NunitoText from "../components/Texts/NunitoText";
 
 export default function WelcomeScreen() {
@@ -19,24 +19,34 @@ export default function WelcomeScreen() {
   const slideAnim = useRef(new Animated.Value(50)).current;
   const lottieRef = useRef<LottieView>(null);
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start();
+  useFocusEffect(
+    useCallback(() => {
+      fadeAnim.setValue(0);
+      slideAnim.setValue(50);
 
-    lottieRef.current?.play();
-  }, []);
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ]).start();
 
-  const navigateTo = (screen: "login" | "register") => {
+      lottieRef.current?.play();
+
+      return () => {
+        fadeAnim.setValue(0);
+        slideAnim.setValue(50);
+      };
+    }, [])
+  );
+
+  const navigateTo = (screen: "login" | "register" | "tests/teste") => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 0,
@@ -63,19 +73,31 @@ export default function WelcomeScreen() {
       >
         <NunitoText style={styles.logotitle}>Pagges</NunitoText>
         <Image source={ImageCartoon} style={styles.logo} />
-        <NunitoText style={styles.title}>Sua nova comunidade de leitura</NunitoText>
+        <NunitoText style={styles.title}>
+          Sua nova comunidade de leitura
+        </NunitoText>
         <NunitoText style={styles.subtitle}>
           Leia, escreva, comente e interaja sempre que desejar
         </NunitoText>
 
         <View style={styles.buttonContainer}>
-          <CustomButton title={"Entrar"} onPress={() => navigateTo("login")} />
+          <CustomButton
+            title={"Entrar"}
+            fontWeight="bold"
+            onPress={() => navigateTo("login")}
+          />
           <TouchableOpacity
             style={styles.registerLink}
             onPress={() => navigateTo("register")}
           >
-            <NunitoText style={styles.registerLinkText}>Não possui uma conta?</NunitoText>
-            <NunitoText style={[styles.registerLinkText, {fontWeight: 'bold'}]}>Inscreva-se</NunitoText>
+            <NunitoText style={styles.registerLinkText}>
+              Não possui uma conta?
+            </NunitoText>
+            <NunitoText
+              style={[styles.registerLinkText, { fontWeight: "bold" }]}
+            >
+              Inscreva-se
+            </NunitoText>
           </TouchableOpacity>
         </View>
       </Animated.View>
@@ -123,10 +145,9 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   registerLink: {
-    display:"flex",
-    flexDirection:'row',
-    alignSelf: 'center',
-    gap: 4
+    flexDirection: "row",
+    alignSelf: "center",
+    gap: 4,
   },
   registerLinkText: {
     color: "#666",
