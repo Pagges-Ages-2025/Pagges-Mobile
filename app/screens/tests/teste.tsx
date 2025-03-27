@@ -5,11 +5,13 @@ import {
   ScrollView,
   Animated,
   TouchableOpacity,
+  GestureResponderEvent,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/app/context/ThemeContext";
 import ButtonSection from "./sections/buttonsSection";
+import CustomButton from "@/app/components/Buttons/CustomButton";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -46,7 +48,10 @@ export default function TestsScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.Background }} edges={["top"]}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: theme.Background }}
+      edges={["top"]}
+    >
       <ScrollView contentContainerStyle={styles.scroll}>
         {/* Botão de troca de tema */}
         <View style={styles.themeToggleContainer}>
@@ -64,10 +69,11 @@ export default function TestsScreen() {
 
         {/* Seções */}
         <View style={styles.container}>
-        <ButtonSection />
+          <ButtonSection />
         </View>
 
-
+        {/* importar aqui o novo componente para poder testar */}
+      
       </ScrollView>
     </SafeAreaView>
   );
