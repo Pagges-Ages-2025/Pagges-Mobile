@@ -3,11 +3,12 @@ import { View, FlatList, Dimensions, Animated } from 'react-native';
 
 interface CarouselProps {
   data: React.ReactNode[];
+  isHorizontal?: true
 }
 
 const { width } = Dimensions.get('window');
 
-const CustomCarousel: React.FC<CarouselProps> = ({ data }) => {
+const CustomCarousel: React.FC<CarouselProps> = ({ data, isHorizontal }) => {
   const scrollX = useRef(new Animated.Value(0)).current;
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
@@ -27,12 +28,13 @@ const CustomCarousel: React.FC<CarouselProps> = ({ data }) => {
       <FlatList
         ref={flatListRef}
         data={data}
-        horizontal
+        horizontal = {isHorizontal}
         pagingEnabled
+        
         showsHorizontalScrollIndicator={false}
         keyExtractor={(_, index) => index.toString()}
         renderItem={({ item }) => (
-          <View style={{ width }}>{item}</View>
+          <View style={{marginLeft: 10 }}>{item}</View>
         )}
         onScroll={handleScroll}
         onMomentumScrollEnd={handleMomentumScrollEnd}
