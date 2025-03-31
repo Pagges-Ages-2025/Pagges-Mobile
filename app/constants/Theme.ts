@@ -3,6 +3,8 @@ export type Theme = {
   primaryText: string;
   secondaryText: string;
   tertiaryText: string;
+  quaternaryText: string; //criado para textos brancos no light, facilitando a manutenção sem modificar o background por exemplo
+  quinaryText: string //criado para textos pretos no dark
   primary:string;
   secondary:string;
   tertiary:string;
@@ -24,6 +26,8 @@ export const themes: Record<'light' | 'dark', Theme> = {
     primaryText: "#000000",
     secondaryText:"#474545",
     tertiaryText:"#9D0F54",
+    quaternaryText: '#FFFFFF',
+    quinaryText: '#000000',
     primary:"#9D0F54",
     secondary:"#064A4A",
     tertiary:"#FF8811",
@@ -43,6 +47,8 @@ export const themes: Record<'light' | 'dark', Theme> = {
     primaryText: "#FFFFFF",
     secondaryText: "#B3B3B3",
     tertiaryText: "#9D0F54",
+    quaternaryText: '#000000', //preto
+    quinaryText: '#FFFFFF', //branco
     primary: "#9D0F54",
     secondary: "#064A4A",
     tertiary: "#FF8811",
