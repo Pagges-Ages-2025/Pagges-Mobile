@@ -16,7 +16,6 @@ import { Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
 import CustomButton from "../components/Buttons/CustomButton";
 import NunitoText from "../components/Texts/NunitoText";
-import SearchBar, { Book } from "../components/SearchBar/SearchBar";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -26,18 +25,6 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const lottieRef = useRef<LottieView>(null);
-
-  const books: Book[] = [
-    { id: "1", title: "1984", author: "George Orwell" },
-    { id: "2", title: "O Senhor dos Anéis", author: "J.R.R. Tolkien" },
-    { id: "3", title: "Dom Quixote", author: "Miguel de Cervantes" },
-    { id: "4", title: "O Pequeno Príncipe", author: "Antoine de Saint-Exupéry" },
-    { id: "5", title: "Cem Anos de Solidão", author: "Gabriel García Márquez" },
-  ];
-
-  const handleSelectBook = (book: Book) => {
-    console.log("Livro selecionado:", book);
-  };
 
   useEffect(() => {
     Animated.parallel([
@@ -145,7 +132,7 @@ export default function LoginScreen() {
               <NunitoText style={styles.forgotPasswordText}>Esqueceu a senha?</NunitoText>
             </TouchableOpacity>
 
-            <SearchBar books={books} onSelectBook={handleSelectBook}></SearchBar>
+            <CustomButton title={"Entrar"} onPress={() => {}} />
 
             <TouchableOpacity
               style={styles.registerLink}
