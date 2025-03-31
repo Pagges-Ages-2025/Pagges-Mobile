@@ -43,6 +43,52 @@ Pagges mobile repository
    - On Android, use **Expo Go > Scan QR**.
    - On iOS, use the default camera app.
 
+#ESLint
+
+## Required Extensions
+
+- Install the `ESLint` extension in VSCode
+
+## How to Run ESLint
+
+1. To check for linting errors in your code:
+
+   ```bash
+   npx eslint path/to/file
+   ```
+
+   So if you want to run the ESLint for the entire project you can run from root:
+
+   ```bash
+   npx eslint app
+   ```
+
+2. To automatically fix linting errors:
+
+   ```bash
+   npx eslint --fix
+   ```
+
+Note: ESLint will automatically run when you save files if you have the ESLint extension installed in VSCode.
+
+# Prettier
+
+## Required Extensions
+
+- Install the `Prettier` extension in VSCode
+
+- Open the Command Pallete (Ctrl + Shift + P) and search for "Preferences: Open User Settings (JSON)"
+
+- Enable "Format on Save" in your VSCode by adding this to the settings:
+
+{
+...
+"editor.formatOnSave": true,
+"editor.defaultFormatter": "esbenp.prettier-vscode"
+}
+
+Now Prettier will automatically format your code when you save files (Ctrl + S) if you have the Prettier extension installed in VSCode.
+
 # Branch Naming Convention
 
 ## Format

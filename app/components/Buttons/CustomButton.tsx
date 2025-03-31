@@ -15,11 +15,11 @@ type ButtonType = "primary" | "outlined" | "secondary" | "outlinedSecondary";
 type ButtonSize = "small" | "medium" | "large";
 type FontWeight = "light" | "regular" | "semibold" | "bold";
 
-interface CustomButtonProps {
+interface CustomButtonProps { // props: parametros que sao passados para os componentes para definir o comportamento/dados personalizados
   type?: ButtonType;
   size?: ButtonSize;
-  disabled?: boolean;
-  full?: boolean; // DEIXO FULL OU COLOCO FULLSIZE PARA SER MAIS EXPECIFICA?
+  isDisabled?: boolean;
+  fullWidth?: boolean; 
   fontWeight?: FontWeight;
   title: string;
   onPress: (event: GestureResponderEvent) => void;
@@ -35,15 +35,11 @@ const CustomButton: React.FC<CustomButtonProps> = ({ //define como padrao
   onPress,
   containerStyle,
   textStyle,
-  disabled = false,
-  full = true
+  isDisabled = true,
+  fullWidth = true
 }) => {
   const { theme, themeName } = useTheme();
   
-  
-  const isDisabled = disabled; // const eh igual a prop
-  const isFull = full;
-
   // Tipos de botão
   const isOutlined = type === "outlined"; //outlined = bordinha
   const isSecondary = type === "secondary"; //secondary = verde
@@ -117,11 +113,11 @@ const CustomButton: React.FC<CustomButtonProps> = ({ //define como padrao
         dynamicButtonStyle,
         containerStyle,
         {
-          width: isFull? "100%" : "30%"
+          width: fullWidth? "100%" : "30%"
         }
       ]}
       onPress={onPress}
-      disabled= {isDisabled ? true : false}
+      disabled= {isDisabled}
       
       activeOpacity={0.8}
     >

@@ -63,7 +63,10 @@ export default function LoginScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer} scrollEnabled={false}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        scrollEnabled={false}
+      >
         <View style={styles.container}>
           <Animated.View
             style={[
@@ -75,7 +78,9 @@ export default function LoginScreen() {
             ]}
           >
             <NunitoText style={styles.title}>Pagges</NunitoText>
-            <NunitoText style={styles.subtitle}>Bem-vindo de volta, leitor(a)!</NunitoText>
+            <NunitoText style={styles.subtitle}>
+              Bem-vindo de volta, leitor(a)!
+            </NunitoText>
 
             <LottieView
               ref={lottieRef}
@@ -129,7 +134,9 @@ export default function LoginScreen() {
             </View>
 
             <TouchableOpacity style={styles.forgotPassword}>
-              <NunitoText style={styles.forgotPasswordText}>Esqueceu a senha?</NunitoText>
+              <NunitoText style={styles.forgotPasswordText}>
+                Esqueceu a senha?
+              </NunitoText>
             </TouchableOpacity>
 
             <CustomButton title={"Entrar"} onPress={() => {}} />
@@ -138,7 +145,9 @@ export default function LoginScreen() {
               style={styles.registerLink}
               onPress={() => navigateTo("register")}
             >
-              <NunitoText style={styles.registerLinkText}>Não possui uma conta?</NunitoText>
+              <NunitoText style={styles.registerLinkText}>
+                Não possui uma conta?
+              </NunitoText>
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -205,7 +214,7 @@ const styles = StyleSheet.create({
     height: "100%",
     color: "#333",
     fontSize: 16,
-    fontFamily: "Nunito"
+    fontFamily: "Nunito",
   },
   eyeIcon: {
     padding: 10,
