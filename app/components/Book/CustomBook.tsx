@@ -5,10 +5,8 @@ import {
   GestureResponderEvent,
   StyleProp,
   ViewStyle,
-  TextStyle,
   Image,
 } from "react-native";
-import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
 
 type BookSize = "small" | "medium" | "large";
@@ -67,7 +65,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-
     overflow: "hidden"
   },
   baseText: {

@@ -30,7 +30,6 @@ const CustomCarousel: React.FC<CarouselProps> = ({ data, isHorizontal }) => {
         data={data}
         horizontal = {isHorizontal}
         pagingEnabled
-        
         showsHorizontalScrollIndicator={false}
         keyExtractor={(_, index) => index.toString()}
         renderItem={({ item }) => (
