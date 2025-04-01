@@ -1,11 +1,10 @@
 import React from "react";
-import { TouchableOpacity, Image, GestureResponderEvent } from 'react-native';
+import { TouchableOpacity} from 'react-native';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-
-export default function ActionButton(props: {color?: string, size: number}){
+export default function EditProfileButton(props: {color?: string, size: number}){
     function onPress(){
-        console.log("Action Button Pressed")
+        console.log("Edit Profile Button Pressed")
     } 
     
     return(
