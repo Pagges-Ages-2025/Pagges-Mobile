@@ -17,6 +17,9 @@ export type Theme = {
   borders: string; 
   placeholder: string;
   iconColor: string;
+  secondaryTransparent: string;
+  primaryTransparent: string;
+  iconColorSecondary: string;
 };
 
 
@@ -40,7 +43,9 @@ export const themes: Record<'light' | 'dark', Theme> = {
     borders: "#CCCCCC",            
     placeholder: "#A9A9A9",        
     iconColor: "#9D0F54",          
-
+    iconColorSecondary: "#064A4A",
+    secondaryTransparent: "#064A4A80",
+    primaryTransparent: "#9D0F5480"
   },
   dark: {
     Background: "#0F0F0F",
@@ -60,7 +65,10 @@ export const themes: Record<'light' | 'dark', Theme> = {
     dividerColor: "#2C2C2C",
     borders: "#3A3A3A",
     placeholder: "#888888",
-    iconColor: "#9D0F54"
+    iconColor: "#9D0F54",
+    iconColorSecondary: "#064A4A",
+    secondaryTransparent: "#064A4A80",
+    primaryTransparent: "#9D0F5480",
   }
   
 };

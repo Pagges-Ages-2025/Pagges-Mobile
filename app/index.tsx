@@ -19,7 +19,7 @@ export default function Index() {
 
   if (!fontsLoaded) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}> {/*View eh tipo uma div*/}
         <ActivityIndicator size="large" color="#9C0F5F" />
       </View>
     );
