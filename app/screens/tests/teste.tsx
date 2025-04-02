@@ -10,6 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/app/context/ThemeContext";
 import ButtonSection from "./sections/buttonsSection";
+import UserStats from "@/app/components/UserStats/UserStats";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -64,7 +65,7 @@ export default function TestsScreen() {
 
         {/* Seções */}
         <View style={styles.container}>
-        <ButtonSection />
+        <UserStats kmLidos={100} livros={70} ranking={4} amigos={25} />
         </View>
 
 
