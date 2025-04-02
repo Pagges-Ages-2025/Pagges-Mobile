@@ -43,18 +43,17 @@ const getStyles = (theme: Theme) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      padding: 16,
     },
     statContainer: {
       alignItems: "center",
     },
     value: {
-      fontSize: 18,
+      fontSize: 25,
       fontWeight: "bold",
       color: theme.secondary,
     },
     label: {
-      fontSize: 14,
+      fontSize: 20,
       color: theme.secondaryText,
     },
   });
