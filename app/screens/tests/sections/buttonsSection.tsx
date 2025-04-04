@@ -1,4 +1,3 @@
-// sections/ButtonSection.tsx
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import CustomButton from "@/app/components/Buttons/CustomButton";
@@ -6,10 +5,12 @@ import Section from "../components/section";
 
 const ButtonSection = () => {
   const [open, setOpen] = useState({
-    buttons: true,
+    buttons: false,
     size: true,
     type: true,
     fontWeight: true,
+    disabled: true,
+    fullWidth: true,
   });
 
   const toggle = (key: keyof typeof open) =>
@@ -53,8 +54,40 @@ const ButtonSection = () => {
       >
         <View style={styles.grid}>
           <CustomButton title="Light" fontWeight="light" onPress={() => {}} />
-          <CustomButton title="Regular" fontWeight="regular" onPress={() => {}} />
+          <CustomButton
+            title="Regular"
+            fontWeight="regular"
+            onPress={() => {}}
+          />
           <CustomButton title="Bold" fontWeight="bold" onPress={() => {}} />
+        </View>
+      </Section>
+      <Section
+        title="largura do botão"
+        isOpen={open.fullWidth}
+        onToggle={() => toggle("fullWidth")}
+      >
+        <View style={styles.grid}>
+          <CustomButton
+            title="fullWidth={false}"
+            onPress={() => {}}
+            fullWidth={false}
+          />
+          <CustomButton title="*(normal)*" onPress={() => {}} />
+        </View>
+      </Section>
+      <Section
+        title="Botão desabilitado"
+        isOpen={open.disabled}
+        onToggle={() => toggle("disabled")}
+      >
+        <View style={styles.grid}>
+          <CustomButton
+            title="isDisabled"
+            onPress={() => {}}
+            isDisabled
+          />
+          <CustomButton title="*(normal)*" onPress={() => {}} />
         </View>
       </Section>
     </Section>
@@ -68,7 +101,6 @@ const styles = StyleSheet.create({
     gap: 10,
     justifyContent: "flex-start",
   },
-  
 });
 
 export default ButtonSection;
