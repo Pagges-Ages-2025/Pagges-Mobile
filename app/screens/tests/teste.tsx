@@ -5,13 +5,16 @@ import {
   ScrollView,
   Animated,
   TouchableOpacity,
-  GestureResponderEvent,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/app/context/ThemeContext";
 import ButtonSection from "./sections/buttonsSection";
-import CustomButton from "@/app/components/Buttons/CustomButton";
+import AnimationSection from "./sections/animationsSection";
+import SearchBarSection from "./sections/searchbarSection";
+import BooksSection from "./sections/booksSection";
+import CarouselSection from "./sections/carouselSection";
+import ColorsSection from "./sections/colorsSection";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -69,7 +72,12 @@ export default function TestsScreen() {
 
         {/* Seções */}
         <View style={styles.container}>
+          <ColorsSection />
           <ButtonSection />
+          <AnimationSection />
+          <SearchBarSection />
+          <BooksSection />
+          <CarouselSection />
         </View>
 
         {/* importar aqui o novo componente para poder testar */}

@@ -15,11 +15,12 @@ type ButtonType = "primary" | "outlined" | "secondary" | "outlinedSecondary";
 type ButtonSize = "small" | "medium" | "large";
 type FontWeight = "light" | "regular" | "semibold" | "bold";
 
-interface CustomButtonProps { // props: parametros que sao passados para os componentes para definir o comportamento/dados personalizados
+interface CustomButtonProps {
+  // props: parametros que sao passados para os componentes para definir o comportamento/dados personalizados
   type?: ButtonType;
   size?: ButtonSize;
   isDisabled?: boolean;
-  fullWidth?: boolean; 
+  fullWidth?: boolean;
   fontWeight?: FontWeight;
   title: string;
   onPress: (event: GestureResponderEvent) => void;
@@ -27,7 +28,8 @@ interface CustomButtonProps { // props: parametros que sao passados para os comp
   textStyle?: StyleProp<TextStyle>;
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({ //define como padrao
+const CustomButton: React.FC<CustomButtonProps> = ({
+  //define como padrao
   type = "primary",
   size = "medium",
   fontWeight = "regular",
@@ -35,11 +37,11 @@ const CustomButton: React.FC<CustomButtonProps> = ({ //define como padrao
   onPress,
   containerStyle,
   textStyle,
-  isDisabled = true,
-  fullWidth = true
+  isDisabled = false,
+  fullWidth = true,
 }) => {
   const { theme, themeName } = useTheme();
-  
+
   // Tipos de botão
   const isOutlined = type === "outlined"; //outlined = bordinha
   const isSecondary = type === "secondary"; //secondary = verde
@@ -62,7 +64,6 @@ const CustomButton: React.FC<CustomButtonProps> = ({ //define como padrao
       paddingHorizontal: 28,
       fontSize: 18,
     },
-
   }[size];
 
   // Fontes do botão
@@ -78,15 +79,15 @@ const CustomButton: React.FC<CustomButtonProps> = ({ //define como padrao
     backgroundColor: isOutlined
       ? "transparent"
       : isOutlinedSecondary
-      ? "transparent"
-      : isSecondary
-      ? theme.secondary
-      : theme.primary,
+        ? "transparent"
+        : isSecondary
+          ? theme.secondary
+          : theme.primary,
     borderColor: isOutlined
       ? theme.primary
       : isOutlinedSecondary
-      ? theme.secondary
-      : undefined,
+        ? theme.secondary
+        : undefined,
     borderWidth: isOutlined ? 2 : isOutlinedSecondary ? 2 : undefined,
     height: sizeStyles.height,
     paddingHorizontal: sizeStyles.paddingHorizontal,
@@ -98,10 +99,10 @@ const CustomButton: React.FC<CustomButtonProps> = ({ //define como padrao
         ? theme.primaryText
         : theme.primary
       : isOutlinedSecondary
-      ? themeName === "dark"
-        ? theme.primaryText
-        : theme.secondary
-      : "white",
+        ? themeName === "dark"
+          ? theme.primaryText
+          : theme.secondary
+        : "white",
     fontSize: sizeStyles.fontSize,
     fontWeight: fontWeightMap[fontWeight],
   };
@@ -113,12 +114,12 @@ const CustomButton: React.FC<CustomButtonProps> = ({ //define como padrao
         dynamicButtonStyle,
         containerStyle,
         {
-          width: fullWidth? "100%" : "30%"
-        }
+          width: fullWidth ? "100%" : "30%",
+          opacity: isDisabled ? 0.5 : 1,
+        },
       ]}
       onPress={onPress}
-      disabled= {isDisabled}
-      
+      disabled={isDisabled}
       activeOpacity={0.8}
     >
       <NunitoText style={[styles.baseText, dynamicTextStyle, textStyle]}>

@@ -50,7 +50,7 @@ const CustomBook: React.FC<CustomBookProps> = ({
 
   return (
     <TouchableOpacity
-      style={[styles.baseBook, containerStyle, sizeStyles]}
+      style={[styles.baseBook, containerStyle, sizeStyles, {backgroundColor: theme.placeholder}]}
       onPress={onPress}
       activeOpacity={0.8}
     >
@@ -61,7 +61,6 @@ const CustomBook: React.FC<CustomBookProps> = ({
 
 const styles = StyleSheet.create({
   baseBook: {
-    backgroundColor:"blue",
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
