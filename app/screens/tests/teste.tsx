@@ -10,6 +10,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/app/context/ThemeContext";
 import ButtonSection from "./sections/buttonsSection";
+import AnimationSection from "./sections/animationsSection";
+import SearchBarSection from "./sections/searchbarSection";
+import BooksSection from "./sections/booksSection";
+import CarouselSection from "./sections/carouselSection";
+import ColorsSection from "./sections/colorsSection";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -46,7 +51,10 @@ export default function TestsScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.Background }} edges={["top"]}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: theme.Background }}
+      edges={["top"]}
+    >
       <ScrollView contentContainerStyle={styles.scroll}>
         {/* Botão de troca de tema */}
         <View style={styles.themeToggleContainer}>
@@ -64,10 +72,16 @@ export default function TestsScreen() {
 
         {/* Seções */}
         <View style={styles.container}>
-        <ButtonSection />
+          <ColorsSection />
+          <ButtonSection />
+          <AnimationSection />
+          <SearchBarSection />
+          <BooksSection />
+          <CarouselSection />
         </View>
 
-
+        {/* importar aqui o novo componente para poder testar */}
+      
       </ScrollView>
     </SafeAreaView>
   );
