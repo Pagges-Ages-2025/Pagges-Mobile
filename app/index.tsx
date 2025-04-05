@@ -10,7 +10,7 @@ export default function Index() {
   useEffect(() => {
     if (fontsLoaded) {
       const timeout = setTimeout(() => {
-        router.replace("/screens/splash");
+        router.replace("/screens/splash"); //rota para mudar para a tela 'splash'
       }, 50);
 
       return () => clearTimeout(timeout);
@@ -19,7 +19,7 @@ export default function Index() {
 
   if (!fontsLoaded) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}> {/*View eh tipo uma div*/}
         <ActivityIndicator size="large" color="#9C0F5F" />
       </View>
     );

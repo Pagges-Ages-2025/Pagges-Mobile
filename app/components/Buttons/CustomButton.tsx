@@ -9,14 +9,18 @@ import {
 } from "react-native";
 import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
+//importa todo componente que for usar
 
-type ButtonType = "primary" | "outlined" | "secondary";
+type ButtonType = "primary" | "outlined" | "secondary" | "outlinedSecondary";
 type ButtonSize = "small" | "medium" | "large";
 type FontWeight = "light" | "regular" | "semibold" | "bold";
 
 interface CustomButtonProps {
+  // props: parametros que sao passados para os componentes para definir o comportamento/dados personalizados
   type?: ButtonType;
   size?: ButtonSize;
+  isDisabled?: boolean;
+  fullWidth?: boolean;
   fontWeight?: FontWeight;
   title: string;
   onPress: (event: GestureResponderEvent) => void;
@@ -25,6 +29,7 @@ interface CustomButtonProps {
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
+  //define como padrao
   type = "primary",
   size = "medium",
   fontWeight = "regular",
@@ -32,13 +37,15 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   onPress,
   containerStyle,
   textStyle,
+  isDisabled = false,
+  fullWidth = true,
 }) => {
   const { theme, themeName } = useTheme();
 
-
   // Tipos de botão
-  const isOutlined = type === "outlined";
-  const isSecondary = type === "secondary";
+  const isOutlined = type === "outlined"; //outlined = bordinha
+  const isSecondary = type === "secondary"; //secondary = verde
+  const isOutlinedSecondary = type === "outlinedSecondary"; // bordinha verde
 
   // Tamanho do Botão
   const sizeStyles = {
@@ -71,11 +78,17 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   const dynamicButtonStyle: ViewStyle = {
     backgroundColor: isOutlined
       ? "transparent"
-      : isSecondary
-      ? theme.secondary
-      : theme.primary,
-    borderColor: isOutlined ? theme.primary : undefined,
-    borderWidth: isOutlined ? 2 : undefined,
+      : isOutlinedSecondary
+        ? "transparent"
+        : isSecondary
+          ? theme.secondary
+          : theme.primary,
+    borderColor: isOutlined
+      ? theme.primary
+      : isOutlinedSecondary
+        ? theme.secondary
+        : undefined,
+    borderWidth: isOutlined ? 2 : isOutlinedSecondary ? 2 : undefined,
     height: sizeStyles.height,
     paddingHorizontal: sizeStyles.paddingHorizontal,
   };
@@ -85,16 +98,28 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       ? themeName === "dark"
         ? theme.primaryText
         : theme.primary
-      : "white",
+      : isOutlinedSecondary
+        ? themeName === "dark"
+          ? theme.primaryText
+          : theme.secondary
+        : "white",
     fontSize: sizeStyles.fontSize,
     fontWeight: fontWeightMap[fontWeight],
   };
-  
 
   return (
     <TouchableOpacity
-      style={[styles.baseButton, dynamicButtonStyle, containerStyle]}
+      style={[
+        styles.baseButton,
+        dynamicButtonStyle,
+        containerStyle,
+        {
+          width: fullWidth ? "100%" : "30%",
+          opacity: isDisabled ? 0.5 : 1,
+        },
+      ]}
       onPress={onPress}
+      disabled={isDisabled}
       activeOpacity={0.8}
     >
       <NunitoText style={[styles.baseText, dynamicTextStyle, textStyle]}>
@@ -109,7 +134,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
-    width: "100%",
   },
   baseText: {
     textAlign: "center",
