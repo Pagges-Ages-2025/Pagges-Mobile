@@ -9,6 +9,8 @@ import {
 import FavouriteGenreLabel from "../Labels/FavouriteGenreLabel";
 import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
+import VerifiedIcon from "../../assets/images/ic_verified.svg";
+import Strings from "@/app/constants/Strings";
 
 interface ProfileHeaderProps {
   marginStart: number;
@@ -16,6 +18,7 @@ interface ProfileHeaderProps {
   backgroundImageUrl: string;
   name: string;
   username: string;
+  isAuthor: boolean;
   genres: Array<{
     text: string;
     textColor: string;
@@ -32,6 +35,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   backgroundImageUrl,
   name,
   username,
+  isAuthor,
   genres,
 }) => {
   const { theme } = useTheme();
@@ -70,7 +74,19 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </View>
       </View>
       <View style={{ marginStart: marginStart }}>
-        <NunitoText style={[styles.name, dynamicTextStyle]}>{name}</NunitoText>
+        <View style={styles.nameContainer}>
+          <NunitoText style={[styles.name, dynamicTextStyle]}>
+            {name}
+          </NunitoText>
+          {isAuthor && (
+            <View style={styles.isAuthorContainer}>
+              <VerifiedIcon width={24} height={24} fill={theme.primary} />
+              <NunitoText style={[styles.isAuthorText, dynamicTextStyle]}>
+                {Strings.author}
+              </NunitoText>
+            </View>
+          )}
+        </View>
         <NunitoText style={[styles.username, dynamicTextStyle]}>
           {username}
         </NunitoText>
@@ -110,8 +126,23 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 400,
   },
+  nameContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
   genreLabel: {
     marginEnd: 8,
+  },
+  isAuthorContainer: {
+    marginLeft: 8,
+    marginTop: 4,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  isAuthorText: {
+    fontSize: 12,
+    fontWeight: 400,
   },
 });
 
