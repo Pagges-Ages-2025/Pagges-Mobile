@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View, StyleSheet } from "react-native";
 import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
-import { Theme } from "@/app/constants/Theme"; 
+import { Theme } from "@/app/constants/Theme";
 
 interface UserStatsProps {
   kmLidos: number;
@@ -15,24 +15,21 @@ const UserStats: React.FC<UserStatsProps> = ({ kmLidos, livros, ranking, amigos 
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
+  const stats = [
+    { label: "km lidos", value: kmLidos },
+    { label: "livros", value: livros },
+    { label: "ranking", value: ranking },
+    { label: "amigos", value: amigos },
+  ];
+
   return (
     <View style={styles.container}>
-      <View style={styles.statContainer}>
-        <NunitoText style={styles.value}>{kmLidos}</NunitoText>
-        <Text style={styles.label}>km lidos</Text>
-      </View>
-      <View style={styles.statContainer}>
-        <NunitoText style={styles.value}>{livros}</NunitoText>
-        <Text style={styles.label}>livros</Text>
-      </View>
-      <View style={styles.statContainer}>
-        <NunitoText style={styles.value}>{ranking}</NunitoText>
-        <Text style={styles.label}>ranking</Text>
-      </View>
-      <View style={styles.statContainer}>
-        <NunitoText style={styles.value}>{amigos}</NunitoText>
-        <Text style={styles.label}>amigos</Text>
-      </View>
+      {stats.map((stat, index) => (
+        <View key={index} style={styles.statContainer}>
+          <NunitoText style={styles.value}>{stat.value}</NunitoText>
+          <Text style={styles.label}>{stat.label}</Text>
+        </View>
+      ))}
     </View>
   );
 };
