@@ -5,8 +5,7 @@ import { useTheme } from "../../context/ThemeContext";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import Feather from '@expo/vector-icons/Feather';
-
-const profile = require("../../../assets/images/profile.png");
+import profile from "../../assets/images/profile.png";
 
 type Props = TextInputProps & {
   comment?: boolean
@@ -28,6 +27,7 @@ export const ReviewComment = forwardRef((props: CombinedProps) => {
   const { comment, byAuthor, fullNamePostAuthor, datePost, text, photoPostAuthor, likesNumber, commentsNumber, repostNumber } = props;
   const { theme } = useTheme();
   const photo = photoPostAuthor ? { uri: photoPostAuthor } : profile;
+  // const photo = photoPostAuthor ? { uri: photoPostAuthor } : {{uri:photoPath}};
   const textValue = comment && text.length > 100 ? text.substring(0, 100) : text
   const likesNumberValue = likesNumber || 1200;
   const commentsNumberValue = commentsNumber || 34;

@@ -24,7 +24,7 @@ const CustomCarousel: React.FC<CarouselProps> = ({ data, isHorizontal }) => {
   };
 
   return (
-    <View>
+    <View style={{paddingLeft: 18}}>
       <FlatList
         ref={flatListRef}
         data={data}

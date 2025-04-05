@@ -1,14 +1,19 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { View, StyleSheet, Text, ImageBackground, TouchableOpacity } from "react-native";
-import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { View, StyleSheet, Text, ImageBackground, TouchableOpacity} from "react-native";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
-import BookCover from "../../assets/images/book-cover.png";
+import BookCover from "../assets/images/book-cover.png";
 import NunitoText from "../components/Texts/NunitoText";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme } from "../context/ThemeContext";
-import { ReviewComment } from "../components/reviews-comments/review-comment";
 import CustomButton from "../components/Buttons/CustomButton";
+import BottomSheet, { BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
+import CustomCarousel from "../components/Carousel/CustomCarousel";
+import CustomBook from "../components/Book/CustomBook";
+import { ReviewComment } from "../components/review-comments/review-comments";
+import { Modal, Pressable } from 'react-native';
+import CustomModal from "../components/review-comments/pop-up-modal";
+
 
 interface BookPageProps {
   rating: number;
@@ -18,21 +23,22 @@ interface BookPageProps {
   rankingNumber: string;
 }
 
-//vi que padrão default é o dark então considerei os designs escolhidos como do dark
-// coisas a fazer:
-// 1. melhorar o tempo de carregamento do titulo do bottom sheet pq tem um delay grande
-
 export default function BookPage({ rating, name, readersNumber, pagesNumber, rankingNumber }: BookPageProps) {
-  const { theme } = useTheme();
-  const ratingValue = rating || 3.3;
-  const nameValue = name || "Memórias da Meia-Noite";
-  const readersNumberValue = readersNumber || 1.201;
-  const pagesNumberValue = pagesNumber || 201;
-  const rankingNumberValue = rankingNumber || "1";
+  const { theme } = useTheme()
+  const ratingValue = rating || 3.5
+  const nameValue = name || "Memórias da Meia-Noite"
+  const readersNumberValue = readersNumber || 1.201
+  const pagesNumberValue = pagesNumber || 201
+  const rankingNumberValue = rankingNumber || "1"
   const synopsis = "Catherine começa a ter vislumbres do passado, flashes de memórias fragmentadas que desafiam a névoa imposta sobre sua mente. Aos poucos, os rostos de Larry Douglas e Noelle Page ressurgem em sua consciência, assim como a sensação de perigo e traição que a assombra mesmo sem compreender completamente o motivo. No convento isolado onde vive, as freiras percebem sua inquietação crescente. O instinto de sobrevivência de Catherine a impulsiona a buscar respostas, e um dia, ao encontrar uma notícia antiga em um jornal amarelado deixado na biblioteca do convento, um nome chama sua atenção: Constantin Demiris. Embora não consiga lembrar de tudo, a simples leitura daquele nome desperta nela uma sensação de medo e repulsa inexplicáveis."
   const review = "O Homem de Giz, de C.J. Tudor, é um thriller psicológico envolvente que mistura passado e presente para revelar um mistério sombrio e perturbador. Com uma narrativa que lembra os clássicos de Stephen King, o livro nos transporta para a infância de Eddie Adams, um garoto de 12 anos que, junto com seus amigos, vive em uma pequena cidade inglesa. Eles criam um código secreto usando desenhos de bonecos de giz para se comunicarem, mas o jogo inocente se torna um pesadelo quando encontram um corpo mutilado na floresta. Trinta anos depois, Eddie tenta esquecer os traumas do passado, até que recebe um envelope contendo um desenho idêntico aos de sua infância. Logo, eventos estranhos começam a acontecer, e antigos segredos vêm à tona. A história é contada em capítulos alternados entre 1986 e 2016, criando uma atmosfera de mistério e tensão constante."
-  const [isMaximized, setIsMaximized] = useState(false);
-  const [showMoreText, setShowMoreText] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false)
+  const [showMoreText, setShowMoreText] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [currentRating, setCurrentRating] = useState(ratingValue)
+  const [ratingCount, setRatingCount] = useState(1)
+
+
   const bottomSheetRef = useRef<BottomSheet>(null);
   const roundedStars = Math.round(ratingValue)
   const snapPoints = useMemo(() => ["62%", "85%"], []);
@@ -59,7 +65,7 @@ export default function BookPage({ rating, name, readersNumber, pagesNumber, ran
   const bookStats = [
     { value: readersNumberValue, label: "Leitores" },
     { value: pagesNumberValue, label: "Páginas" },
-    { value: ratingValue, label: "Avaliação" },
+    { value: currentRating.toFixed(1), label: "Avaliação" },
     { value: `#${rankingNumberValue}`, label: "Ranking" },
   ];
 
@@ -69,9 +75,20 @@ export default function BookPage({ rating, name, readersNumber, pagesNumber, ran
     { label: "Quero ler", onPress: () => {/*lLógica futura */} },
   ];
 
+  const handleNewRating = (newRating: number) => {
+    const total = currentRating * ratingCount;
+    const updatedCount = ratingCount + 1;
+    const newAverage = (total + newRating) / updatedCount;
+  
+    setCurrentRating(newAverage);
+    setRatingCount(updatedCount);
+  };
+  
+
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground source={BookCover} style={styles.backgroundImage}>
+      {/* <ImageBackground source={{uri:photoPath}} style={styles.backgroundImage}> */}
       <View style={styles.overlay} />
 
       {/* Conteúdo escrito */}
@@ -91,7 +108,7 @@ export default function BookPage({ rating, name, readersNumber, pagesNumber, ran
               <View style={{flex: 1}} />
               <TouchableOpacity
                 onPress={() => {
-                  // Lógica para sair do livro
+                  // Lógica
                 }}
                 style={{
                   borderRadius: 15,
@@ -118,12 +135,39 @@ export default function BookPage({ rating, name, readersNumber, pagesNumber, ran
             <NunitoText style={[styles.gender, {color: theme.quinaryText}]}>Fantasia</NunitoText>
           </View>
 
-        <View style={styles.starsContainer}>
-          {Array.from({ length: 5 }).map((_, index) => (
-            <AntDesign key={index} name={index < roundedStars? "star" : "staro"} size={20} color={index < roundedStars ? theme.starColor : theme.quinaryText} /> 
-          ))}
-        </View>
+        <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
+          <View style={styles.starsContainer}>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <AntDesign key={index} name={index < roundedStars? "star" : "staro"} size={20} color={index < roundedStars ? theme.starColor : theme.quinaryText} /> 
+            ))}
+          </View>
+          <TouchableOpacity
+            onPress={() => setModalVisible(true)}
+            style={{
+              borderRadius: 15,
+              backgroundColor: theme.quinaryText,
+              width: "35%",
+              height: 20,
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "row",
+              marginRight: 10
+            }}
+            >
+              <NunitoText style={{ fontSize: 15, fontWeight: "bold", color: theme.quaternaryText }}>
+        Criar Resenha
+              </NunitoText>
+            </TouchableOpacity>
 
+            <CustomModal
+              visible={modalVisible}
+              onClose={() => setModalVisible(false)}
+              content="Avalie o livro"
+              nameBook={nameValue}
+              onRate={handleNewRating}
+            />
+
+        </View>
       </View>
 
       {/* bottom sheet */}
@@ -215,9 +259,20 @@ export default function BookPage({ rating, name, readersNumber, pagesNumber, ran
                       Acessar mais
                     </Text>
                   </TouchableOpacity>
-              </View>
+              </View> 
 
-              <View style={{marginBottom: 500}}></View> 
+
+              <View style={{marginBottom: 30}}></View>
+
+              <NunitoText style={[styles.secondTitle, {paddingBottom: 15}]}>Livros do mesmo autor</NunitoText>
+              <CustomCarousel isHorizontal data={[<CustomBook photoPath={"https://static.wixstatic.com/media/31a549_7dffb191bffa440686e5a148b8e042d9~mv2.jpg/v1/fill/w_480,h_768,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/31a549_7dffb191bffa440686e5a148b8e042d9~mv2.jpg"} />, <CustomBook photoPath={"https://f.i.uol.com.br/fotografia/2023/04/13/16813903606437fb18c8902_1681390360_1x1_md.jpg"} />, <CustomBook photoPath={"https://ocapista.com.br/imgs/capas/capa_livro_fantasia.jpg"} />]}              />
+
+              <View style={{marginBottom: 15}}></View>
+
+              <NunitoText style={[styles.secondTitle, {paddingBottom: 15}]}>Livros semelhantes</NunitoText>
+              <CustomCarousel isHorizontal data={[<CustomBook photoPath={"https://static.wixstatic.com/media/31a549_7dffb191bffa440686e5a148b8e042d9~mv2.jpg/v1/fill/w_480,h_768,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/31a549_7dffb191bffa440686e5a148b8e042d9~mv2.jpg"} />, <CustomBook photoPath={"https://f.i.uol.com.br/fotografia/2023/04/13/16813903606437fb18c8902_1681390360_1x1_md.jpg"} />, <CustomBook photoPath={"https://ocapista.com.br/imgs/capas/capa_livro_fantasia.jpg"} />]}              />
+
+              <View style={{marginBottom: 500}}></View>
 
               </ScrollView>
             </BottomSheetScrollView>
@@ -272,6 +327,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
+    paddingRight: 5,
   },
   bookContentContainer: {
     position: "absolute",
