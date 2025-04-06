@@ -1,24 +1,30 @@
 import React from "react";
-import { TouchableOpacity} from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 
 type Color = 'primary' | 'secondary';
 
-export default function EditProfileButton(props: {color?: Color, size?: number}){
-    const { theme } = useTheme()
+interface EditProfileButtonProps {
+  color?: Color;
+  size?: number;
+  onPress?: () => void;
+}
 
-    function onPress(){
-        console.log("Edit Profile Button Pressed")
-    } 
-    
-    return(
-        <TouchableOpacity onPress={onPress}>
-           <MaterialCommunityIcons
-                name="square-edit-outline"
-                size={props.size ? props.size : 40 }
-                color= {props.color == 'secondary' ? theme.secondary  : theme.primary}
-              />
-        </TouchableOpacity>
-    )
+export default function EditProfileButton({
+  color = 'primary',
+  size = 40,
+  onPress,
+}: EditProfileButtonProps) {
+  const { theme } = useTheme();
+
+  return (
+    <TouchableOpacity onPress={onPress}>
+      <MaterialCommunityIcons
+        name="square-edit-outline"
+        size={size}
+        color={color === 'secondary' ? theme.secondary : theme.primary}
+      />
+    </TouchableOpacity>
+  );
 }
