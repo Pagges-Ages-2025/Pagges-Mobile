@@ -18,6 +18,9 @@ export type Theme = {
   secondaryTransparent: string;
   primaryTransparent: string;
   iconColorSecondary: string;
+  spoilerOverlay: string;
+  postCardBackground: string;
+  spoilerText: string;
 };
 
 
@@ -41,7 +44,10 @@ export const themes: Record<'light' | 'dark', Theme> = {
     iconColor: "#9D0F54",          
     iconColorSecondary: "#064A4A",
     secondaryTransparent: "#064A4A80",
-    primaryTransparent: "#9D0F5480"
+    primaryTransparent: "#9D0F5480",
+    spoilerOverlay: "#000000E6",
+    postCardBackground:"#ECECEC",
+    spoilerText: "#FFFFFF",
   },
   dark: {
     Background: "#0F0F0F",
@@ -63,6 +69,9 @@ export const themes: Record<'light' | 'dark', Theme> = {
     iconColorSecondary: "#064A4A",
     secondaryTransparent: "#064A4A80",
     primaryTransparent: "#9D0F5480",
+    spoilerOverlay: "#5C5757DE",
+    postCardBackground:"#2F2B2B",
+    spoilerText: "#FFFFFF"
   }
   
 };
