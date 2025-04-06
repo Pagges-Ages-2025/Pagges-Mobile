@@ -27,32 +27,31 @@ const Biography: React.FC<BiographyProps> = ({ biographyText }) => {
 
   return (
     <View style={styles.container}>
-      {editing ? (
-        <>
-          <View style={styles.header}>
-            <NunitoText style={styles.title}>Biografia</NunitoText>
-          </View>
-          <TextInput
-            style={styles.input}
-            multiline
-            value={bioText}
-            onChangeText={setBioText}
-            maxLength={250}
-          />
-          <TouchableOpacity onPress={saveBiography} style={styles.saveButton}>
-            <NunitoText style={styles.saveText}>Salvar</NunitoText>
+      <View style={styles.header}>
+        <NunitoText style={styles.title}>Biografia</NunitoText>
+        {editing ? (
+          <TouchableOpacity onPress={saveBiography}>
+            <Feather name="check" size={20} color={theme.secondaryText} />
           </TouchableOpacity>
-        </>
+        ) : (
+          <TouchableOpacity onPress={() => setEditing(true)}>
+            <Feather name="edit" size={18} color={theme.secondaryText} />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {editing ? (
+        <TextInput
+          style={styles.input}
+          multiline
+          value={bioText}
+          onChangeText={setBioText}
+          maxLength={250}
+          placeholder="Escreva sua biografia..."
+          placeholderTextColor={theme.secondaryText}
+        />
       ) : (
-        <>
-          <View style={styles.header}>
-            <NunitoText style={styles.title}>Biografia</NunitoText>
-            <TouchableOpacity onPress={() => setEditing(true)}>
-              <Feather name="edit" size={20} color={theme.secondaryText} />
-            </TouchableOpacity>
-          </View>
-          <NunitoText style={styles.bio}>{bioText}</NunitoText>
-        </>
+        <NunitoText style={styles.bio}>{bioText}</NunitoText>
       )}
     </View>
   );
@@ -61,7 +60,7 @@ const Biography: React.FC<BiographyProps> = ({ biographyText }) => {
 const getStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
-      padding: 16,
+      padding: 0,
     },
     header: {
       flexDirection: "row",
@@ -71,11 +70,10 @@ const getStyles = (theme: Theme) =>
     },
     title: {
       fontSize: 18,
-      fontWeight: "bold",
       color: theme.secondaryText,
     },
     bio: {
-      fontSize: 16,
+      fontSize: 15,
       color: theme.secondaryText,
       lineHeight: 22,
       textAlign: "justify",
@@ -86,20 +84,10 @@ const getStyles = (theme: Theme) =>
       borderRadius: 8,
       padding: 8,
       minHeight: 80,
-      fontSize: 16,
+      fontSize: 15,
       color: theme.secondaryText,
-    },
-    saveButton: {
-      marginTop: 8,
-      alignSelf: "flex-end",
-      backgroundColor: theme.secondaryText,
-      paddingVertical: 6,
-      paddingHorizontal: 12,
-      borderRadius: 6,
-    },
-    saveText: {
-      color: "#fff",
-      fontWeight: "bold",
+      textAlignVertical: "top", // garante que o texto fique no topo
+      fontFamily: "Nunito-Regular", // <- garanta que essa fonte está carregada no projeto
     },
   });
 
