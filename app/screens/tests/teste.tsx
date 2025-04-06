@@ -16,7 +16,6 @@ import SearchBarSection from "./sections/searchbarSection";
 import BooksSection from "./sections/booksSection";
 import CarouselSection from "./sections/carouselSection";
 import ColorsSection from "./sections/colorsSection";
-import Biography from "@/app/components/Biography/Biography";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -82,9 +81,7 @@ export default function TestsScreen() {
           <CarouselSection />
         </View>
 
-        <View style={styles.container}>
-        <Biography biographyText="Escritora e apaixonada por literatura desde a infância. Nascida em São Paulo, começou a escrever seus primeiros contos aos 12 anos e, aos 25, publicou seu primeiro romance." />
-        </View>
+        {/* importar aqui o novo componente para poder testar */}
       
       </ScrollView>
     </SafeAreaView>

@@ -20,8 +20,19 @@ const Biography: React.FC<BiographyProps> = ({ biographyText }) => {
 
   const [editing, setEditing] = useState(false);
   const [bioText, setBioText] = useState(biographyText);
+  const [originalBio, setOriginalBio] = useState(biographyText); // novo estado
+
+  const startEditing = () => {
+    setOriginalBio(bioText); // salva o texto antes da edição
+    setEditing(true);
+  };
 
   const saveBiography = () => {
+    setEditing(false);
+  };
+
+  const cancelEditing = () => {
+    setBioText(originalBio); // desfaz alterações
     setEditing(false);
   };
 
@@ -30,9 +41,14 @@ const Biography: React.FC<BiographyProps> = ({ biographyText }) => {
       <View style={styles.header}>
         <NunitoText style={styles.title}>Biografia</NunitoText>
         {editing ? (
-          <TouchableOpacity onPress={saveBiography}>
-            <Feather name="check" size={20} color={theme.secondaryText} />
-          </TouchableOpacity>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity onPress={cancelEditing}>
+              <Feather name="x" size={20} color={theme.secondaryText} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={saveBiography}>
+              <Feather name="check" size={20} color={theme.secondaryText} />
+            </TouchableOpacity>
+          </View>
         ) : (
           <TouchableOpacity onPress={() => setEditing(true)}>
             <Feather name="edit" size={18} color={theme.secondaryText} />
@@ -88,6 +104,10 @@ const getStyles = (theme: Theme) =>
       color: theme.secondaryText,
       textAlignVertical: "top", // garante que o texto fique no topo
       fontFamily: "Nunito-Regular", // <- garanta que essa fonte está carregada no projeto
+    },
+    actionButtons: {
+      flexDirection: "row",
+      columnGap: 10,
     },
   });
 
