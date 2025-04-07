@@ -10,7 +10,7 @@ export default function Index() {
   useEffect(() => {
     if (fontsLoaded) {
       const timeout = setTimeout(() => {
-        router.replace("/screens/book");
+        router.replace("/screens/searchPage");
       }, 50);
 
       return () => clearTimeout(timeout);
