@@ -1,8 +1,11 @@
 export type Theme = {
   Background: string;
+  starColor: string;
   primaryText: string;
   secondaryText: string;
   tertiaryText: string;
+  quaternaryText: string;
+  quinaryText: string 
   primary:string;
   secondary:string;
   tertiary:string;
@@ -27,9 +30,12 @@ export type Theme = {
 export const themes: Record<'light' | 'dark', Theme> = {
   light: {
     Background: "#FFFFFF",
+    starColor: "#F4D06F",
     primaryText: "#000000",
     secondaryText:"#474545",
     tertiaryText:"#9D0F54",
+    quaternaryText: '#FFFFFF',
+    quinaryText: '#000000',
     primary:"#9D0F54",
     secondary:"#064A4A",
     tertiary:"#FF8811",
@@ -51,9 +57,12 @@ export const themes: Record<'light' | 'dark', Theme> = {
   },
   dark: {
     Background: "#0F0F0F",
+    starColor: "#F4D06F",
     primaryText: "#FFFFFF",
     secondaryText: "#B3B3B3",
     tertiaryText: "#9D0F54",
+    quaternaryText: '#000000', //preto
+    quinaryText: '#FFFFFF', //branco
     primary: "#9D0F54",
     secondary: "#064A4A",
     tertiary: "#FF8811",

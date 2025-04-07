@@ -10,7 +10,7 @@ export default function Index() {
   useEffect(() => {
     if (fontsLoaded) {
       const timeout = setTimeout(() => {
-        router.replace("/screens/splash"); //rota para mudar para a tela 'splash'
+        router.replace("/screens/book");
       }, 50);
 
       return () => clearTimeout(timeout);
