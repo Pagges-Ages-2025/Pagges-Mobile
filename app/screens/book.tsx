@@ -5,6 +5,7 @@ import {
   Text,
   ImageBackground,
   TouchableOpacity,
+  GestureResponderEvent,
 } from "react-native";
 import {
   GestureHandlerRootView,
@@ -327,31 +328,14 @@ export default function BookPage({
 
                 <View style={styles.statusBookContainer}>
                   {bookActions.map((action, index) => (
-                    <TouchableOpacity
+                    <CustomButton
                       key={index}
-                      onPress={action.onPress}
-                      style={{
-                        borderRadius: 15,
-                        backgroundColor: theme.primary,
-                        width: "25%",
-                        height: 23,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexDirection: "row",
-                        marginRight: 8,
-                        marginLeft: 8,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          fontWeight: "bold",
-                          color: theme.quinaryText,
-                        }}
-                      >
-                        {action.label}
-                      </Text>
-                    </TouchableOpacity>
+                      title={action.label}
+                      onPress={() => {}}
+                      fullWidth={false}
+                      width={140}
+                      height={30}
+                    />
                   ))}
                 </View>
 
@@ -618,10 +602,12 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   statusBookContainer: {
+    gap:10,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 30,
     paddingBottom: 20,
+    transform: "scale(0.8)"
   },
 });

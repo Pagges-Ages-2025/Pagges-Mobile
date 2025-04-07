@@ -52,18 +52,18 @@ export const ReviewComment = forwardRef((props: CombinedProps) => {
     if (!datePost || typeof datePost !== "string" || !datePost.includes("/")) {
       return "Data inválida";
     }
-  
+
     const formattedDate = convertDateFormat(datePost);
     const currentDate = new Date();
     const postDate = new Date(formattedDate);
-  
+
     if (isNaN(postDate.getTime())) {
       return "Data inválida";
     }
-  
+
     const timeDifference = currentDate.getTime() - postDate.getTime();
     const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
-  
+
     if (daysDifference < 7) {
       return `${daysDifference}d`;
     } else if (daysDifference < 30) {
@@ -77,7 +77,6 @@ export const ReviewComment = forwardRef((props: CombinedProps) => {
       return `${years}a`;
     }
   };
-  
 
   return (
     <View style={styles.container}>

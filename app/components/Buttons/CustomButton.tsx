@@ -9,14 +9,13 @@ import {
 } from "react-native";
 import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
-//importa todo componente que for usar
 
+// Tipos de variações do botão
 type ButtonType = "primary" | "outlined" | "secondary" | "outlinedSecondary";
 type ButtonSize = "small" | "medium" | "large";
 type FontWeight = "light" | "regular" | "semibold" | "bold";
 
 interface CustomButtonProps {
-  // props: parametros que sao passados para os componentes para definir o comportamento/dados personalizados
   type?: ButtonType;
   size?: ButtonSize;
   isDisabled?: boolean;
@@ -26,10 +25,15 @@ interface CustomButtonProps {
   onPress: (event: GestureResponderEvent) => void;
   containerStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
+  /**
+   * ✅ Propriedades opcionais que permitem definir
+   *    a largura e a altura do botão manualmente.
+   */
+  width?: number | string;
+  height?: number;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
-  //define como padrao
   type = "primary",
   size = "medium",
   fontWeight = "regular",
@@ -39,15 +43,17 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   textStyle,
   isDisabled = false,
   fullWidth = true,
+  width,
+  height,
 }) => {
   const { theme, themeName } = useTheme();
 
-  // Tipos de botão
-  const isOutlined = type === "outlined"; //outlined = bordinha
-  const isSecondary = type === "secondary"; //secondary = verde
-  const isOutlinedSecondary = type === "outlinedSecondary"; // bordinha verde
+  // Verifica o tipo do botão
+  const isOutlined = type === "outlined";
+  const isSecondary = type === "secondary";
+  const isOutlinedSecondary = type === "outlinedSecondary";
 
-  // Tamanho do Botão
+  // Define estilos para cada tamanho
   const sizeStyles = {
     small: {
       height: 40,
@@ -66,7 +72,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     },
   }[size];
 
-  // Fontes do botão
+  // Mapeia o fontWeight para valores de fontWeight do React Native
   const fontWeightMap: Record<FontWeight, TextStyle["fontWeight"]> = {
     light: "300",
     regular: "500",
@@ -74,35 +80,40 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     bold: "900",
   };
 
-  // Estilos dinâmicos do botão
+  // Estilo dinâmico do botão
   const dynamicButtonStyle: ViewStyle = {
     backgroundColor: isOutlined
       ? "transparent"
       : isOutlinedSecondary
-        ? "transparent"
-        : isSecondary
-          ? theme.secondary
-          : theme.primary,
+      ? "transparent"
+      : isSecondary
+      ? theme.secondary
+      : theme.primary,
     borderColor: isOutlined
       ? theme.primary
       : isOutlinedSecondary
-        ? theme.secondary
-        : undefined,
-    borderWidth: isOutlined ? 2 : isOutlinedSecondary ? 2 : undefined,
-    height: sizeStyles.height,
+      ? theme.secondary
+      : undefined,
+    borderWidth: isOutlined || isOutlinedSecondary ? 2 : undefined,
+    /**
+     * ✅ Se 'height' não for fornecido, usa a altura definida
+     *    pela prop 'size'. Caso contrário, substitui pela prop 'height'.
+     */
+    height: height ?? sizeStyles.height,
     paddingHorizontal: sizeStyles.paddingHorizontal,
   };
 
+  // Estilo dinâmico do texto
   const dynamicTextStyle: TextStyle = {
     color: isOutlined
       ? themeName === "dark"
         ? theme.primaryText
         : theme.primary
       : isOutlinedSecondary
-        ? themeName === "dark"
-          ? theme.primaryText
-          : theme.secondary
-        : "white",
+      ? themeName === "dark"
+        ? theme.primaryText
+        : theme.secondary
+      : "white",
     fontSize: sizeStyles.fontSize,
     fontWeight: fontWeightMap[fontWeight],
   };
@@ -114,7 +125,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         dynamicButtonStyle,
         containerStyle,
         {
-          width: fullWidth ? "100%" : "30%",
+          width: width ?? (fullWidth ? "100%" : "30%"),
           opacity: isDisabled ? 0.5 : 1,
         },
       ]}
