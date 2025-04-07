@@ -79,7 +79,7 @@ export default function BookPage({
   );
 
   const BottomSheetHandle = () => (
-    <View style={styles.handleContainer}>
+    <View style={[styles.handleContainer, { backgroundColor: theme.quaternaryText }]}>
       <View style={styles.handle} />
     </View>
   );
@@ -171,7 +171,7 @@ export default function BookPage({
               <Ionicons
                 name="return-up-back-outline"
                 size={30}
-                color={theme.quinaryText}
+                color={theme.white}
               />
               <View style={{ flex: 1 }} />
               <TouchableOpacity
@@ -193,19 +193,19 @@ export default function BookPage({
                   style={{
                     fontSize: 15,
                     fontWeight: "bold",
-                    color: theme.quinaryText,
+                    color: theme.white,
                   }}
                 >
                   Criar Resenha
                 </NunitoText>
               </TouchableOpacity>
-              <AntDesign name="export" size={24} color={theme.quinaryText} />
+              <AntDesign name="export" size={24} color={theme.white} />
             </View>
           )}
-          <NunitoText style={[styles.title, { color: theme.quinaryText }]}>
+          <NunitoText style={[styles.title, { color: theme.white }]}>
             Memórias da Meia-Noite
           </NunitoText>
-          <NunitoText style={[styles.subtitle, { color: theme.quinaryText }]}>
+          <NunitoText style={[styles.subtitle, { color: theme.white }]}>
             Julia Polastrie
           </NunitoText>
           <View
@@ -215,15 +215,15 @@ export default function BookPage({
               marginBottom: 8,
             }}
           >
-            <NunitoText style={[styles.date, { color: theme.quinaryText }]}>
+            <NunitoText style={[styles.date, { color: theme.white }]}>
               26 de junho, 1997
             </NunitoText>
             <NunitoText
-              style={{ color: theme.quinaryText, paddingHorizontal: 10 }}
+              style={{ color: theme.white, paddingHorizontal: 10 }}
             >
               -
             </NunitoText>
-            <NunitoText style={[styles.gender, { color: theme.quinaryText }]}>
+            <NunitoText style={[styles.gender, { color: theme.white }]}>
               Fantasia
             </NunitoText>
           </View>
@@ -267,7 +267,7 @@ export default function BookPage({
                   color: theme.quaternaryText,
                 }}
               >
-                Criar Resenha
+                Avaliar
               </NunitoText>
             </TouchableOpacity>
 
@@ -292,9 +292,10 @@ export default function BookPage({
             enableOverDrag={false}
             handleComponent={BottomSheetHandle}
             enableContentPanningGesture={false}
+            style={{ backgroundColor: "black" }}
           >
             {/* conteúdo do bottom sheet */}
-            <BottomSheetScrollView>
+            <BottomSheetScrollView style={{backgroundColor: theme.quaternaryText}}>
               <ScrollView>
                 <View style={styles.bookNumbersContainer}>
                   {bookStats.map((stat, index) => (
@@ -309,7 +310,7 @@ export default function BookPage({
                       <NunitoText
                         style={[
                           styles.bookNumbers,
-                          { color: theme.quaternaryText },
+                          { color: theme.quinaryText },
                         ]}
                       >
                         {stat.value}
@@ -317,7 +318,7 @@ export default function BookPage({
                       <NunitoText
                         style={[
                           styles.bookNumbersTitle,
-                          { color: theme.quaternaryText },
+                          { color: theme.quinaryText },
                         ]}
                       >
                         {stat.label}
@@ -343,7 +344,7 @@ export default function BookPage({
                   <NunitoText
                     style={[
                       styles.secondTitle,
-                      { color: theme.quaternaryText },
+                      { color: theme.quinaryText },
                     ]}
                   >
                     Sinopse
@@ -351,7 +352,7 @@ export default function BookPage({
                   <NunitoText
                     style={[
                       styles.synopsisText,
-                      { color: theme.quaternaryText },
+                      { color: theme.quinaryText },
                     ]}
                   >
                     {showMoreText
@@ -366,7 +367,7 @@ export default function BookPage({
                     <Text
                       style={[
                         styles.showMoreAndLess,
-                        { color: theme.quaternaryText },
+                        { color: theme.quinaryText },
                       ]}
                     >
                       {showMoreText ? "Mostrar menos" : "Mostrar mais"}
@@ -378,7 +379,7 @@ export default function BookPage({
                   style={{ alignItems: "flex-start", justifyContent: "center" }}
                 >
                   <NunitoText
-                    style={[styles.secondTitle, { paddingBottom: 25 }]}
+                    style={[styles.secondTitle, { paddingBottom: 25, color: theme.quinaryText }]}
                   >
                     Principais Resenhas e Comentários
                   </NunitoText>
@@ -416,7 +417,7 @@ export default function BookPage({
                       borderRadius: 30,
                     }}
                   >
-                    <Text style={{ color: theme.quinaryText }}>
+                    <Text style={{ color: theme.white }}>
                       Acessar mais
                     </Text>
                   </TouchableOpacity>
@@ -424,7 +425,7 @@ export default function BookPage({
 
                 <View style={{ marginBottom: 30 }}></View>
 
-                <NunitoText style={[styles.secondTitle, { paddingBottom: 15 }]}>
+                <NunitoText style={[styles.secondTitle, { paddingBottom: 15, color: theme.quinaryText }]}>
                   Livros do mesmo autor
                 </NunitoText>
                 <CustomCarousel
@@ -450,7 +451,7 @@ export default function BookPage({
 
                 <View style={{ marginBottom: 15 }}></View>
 
-                <NunitoText style={[styles.secondTitle, { paddingBottom: 15 }]}>
+                <NunitoText style={[styles.secondTitle, { paddingBottom: 15, color: theme.quinaryText }]}>
                   Livros semelhantes
                 </NunitoText>
                 <CustomCarousel

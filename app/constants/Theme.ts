@@ -1,4 +1,8 @@
 export type Theme = {
+  white: string;
+  black: string;
+  authorBackground: string;
+  textColorReview: string;
   Background: string;
   starColor: string;
   primaryText: string;
@@ -29,6 +33,10 @@ export type Theme = {
 
 export const themes: Record<'light' | 'dark', Theme> = {
   light: {
+    white: '#FFFFFF',
+    black: '#FFFFFF',
+    authorBackground: '#rgba(156, 15, 83, 0.07)',
+    textColorReview: '#808080',
     Background: "#FFFFFF",
     starColor: "#F4D06F",
     primaryText: "#000000",
@@ -56,6 +64,10 @@ export const themes: Record<'light' | 'dark', Theme> = {
     spoilerText: "#FFFFFF",
   },
   dark: {
+    white: '#FFFFFF',
+    black: '#FFFFFF',
+    authorBackground: '#rgba(255, 255, 255, 0.07)',
+    textColorReview: '#D3D3D3',
     Background: "#0F0F0F",
     starColor: "#F4D06F",
     primaryText: "#FFFFFF",

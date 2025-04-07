@@ -46,7 +46,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
               <EvilIcons name="close" size={22} color="gray" />
             </Pressable>
           </View>
-          <NunitoText style={styles.titleBook}>{nameBook}</NunitoText>
+          <NunitoText style={[styles.titleBook, {color: theme.white}]}>{nameBook}</NunitoText>
 
           <View style={styles.starsContainer}>
             {Array.from({ length: 5 }).map((_, index) => {
