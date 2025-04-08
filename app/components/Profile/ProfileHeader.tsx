@@ -6,24 +6,17 @@ import {
   ImageBackground,
   TextStyle,
 } from "react-native";
-import FavouriteGenreLabel from "../Labels/FavouriteGenreLabel";
 import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
 import VerifiedIcon from "../../assets/images/ic_verified.svg";
 import Strings from "@/app/constants/Strings";
+import DefaultProfileHeaderImage from "../../assets/images/default_profile_header_image.png";
 
 interface ProfileHeaderProps {
   marginStart: number;
   profileImageUrl: string;
-  backgroundImageUrl: string;
   name: string;
-  username: string;
   isAuthor: boolean;
-  genres: Array<{
-    text: string;
-    textColor: string;
-    backgroundColor: string;
-  }>;
 }
 
 const headerImageHeight = 123;
@@ -32,11 +25,8 @@ const profileImageSize = 87;
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   marginStart,
   profileImageUrl,
-  backgroundImageUrl,
   name,
-  username,
   isAuthor,
-  genres,
 }) => {
   const { theme } = useTheme();
 
@@ -48,7 +38,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     <View style={styles.container}>
       <View style={styles.profileImageContainer}>
         <ImageBackground
-          source={{ uri: backgroundImageUrl }}
+          source={DefaultProfileHeaderImage}
           style={styles.backgroundImage}
         >
           <Image
@@ -56,22 +46,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             style={[styles.profileImage, { marginStart: marginStart }]}
           />
         </ImageBackground>
-        <View
-          style={[
-            styles.genresContainer,
-            { marginStart: marginStart + profileImageSize + 10 },
-          ]}
-        >
-          {genres.map((genre) => (
-            <FavouriteGenreLabel
-              key={genre.text}
-              text={genre.text}
-              textColor={genre.textColor}
-              backgroundColor={genre.backgroundColor}
-              style={styles.genreLabel}
-            />
-          ))}
-        </View>
       </View>
       <View style={{ marginStart: marginStart }}>
         <View style={styles.nameContainer}>
@@ -80,16 +54,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           </NunitoText>
           {isAuthor && (
             <View style={styles.isAuthorContainer}>
-              <VerifiedIcon width={24} height={24} fill={theme.primary} />
+              <VerifiedIcon width={16} height={16} fill={theme.primary} />
               <NunitoText style={[styles.isAuthorText, dynamicTextStyle]}>
                 {Strings.author}
               </NunitoText>
             </View>
           )}
         </View>
-        <NunitoText style={[styles.username, dynamicTextStyle]}>
-          {username}
-        </NunitoText>
       </View>
     </View>
   );
@@ -129,7 +100,6 @@ const styles = StyleSheet.create({
   nameContainer: {
     flex: 1,
     flexDirection: "row",
-    alignItems: "center",
   },
   genreLabel: {
     marginEnd: 8,
@@ -138,7 +108,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     marginTop: 4,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   isAuthorText: {
     fontSize: 12,
