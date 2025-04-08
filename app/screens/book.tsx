@@ -1,3 +1,5 @@
+/* eslint-disable react-native/no-raw-text */
+/* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   View,
@@ -5,61 +7,70 @@ import {
   Text,
   ImageBackground,
   TouchableOpacity,
+  Modal,
   GestureResponderEvent,
 } from "react-native";
 import {
   GestureHandlerRootView,
-  ScrollView,
 } from "react-native-gesture-handler";
-import BookCover from "../assets/images/book-cover.png";
+import { useTheme } from "../context/ThemeContext";
 import NunitoText from "../components/Texts/NunitoText";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useTheme } from "../context/ThemeContext";
-import CustomButton from "../components/Buttons/CustomButton";
 import BottomSheet, {
+  BottomSheetHandle,
   BottomSheetScrollView,
-  BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import CustomCarousel from "../components/Carousel/CustomCarousel";
 import CustomBook from "../components/Book/CustomBook";
 import { ReviewComment } from "../components/review-comments/review-comments";
-import { Modal, Pressable } from "react-native";
 import CustomModal from "../components/review-comments/pop-up-modal";
+import CustomButton from "../components/Buttons/CustomButton";
 
-interface BookPageProps {
-  rating: number;
-  name: string;
-  readersNumber: number;
-  pagesNumber: number;
-  rankingNumber: string;
+interface ModalBookDetailsProps {
+  visible: boolean;
+  onClose: () => void;
+  rating?: number;
+  titulo?: string;
+  readersNumber?: number;
+  paginas?: number;
+  rankingNumber?: string;
+  sinopse?: string;
+  review?: string;
+  author?: string;
+  publicationDate?: string;
+  genre?: string;
+  capa?: string;
+  onCreateReview?: () => void;
+  onShare?: () => void;
 }
 
-export default function BookPage({
-  rating,
-  name,
-  readersNumber,
-  pagesNumber,
-  rankingNumber,
-}: BookPageProps) {
+export default function ModalBookDetails({
+  visible,
+  onClose,
+  rating = 4.5,
+  titulo = "Título do Livro",
+  readersNumber = 1000,
+  paginas = 300,
+  rankingNumber = "10",
+  sinopse = "Sinopse do livro...",
+  review = "Review do livro...",
+  author = "Autor do Livro",
+  publicationDate = "2023",
+  genre = "Ficção",
+  capa = "https://placeholder.com/book",
+  onCreateReview,
+  onShare,
+}: ModalBookDetailsProps) {
   const { theme } = useTheme();
-  const ratingValue = rating || 3.5;
-  const nameValue = name || "Memórias da Meia-Noite";
-  const readersNumberValue = readersNumber || 1.201;
-  const pagesNumberValue = pagesNumber || 201;
-  const rankingNumberValue = rankingNumber || "1";
-  const synopsis =
-    "Catherine começa a ter vislumbres do passado, flashes de memórias fragmentadas que desafiam a névoa imposta sobre sua mente. Aos poucos, os rostos de Larry Douglas e Noelle Page ressurgem em sua consciência, assim como a sensação de perigo e traição que a assombra mesmo sem compreender completamente o motivo. No convento isolado onde vive, as freiras percebem sua inquietação crescente. O instinto de sobrevivência de Catherine a impulsiona a buscar respostas, e um dia, ao encontrar uma notícia antiga em um jornal amarelado deixado na biblioteca do convento, um nome chama sua atenção: Constantin Demiris. Embora não consiga lembrar de tudo, a simples leitura daquele nome desperta nela uma sensação de medo e repulsa inexplicáveis.";
-  const review =
-    "O Homem de Giz, de C.J. Tudor, é um thriller psicológico envolvente que mistura passado e presente para revelar um mistério sombrio e perturbador. Com uma narrativa que lembra os clássicos de Stephen King, o livro nos transporta para a infância de Eddie Adams, um garoto de 12 anos que, junto com seus amigos, vive em uma pequena cidade inglesa. Eles criam um código secreto usando desenhos de bonecos de giz para se comunicarem, mas o jogo inocente se torna um pesadelo quando encontram um corpo mutilado na floresta. Trinta anos depois, Eddie tenta esquecer os traumas do passado, até que recebe um envelope contendo um desenho idêntico aos de sua infância. Logo, eventos estranhos começam a acontecer, e antigos segredos vêm à tona. A história é contada em capítulos alternados entre 1986 e 2016, criando uma atmosfera de mistério e tensão constante.";
   const [isMaximized, setIsMaximized] = useState(false);
   const [showMoreText, setShowMoreText] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [currentRating, setCurrentRating] = useState(ratingValue);
+  const [currentRating, setCurrentRating] = useState(rating);
   const [ratingCount, setRatingCount] = useState(1);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const roundedStars = Math.round(ratingValue);
+  const roundedStars = Math.round(currentRating);
   const snapPoints = useMemo(() => ["62%", "85%"], []);
 
   const MAX_SNAP_POINT_INDEX = 1;
@@ -78,40 +89,6 @@ export default function BookPage({
     [bottomSheetRef, MAX_SNAP_POINT_INDEX]
   );
 
-  const BottomSheetHandle = () => (
-    <View style={[styles.handleContainer, { backgroundColor: theme.quaternaryText }]}>
-      <View style={styles.handle} />
-    </View>
-  );
-
-  const bookStats = [
-    { value: readersNumberValue, label: "Leitores" },
-    { value: pagesNumberValue, label: "Páginas" },
-    { value: currentRating.toFixed(1), label: "Avaliação" },
-    { value: `#${rankingNumberValue}`, label: "Ranking" },
-  ];
-
-  const bookActions = [
-    {
-      label: "Já li",
-      onPress: () => {
-        /* lógica futura */
-      },
-    },
-    {
-      label: "Estou lendo",
-      onPress: () => {
-        /* lógica futura */
-      },
-    },
-    {
-      label: "Quero ler",
-      onPress: () => {
-        /*lLógica futura */
-      },
-    },
-  ];
-
   const handleNewRating = (newRating: number) => {
     const total = currentRating * ratingCount;
     const updatedCount = ratingCount + 1;
@@ -121,22 +98,73 @@ export default function BookPage({
     setRatingCount(updatedCount);
   };
 
-  return (
+  const handleBackPress = () => {
+    onClose();
+  };
+
+  const handleCreateReview = () => {
+    if (onCreateReview) {
+      onCreateReview();
+    } else {
+      setModalVisible(true);
+    }
+  };
+
+  const handleShare = () => {
+    if (onShare) {
+      onShare();
+    } else {
+      console.log("Share action");
+    }
+  };
+
+  const bookStats = [
+    { value: readersNumber, label: "Leitores" },
+    { value: paginas, label: "Páginas" },
+    { value: currentRating?.toFixed(1), label: "Avaliação" },
+    { value: `#${rankingNumber}`, label: "Ranking" },
+  ];
+
+  const bookActions = [
+    {
+      label: "Já li",
+      onPress: () => {
+        console.log("Ação: Já li");
+      },
+    },
+    {
+      label: "Estou lendo",
+      onPress: () => {
+        console.log("Ação: Estou lendo");
+      },
+    },
+    {
+      label: "Quero ler",
+      onPress: () => {
+        console.log("Ação: Quero ler");
+      },
+    },
+  ];
+
+  const BookContent = () => (
     <View style={{ flex: 1 }}>
-      <ImageBackground source={BookCover} style={styles.backgroundImage}>
-        {/* <ImageBackground source={{uri:photoPath}} style={styles.backgroundImage}> */}
+      <ImageBackground
+        source={{ uri: capa }}
+        style={styles.backgroundImage}
+      >
         <View style={styles.overlay} />
 
-        {/* Conteúdo escrito */}
         <View style={styles.bookContentContainer}>
           {isMaximized ? (
             <View style={{ flexDirection: "row", marginBottom: 0 }}>
-              <Ionicons
-                name="return-up-back-outline"
-                size={30}
-                color={theme.quinaryText}
-                style={{ paddingRight: 20 }}
-              />
+              <TouchableOpacity onPress={handleBackPress}>
+                <Ionicons
+                  name="return-up-back-outline"
+                  size={30}
+                  color={theme.white}
+                  style={{ paddingRight: 20 }}
+                />
+              </TouchableOpacity>
               <View
                 style={{
                   alignItems: "center",
@@ -153,9 +181,7 @@ export default function BookPage({
                     fontWeight: "bold",
                   }}
                 >
-                  {nameValue.length > 23
-                    ? nameValue.substring(0, 23) + "..."
-                    : nameValue}
+                  {titulo.length > 23 ? titulo?.substring(0, 23) + "..." : titulo}
                 </NunitoText>
               </View>
             </View>
@@ -168,16 +194,16 @@ export default function BookPage({
                 marginBottom: 0,
               }}
             >
-              <Ionicons
-                name="return-up-back-outline"
-                size={30}
-                color={theme.white}
-              />
+              <TouchableOpacity onPress={handleBackPress}>
+                <Ionicons
+                  name="return-up-back-outline"
+                  size={30}
+                  color={theme.white}
+                />
+              </TouchableOpacity>
               <View style={{ flex: 1 }} />
               <TouchableOpacity
-                onPress={() => {
-                  // Lógica
-                }}
+                onPress={handleCreateReview}
                 style={{
                   borderRadius: 15,
                   backgroundColor: theme.primary,
@@ -199,14 +225,17 @@ export default function BookPage({
                   Criar Resenha
                 </NunitoText>
               </TouchableOpacity>
-              <AntDesign name="export" size={24} color={theme.white} />
+              <TouchableOpacity onPress={handleShare}>
+                <AntDesign name="export" size={24} color={theme.white} />
+              </TouchableOpacity>
             </View>
           )}
+
           <NunitoText style={[styles.title, { color: theme.white }]}>
-            Memórias da Meia-Noite
+            {titulo}
           </NunitoText>
           <NunitoText style={[styles.subtitle, { color: theme.white }]}>
-            Julia Polastrie
+            {author}
           </NunitoText>
           <View
             style={{
@@ -216,15 +245,16 @@ export default function BookPage({
             }}
           >
             <NunitoText style={[styles.date, { color: theme.white }]}>
-              26 de junho, 1997
+              {publicationDate}
             </NunitoText>
             <NunitoText
               style={{ color: theme.white, paddingHorizontal: 10 }}
             >
-              -
+              {" "}
+              -{" "}
             </NunitoText>
             <NunitoText style={[styles.gender, { color: theme.white }]}>
-              Fantasia
+              {genre}
             </NunitoText>
           </View>
 
@@ -242,13 +272,14 @@ export default function BookPage({
                   name={index < roundedStars ? "star" : "staro"}
                   size={20}
                   color={
-                    index < roundedStars ? theme.starColor : theme.quinaryText
+                    index < roundedStars ? theme.starColor : theme.white
                   }
                 />
               ))}
             </View>
+
             <TouchableOpacity
-              onPress={() => setModalVisible(true)}
+              onPress={handleCreateReview}
               style={{
                 borderRadius: 15,
                 backgroundColor: theme.quinaryText,
@@ -257,7 +288,7 @@ export default function BookPage({
                 alignItems: "center",
                 justifyContent: "center",
                 flexDirection: "row",
-                marginRight: 10,
+                marginRight: 10
               }}
             >
               <NunitoText
@@ -267,7 +298,7 @@ export default function BookPage({
                   color: theme.quaternaryText,
                 }}
               >
-                Avaliar
+                Criar Resenha
               </NunitoText>
             </TouchableOpacity>
 
@@ -275,15 +306,14 @@ export default function BookPage({
               visible={modalVisible}
               onClose={() => setModalVisible(false)}
               content="Avalie o livro"
-              nameBook={nameValue}
               onRate={handleNewRating}
             />
           </View>
         </View>
 
-        {/* bottom sheet */}
         <GestureHandlerRootView style={styles.container}>
           <BottomSheet
+          backgroundStyle={{backgroundColor: theme.Background}}
             ref={bottomSheetRef}
             snapPoints={snapPoints}
             index={0}
@@ -292,196 +322,173 @@ export default function BookPage({
             enableOverDrag={false}
             handleComponent={BottomSheetHandle}
             enableContentPanningGesture={false}
-            style={{ backgroundColor: "black" }}
           >
-            {/* conteúdo do bottom sheet */}
-            <BottomSheetScrollView style={{backgroundColor: theme.quaternaryText}}>
-              <ScrollView>
-                <View style={styles.bookNumbersContainer}>
-                  {bookStats.map((stat, index) => (
-                    <View
-                      key={index}
-                      style={{
-                        paddingHorizontal: 18,
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <NunitoText
-                        style={[
-                          styles.bookNumbers,
-                          { color: theme.quinaryText },
-                        ]}
-                      >
-                        {stat.value}
-                      </NunitoText>
-                      <NunitoText
-                        style={[
-                          styles.bookNumbersTitle,
-                          { color: theme.quinaryText },
-                        ]}
-                      >
-                        {stat.label}
-                      </NunitoText>
-                    </View>
-                  ))}
-                </View>
-
-                <View style={styles.statusBookContainer}>
-                  {bookActions.map((action, index) => (
-                    <CustomButton
-                      key={index}
-                      title={action.label}
-                      onPress={() => {}}
-                      fullWidth={false}
-                      width={140}
-                      height={30}
-                    />
-                  ))}
-                </View>
-
-                <View>
-                  <NunitoText
-                    style={[
-                      styles.secondTitle,
-                      { color: theme.quinaryText },
-                    ]}
-                  >
-                    Sinopse
-                  </NunitoText>
-                  <NunitoText
-                    style={[
-                      styles.synopsisText,
-                      { color: theme.quinaryText },
-                    ]}
-                  >
-                    {showMoreText
-                      ? synopsis
-                      : synopsis.substring(0, 450) + "..."}
-                  </NunitoText>
-
-                  <TouchableOpacity
-                    onPress={() => setShowMoreText(!showMoreText)}
-                    style={styles.moreAndLessButton}
-                  >
-                    <Text
-                      style={[
-                        styles.showMoreAndLess,
-                        { color: theme.quinaryText },
-                      ]}
-                    >
-                      {showMoreText ? "Mostrar menos" : "Mostrar mais"}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View
-                  style={{ alignItems: "flex-start", justifyContent: "center" }}
-                >
-                  <NunitoText
-                    style={[styles.secondTitle, { paddingBottom: 25, color: theme.quinaryText }]}
-                  >
-                    Principais Resenhas e Comentários
-                  </NunitoText>
-
-                  <ReviewComment
-                    comment={true}
-                    byAuthor={true}
-                    fullNamePostAuthor={"Luisa Marques"}
-                    datePost={"30/01/2025"}
-                    text={
-                      "Amei o livro, muito bom mesmo! Recomendo muito. A história é envolvente e os personagens são bem desenvolvidos."
-                    }
-                  />
-
-                  <ReviewComment
-                    comment={false}
-                    byAuthor={false}
-                    fullNamePostAuthor={"Monica Alvarenga"}
-                    datePost={"22/08/2024"}
-                    text={review}
-                  />
-                </View>
-
-                <View
-                  style={{ alignItems: "center", justifyContent: "center" }}
-                >
-                  <TouchableOpacity
-                    onPress={undefined}
+            <BottomSheetScrollView>
+              <View style={styles.bookNumbersContainer}>
+                {bookStats.map((stat, index) => (
+                  <View
+                    key={index}
                     style={{
+                      paddingHorizontal: 18,
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: theme.primary,
-                      width: "87%",
-                      height: 25,
-                      borderRadius: 30,
                     }}
                   >
-                    <Text style={{ color: theme.white }}>
-                      Acessar mais
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                    <NunitoText
+                      style={[
+                        styles.bookNumbers,
+                        { color: theme.primaryText },
+                      ]}
+                    >
+                      {stat.value}
+                    </NunitoText>
+                    <NunitoText
+                      style={[
+                        styles.bookNumbersTitle,
+                        { color: theme.primaryText },
+                      ]}
+                    >
+                      {stat.label}
+                    </NunitoText>
+                  </View>
+                ))}
+              </View>
 
-                <View style={{ marginBottom: 30 }}></View>
+              <View style={styles.statusBookContainer}>
+                {bookActions.map((action, index) => (
 
-                <NunitoText style={[styles.secondTitle, { paddingBottom: 15, color: theme.quinaryText }]}>
-                  Livros do mesmo autor
+                  <CustomButton width={150} height={30} key={index} title={action.label} onPress={()=>{}} />
+                  // <TouchableOpacity
+                  //   key={index}
+                  //   onPress={action.onPress}
+                  //   style={{
+                  //     borderRadius: 15,
+                  //     backgroundColor: theme.primary,
+                  //     width: "25%",
+                  //     height: 23,
+                  //     alignItems: "center",
+                  //     justifyContent: "center",
+                  //     flexDirection: "row",
+                  //     marginRight: 8,
+                  //     marginLeft: 8,
+                  //   }}
+                  // >
+                  //   <Text
+                  //     style={{
+                  //       fontSize: 12,
+                  //       fontWeight: "bold",
+                  //       color: theme.quinaryText,
+                  //     }}
+                  //   >
+                  //     {action.label}
+                  //   </Text>
+                  // </TouchableOpacity>
+                ))}
+              </View>
+
+              <View>
+                <NunitoText
+                  style={[styles.secondTitle, { color: theme.primaryText }]}
+                >
+                  Sinopse
                 </NunitoText>
-                <CustomCarousel
-                  isHorizontal
-                  data={[
-                    <CustomBook
-                      photoPath={
-                        "https://static.wixstatic.com/media/31a549_7dffb191bffa440686e5a148b8e042d9~mv2.jpg/v1/fill/w_480,h_768,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/31a549_7dffb191bffa440686e5a148b8e042d9~mv2.jpg"
-                      }
-                    />,
-                    <CustomBook
-                      photoPath={
-                        "https://f.i.uol.com.br/fotografia/2023/04/13/16813903606437fb18c8902_1681390360_1x1_md.jpg"
-                      }
-                    />,
-                    <CustomBook
-                      photoPath={
-                        "https://ocapista.com.br/imgs/capas/capa_livro_fantasia.jpg"
-                      }
-                    />,
-                  ]}
-                />
-
-                <View style={{ marginBottom: 15 }}></View>
-
-                <NunitoText style={[styles.secondTitle, { paddingBottom: 15, color: theme.quinaryText }]}>
-                  Livros semelhantes
+                <NunitoText
+                  style={[styles.sinopseText, { color: theme.primaryText }]}
+                >
+                  {showMoreText ? sinopse : sinopse?.substring(0, 450) + "..."}
                 </NunitoText>
-                <CustomCarousel
-                  isHorizontal
-                  data={[
-                    <CustomBook
-                      photoPath={
-                        "https://static.wixstatic.com/media/31a549_7dffb191bffa440686e5a148b8e042d9~mv2.jpg/v1/fill/w_480,h_768,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/31a549_7dffb191bffa440686e5a148b8e042d9~mv2.jpg"
-                      }
-                    />,
-                    <CustomBook
-                      photoPath={
-                        "https://f.i.uol.com.br/fotografia/2023/04/13/16813903606437fb18c8902_1681390360_1x1_md.jpg"
-                      }
-                    />,
-                    <CustomBook
-                      photoPath={
-                        "https://ocapista.com.br/imgs/capas/capa_livro_fantasia.jpg"
-                      }
-                    />,
-                  ]}
-                />
 
-                <View style={{ marginBottom: 500 }}></View>
-              </ScrollView>
+                <TouchableOpacity
+                  onPress={() => setShowMoreText(!showMoreText)}
+                  style={styles.moreAndLessButton}
+                >
+                  <Text
+                    style={[
+                      styles.showMoreAndLess,
+                      { color: theme.primary },
+                    ]}
+                  >
+                    {showMoreText ? "Mostrar menos" : "Mostrar mais"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <View
+                style={{ alignItems: "flex-start", justifyContent: "center" }}
+              >
+                <NunitoText style={[styles.secondTitle, { paddingBottom: 25, color: theme.primaryText }]}>
+                  Principais Resenhas e Comentários
+                </NunitoText>
+
+                <ReviewComment
+                  comment={true}
+                  byAuthor={true}
+                  datePost={"30/01/2025"}
+                  text={"Amei o livro, muito bom mesmo! Recomendo muito. A história é envolvente e os personagens são bem desenvolvidos."} 
+                  fullNamePostAuthor={"Monica Alvarenga"}                />
+
+                <ReviewComment
+                  comment={false}
+                  byAuthor={false}
+                  fullNamePostAuthor={"Monica Alvarenga"}    
+                  datePost={"22/08/2024"}
+                  text={review}
+                />
+              </View>
+
+              <View style={{ alignItems: "center", justifyContent: "center" }}>
+                <TouchableOpacity
+                  onPress={undefined}
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: theme.primary,
+                    width: "87%",
+                    height: 25,
+                    borderRadius: 30,
+                  }}
+                >
+                  <Text style={{ color: theme.quinaryText }}>Acessar mais</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={{ marginBottom: 30 }}></View>
+
+              <NunitoText style={[styles.secondTitle, { paddingBottom: 15, color: theme.primaryText }]}>
+                Livros do mesmo autor
+              </NunitoText>
+              <CustomCarousel
+                isHorizontal
+                data={[<CustomBook key={1} bookId={0} photoPath={"your-image-path"} />]}
+              />
+
+              <View style={{ marginBottom: 15 }}></View>
+
+              <NunitoText style={[styles.secondTitle, { paddingBottom: 15, color: theme.primaryText }]}>
+                Livros semelhantes
+              </NunitoText>
+              <CustomCarousel
+                isHorizontal
+                data={[<CustomBook key={1} bookId={0} photoPath={"your-image-path"} />]}
+              />
+
+              <View style={{ marginBottom: 500 }}></View>
             </BottomSheetScrollView>
           </BottomSheet>
         </GestureHandlerRootView>
       </ImageBackground>
     </View>
+  );
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="fullScreen"
+      onRequestClose={onClose}
+    >
+      <BookContent />
+    </Modal>
   );
 }
 
@@ -489,12 +496,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "transparent",
-  },
-  contentContainer: {
-    flex: 1,
-    padding: 36,
-    alignItems: "center",
-    justifyContent: "flex-start",
   },
   backgroundImage: {
     flex: 1,
@@ -539,18 +540,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 10,
   },
-  ratingValue: {
-    paddingHorizontal: 10,
-    fontSize: 18,
-  },
-  smallTitle: {
-    position: "absolute",
-    top: "9%",
-    alignItems: "center",
-    width: "100%",
-    paddingRight: 5,
-    paddingLeft: 30,
-  },
   bookNumbers: {
     fontSize: 19,
     fontWeight: "bold",
@@ -572,7 +561,7 @@ const styles = StyleSheet.create({
     paddingLeft: 30,
     paddingBottom: 10,
   },
-  synopsisText: {
+  sinopseText: {
     fontSize: 14,
     fontWeight: "regular",
     paddingLeft: 30,
@@ -603,12 +592,12 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   statusBookContainer: {
-    gap:10,
+    gap: 10,
+    transform:"scale(0.8)",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 30,
     paddingBottom: 20,
-    transform: "scale(0.8)"
   },
 });
