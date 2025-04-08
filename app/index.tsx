@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { View, ActivityIndicator } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import useLoadFonts from "./hooks/useLoadFonts";
 
 export default function Index() {
@@ -8,12 +9,17 @@ export default function Index() {
   const fontsLoaded = useLoadFonts();
 
   useEffect(() => {
-    if (fontsLoaded) {
-      const timeout = setTimeout(() => {
-        router.replace("/screens/searchPage");
-      }, 50);
+    const checkUserToken = async () => {
+      const userToken = await AsyncStorage.getItem("userToken");
+      if (userToken) {
+        router.replace("/screens/book");
+      } else {
+        router.replace("/screens/login");
+      }
+    };
 
-      return () => clearTimeout(timeout);
+    if (fontsLoaded) {
+      checkUserToken();
     }
   }, [fontsLoaded, router]);
 
