@@ -1,7 +1,7 @@
 import axios from "axios";
 import { User } from "../models/User";
 // Se não funcionar mudar de localhost para o ip da máquina
-const baseUrl = `http://192.168.15.106:3000/profile`;
+const baseUrl = `http://localhost:3000/profile`;
 
 export default function UserAPI() {
   const getAuthToken = () => {
