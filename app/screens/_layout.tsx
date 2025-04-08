@@ -54,6 +54,7 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
           >
             {/*as rotas sao aqui */}
             <Stack.Screen name="login" />
+            <Stack.Screen name="searchPage" />
             <Stack.Screen name="register" />
             <Stack.Screen name="tests/teste" />
           </Stack>
