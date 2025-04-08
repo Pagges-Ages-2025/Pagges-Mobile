@@ -1,7 +1,7 @@
 import ProfileHeader from "@/app/components/Profile/ProfileHeader";
 import { User } from "@/app/models/User";
 import { useEffect, useState } from "react";
-import UserAPI from "@/app/api/ProfileService";
+import UserAPI from "@/app/services/profileService";
 import { useLocalSearchParams } from "expo-router";
 import { ScrollView, View } from "react-native";
 import UserStats from "../components/UserStats/UserStats";
