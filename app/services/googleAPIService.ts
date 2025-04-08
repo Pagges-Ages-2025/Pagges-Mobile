@@ -11,7 +11,7 @@ export default function SearchAPI() {
   const searchBooks = async (term: string) => {
     const token = getAuthToken(); // Obtém o token de autorização
     try {
-      const response = await axios.get(`http://localhost:3000/google-integration/search`, {
+      const response = await axios.get(`http://localhost:3000/google-integration/search/${term}`, {
         params: { term },
         headers: {
           Authorization: `Bearer ${token}`, // Passa o token no header
@@ -28,7 +28,7 @@ export default function SearchAPI() {
   const searchByGenre = async (genero: string) => {
     const token = getAuthToken(); // Obtém o token de autorização
     try {
-      const response = await axios.get(`http://localhost:3000/google-integration/genre`, {
+      const response = await axios.get(`http://localhost:3000/google-integration/genre/${genero}`, {
         params: { genero },
         headers: {
           Authorization: `Bearer ${token}`, // Passa o token no header
