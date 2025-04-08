@@ -52,18 +52,18 @@ export const ReviewComment = forwardRef((props: CombinedProps) => {
     if (!datePost || typeof datePost !== "string" || !datePost.includes("/")) {
       return "Data inválida";
     }
-  
+
     const formattedDate = convertDateFormat(datePost);
     const currentDate = new Date();
     const postDate = new Date(formattedDate);
-  
+
     if (isNaN(postDate.getTime())) {
       return "Data inválida";
     }
-  
+
     const timeDifference = currentDate.getTime() - postDate.getTime();
     const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
-  
+
     if (daysDifference < 7) {
       return `${daysDifference}d`;
     } else if (daysDifference < 30) {
@@ -77,17 +77,16 @@ export const ReviewComment = forwardRef((props: CombinedProps) => {
       return `${years}a`;
     }
   };
-  
 
   return (
     <View style={styles.container}>
-      {byAuthor && <View style={styles.authorBackground} />}
+      {byAuthor && <View style={[styles.authorBackground, {backgroundColor: theme.authorBackground}]} />}
       <View style={styles.authorInfosContainer}>
         <Image source={photo} style={styles.authorPostImage} />
         <NunitoText
           style={[
             styles.authorName,
-            { color: byAuthor ? theme.primary : theme.quaternaryText },
+            { color: byAuthor ? theme.primary : theme.quinaryText },
           ]}
         >
           {fullNamePostAuthor}
@@ -106,7 +105,7 @@ export const ReviewComment = forwardRef((props: CombinedProps) => {
         )}
       </View>
       <View style={{ paddingLeft: 45, paddingBottom: 15 }}>
-        <NunitoText style={styles.textPost}>{textValue}</NunitoText>
+        <NunitoText style={[styles.textPost, {color: theme.textColorReview}]}>{textValue}</NunitoText>
       </View>
       <View
         style={{
@@ -125,7 +124,7 @@ export const ReviewComment = forwardRef((props: CombinedProps) => {
           }}
         >
           <AntDesign name="hearto" size={15} color="gray" />
-          <NunitoText style={[styles.textPost, { paddingLeft: 5 }]}>
+          <NunitoText style={[styles.textPost, { paddingLeft: 5, color: theme.textColorReview }]}>
             {likesNumberValue}
           </NunitoText>
         </View>
@@ -138,7 +137,7 @@ export const ReviewComment = forwardRef((props: CombinedProps) => {
           }}
         >
           <EvilIcons name="comment" size={22} color="gray" />
-          <NunitoText style={[styles.textPost, { paddingLeft: 5 }]}>
+          <NunitoText style={[styles.textPost, { paddingLeft: 5, color: theme.textColorReview }]}>
             {commentsNumberValue}
           </NunitoText>
         </View>
@@ -151,7 +150,7 @@ export const ReviewComment = forwardRef((props: CombinedProps) => {
         >
           {/* achar outro icone de repost */}
           <Feather name="rotate-ccw" size={15} color="gray" />
-          <NunitoText style={[styles.textPost, { paddingLeft: 5 }]}>
+          <NunitoText style={[styles.textPost, { paddingLeft: 5, color: theme.textColorReview }]}>
             {repostNumberValue}
           </NunitoText>
         </View>
@@ -186,7 +185,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   textPost: {
-    color: "gray",
+    // color: "gray",
     fontSize: 14,
     textAlign: "justify",
     fontWeight: "light",
@@ -203,6 +202,6 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     borderRadius: 30,
-    backgroundColor: "rgba(156, 15, 83, 0.07)",
+    //backgroundColor: "rgba(156, 15, 83, 0.07)",
   },
 });
