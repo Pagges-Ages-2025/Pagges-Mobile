@@ -6,6 +6,7 @@ import {
 } from "react-native-gesture-handler";
 import React from "react";
 import { StatusBar, View } from "react-native";
+import BookPage from "./book";
 
 export default function ScreensLayout() {
   const router = useRouter();
@@ -57,6 +58,7 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
             <Stack.Screen name="searchPage" />
             <Stack.Screen name="register" />
             <Stack.Screen name="tests/teste" />
+            <Stack.Screen name="book"/>
           </Stack>
         </View>
       </LongPressGestureHandler>
