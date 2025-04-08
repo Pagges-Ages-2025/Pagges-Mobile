@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -9,13 +8,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  GestureResponderEvent,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
 import CustomButton from "../components/Buttons/CustomButton";
 import NunitoText from "../components/Texts/NunitoText";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -25,6 +25,44 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const lottieRef = useRef<LottieView>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError("Por favor, preencha todos os campos");
+      return;
+    }
+
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const response = await axios.post(
+        `${process.env.API_URL}/auth/login`,
+        {
+          email,
+          password,
+        }
+      );
+
+      const data = response.data;
+
+      await AsyncStorage.setItem("userToken", data.accessToken);
+
+      router.replace("/screens/book");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(
+          error.status === 401
+            ? "Usuário ou senha inválido"
+            : "Falha ao fazer login"
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     Animated.parallel([
@@ -138,8 +176,18 @@ export default function LoginScreen() {
                 Esqueceu a senha?
               </NunitoText>
             </TouchableOpacity>
-
-            <CustomButton title={"Entrar"} onPress={() => {}} />
+            
+            {error && (
+              <NunitoText style={{ color: 'red', marginBottom: 16, textAlign: 'center' }}>
+              {error}
+              </NunitoText>
+            )}
+            
+            <CustomButton 
+              title={isLoading ? "Entrando..." : "Entrar"} 
+              onPress={handleLogin} 
+              isDisabled={isLoading}
+            />
 
             <TouchableOpacity
               style={styles.registerLink}
