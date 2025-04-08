@@ -31,9 +31,9 @@ const BooksSection = () => {
         onToggle={() => toggle("small")}
       >
         <View style={styles.grid}>
-          <CustomBook size="small" onPress={handlePress} photoPath={"https://m.media-amazon.com/images/I/81ibfYk4qmL.jpg"} />
-          <CustomBook size="small" onPress={handlePress} photoPath={"https://m.media-amazon.com/images/I/81ibfYk4qmL.jpg"} />
-          <CustomBook size="small" onPress={handlePress} photoPath={"https://m.media-amazon.com/images/I/81ibfYk4qmL.jpg"} />
+          <CustomBook size="small" onPress={handlePress} photoPath={"https://m.media-amazon.com/images/I/81ibfYk4qmL.jpg"} bookId={0} />
+          <CustomBook size="small" onPress={handlePress} photoPath={"https://m.media-amazon.com/images/I/81ibfYk4qmL.jpg"} bookId={0} />
+          <CustomBook size="small" onPress={handlePress} photoPath={"https://m.media-amazon.com/images/I/81ibfYk4qmL.jpg"} bookId={0} />
         </View>
       </Section>
       <Section
@@ -42,8 +42,8 @@ const BooksSection = () => {
         onToggle={() => toggle("medium")}
       >
         <View style={styles.grid}>
-          <CustomBook size="medium" onPress={handlePress} photoPath={"https://m.media-amazon.com/images/I/81ibfYk4qmL.jpg"} />
-          <CustomBook size="medium" onPress={handlePress} photoPath={"https://m.media-amazon.com/images/I/81ibfYk4qmL.jpg"} />
+          <CustomBook size="medium" onPress={handlePress} photoPath={"https://m.media-amazon.com/images/I/81ibfYk4qmL.jpg"} bookId={0} />
+          <CustomBook size="medium" onPress={handlePress} photoPath={"https://m.media-amazon.com/images/I/81ibfYk4qmL.jpg"} bookId={0} />
         </View>
       </Section>
       <Section
@@ -52,7 +52,7 @@ const BooksSection = () => {
         onToggle={() => toggle("large")}
       >
         <View style={styles.grid}>
-          <CustomBook size="large" onPress={handlePress} photoPath={"https://m.media-amazon.com/images/I/81ibfYk4qmL.jpg"} />
+          <CustomBook size="large" onPress={handlePress} photoPath={"https://m.media-amazon.com/images/I/81ibfYk4qmL.jpg"} bookId={0} />
         </View>
       </Section>
     </Section>

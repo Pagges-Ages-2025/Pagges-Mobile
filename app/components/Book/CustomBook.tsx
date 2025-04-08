@@ -22,7 +22,7 @@ interface CustomBookProps {
   onPress?: (event: GestureResponderEvent) => void;
   containerStyle?: StyleProp<ViewStyle>;
   photoPath: string;
-  bookId?: number; // Remover '?' na versão final
+  bookId: number;
 }
 
 const CustomBook: React.FC<CustomBookProps> = ({
