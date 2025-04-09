@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -20,7 +20,13 @@ const Biography: React.FC<BiographyProps> = ({ biographyText }) => {
 
   const [editing, setEditing] = useState(false);
   const [bioText, setBioText] = useState(biographyText);
-  const [originalBio, setOriginalBio] = useState(biographyText); // novo estado
+  const [originalBio, setOriginalBio] = useState(biographyText);
+
+  // Add this effect to sync with prop changes
+  useEffect(() => {
+    setBioText(biographyText);
+    setOriginalBio(biographyText);
+  }, [biographyText]);
 
   const startEditing = () => {
     setOriginalBio(bioText); // salva o texto antes da edição

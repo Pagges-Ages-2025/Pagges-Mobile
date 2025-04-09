@@ -7,6 +7,8 @@ import { ScrollView, View, StyleSheet } from "react-native";
 import UserStats from "../components/UserStats/UserStats";
 import { useTheme } from "../context/ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Biography from "../components/Biography/Biography";
+import Achievement from "../components/Achievements/Achievement";
 
 const getToken = async () => {
   const userToken = await AsyncStorage.getItem("userToken");
@@ -30,7 +32,6 @@ export default function ProfileScreen() {
           });
       }
     };
-
     fetchProfile();
   }, []);
 
@@ -55,6 +56,12 @@ export default function ProfileScreen() {
             amigos={data?.friendsNumber || 0}
           />
         </View>
+        <View style={styles.biographyContainer}>
+          <Biography biographyText={data?.biography || ""} />
+        </View>
+        <View style={styles.achievementContainer}>
+          <Achievement />
+        </View>
       </View>
     </ScrollView>
   );
@@ -70,5 +77,14 @@ const styles = StyleSheet.create({
   statsContainer: {
     marginHorizontal: 30,
     marginTop: 20,
+  },
+  biographyContainer: {
+    marginHorizontal: 30,
+    marginTop: 20,
+  },
+  achievementContainer: {
+    marginHorizontal: 30,
+    marginTop: 20,
+    marginBottom: 20,
   },
 });
