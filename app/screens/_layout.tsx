@@ -6,7 +6,7 @@ import {
 } from "react-native-gesture-handler";
 import React from "react";
 import { StatusBar, View } from "react-native";
-import BookPage from "./book";
+import NavBar from "../components/Nav/NavBar";
 
 export default function ScreensLayout() {
   const router = useRouter();
@@ -32,14 +32,16 @@ export default function ScreensLayout() {
 }
 
 function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
-  const { themeName } = useTheme();
+  const pathname = usePathname();
+
+  const removeNavbarFromPageList = ["/screens/login", "/screens/register", "/screens/book"]
 
   return (
     <>
       <StatusBar
         translucent
         backgroundColor="transparent"
-        barStyle={themeName === "light" ? "dark-content" : "light-content"}
+        barStyle="dark-content"
       />
 
       <LongPressGestureHandler
@@ -60,6 +62,7 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
             <Stack.Screen name="tests/teste" />
             <Stack.Screen name="book"/>
           </Stack>
+          {!removeNavbarFromPageList.includes(pathname) && <NavBar />}
         </View>
       </LongPressGestureHandler>
     </>
