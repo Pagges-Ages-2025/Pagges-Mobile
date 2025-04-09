@@ -4,9 +4,6 @@ import { User } from "../models/User";
 const baseUrl = `http://localhost:3000/profile`;
 
 export default function UserAPI() {
-  const getAuthToken = () => {
-    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImVtYWlsIjoiYWxpY2VCQGV4YW1wbGUuY29tIiwiaWQiOjQsImlhdCI6MTc0NDA2MTYxNCwiZXhwIjoxNzQ0MTQ4MDE0fQ.mHCBZAZmX7ZK05XlA4TzvrxjHiCdeR4hQABxp9dW-O0"; // Exemplo com localStorage
-  };
 
   const getProfile = async (token: string): Promise<User> => {
     try {
