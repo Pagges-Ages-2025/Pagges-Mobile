@@ -12,9 +12,10 @@ import { Feather } from "@expo/vector-icons";
 
 interface BiographyProps {
   biographyText: string;
+  onBioChange: (newBio: string) => void;
 }
 
-const Biography: React.FC<BiographyProps> = ({ biographyText }) => {
+const Biography: React.FC<BiographyProps> = ({ biographyText, onBioChange }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
@@ -34,6 +35,8 @@ const Biography: React.FC<BiographyProps> = ({ biographyText }) => {
   };
 
   const saveBiography = () => {
+    setBioText(bioText);
+    onBioChange(bioText);
     setEditing(false);
   };
 
@@ -56,7 +59,7 @@ const Biography: React.FC<BiographyProps> = ({ biographyText }) => {
             </TouchableOpacity>
           </View>
         ) : (
-          <TouchableOpacity onPress={() => setEditing(true)}>
+          <TouchableOpacity onPress={startEditing}>
             <Feather name="edit" size={18} color={theme.secondaryText} />
           </TouchableOpacity>
         )}

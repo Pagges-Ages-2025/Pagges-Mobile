@@ -19,7 +19,22 @@ export default function UserAPI() {
     }
   };
 
+  const updateBio = async (token: string, bio: string): Promise<User> => {
+    try {
+      const response = await axios.put(`${baseUrl}/biography`, { biography: bio }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error("Erro ao atualizar bio:", error);
+      throw error;
+    }
+  };
+  
   return {
     getProfile,
+    updateBio,
   };
 }

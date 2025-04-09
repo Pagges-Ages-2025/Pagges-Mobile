@@ -37,6 +37,20 @@ export default function ProfileScreen() {
 
   console.log("Current data state:", data);
 
+  const handleBioChange = async (newBio: string) => {
+    const token = await getToken();
+    if (token) {
+      UserAPI()
+        .updateBio(token, newBio)
+      .then((response: User) => {
+        console.log("Bio atualizada com sucesso:", response); // TODO: notificar usuário com mensagem na tela
+        })
+        .catch((error) => {
+          console.error("Erro ao atualizar bio:", error);
+        });
+    }
+  };
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: theme.Background }]}
@@ -57,7 +71,7 @@ export default function ProfileScreen() {
           />
         </View>
         <View style={styles.biographyContainer}>
-          <Biography biographyText={data?.biography || ""} />
+          <Biography biographyText={data?.biography || ""} onBioChange={handleBioChange}/>
         </View>
         <View style={styles.achievementContainer}>
           <Achievement />
