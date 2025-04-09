@@ -6,31 +6,40 @@ import { useLocalSearchParams } from "expo-router";
 import { ScrollView, View, StyleSheet } from "react-native";
 import UserStats from "../components/UserStats/UserStats";
 import { useTheme } from "../context/ThemeContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const getToken = async () => {
+  const userToken = await AsyncStorage.getItem("userToken");
+  return userToken;
+};
 
 export default function ProfileScreen() {
-  const { email } = useLocalSearchParams<{ email: string }>();
   const [data, setData] = useState<User>();
   const { theme } = useTheme();
 
   useEffect(() => {
-    if (email) {
-      console.log("Fetching profile for email:", email);
-      UserAPI()
-        .getProfile(email)
-        .then((response: User) => {
-          console.log("API Response:", response);
-          setData(response);
-        })
-        .catch((error: any) => {
-          console.error("Error fetching profile:", error);
-        });
-    }
-  }, [email]);
+    const fetchProfile = async () => {
+      const token = await getToken();
+      if (token) {
+        UserAPI()
+          .getProfile(token)
+          .then((response: User) => {
+            setData(response);
+          })
+          .catch((error: any) => {
+          });
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   console.log("Current data state:", data);
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.Background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.Background }]}
+    >
       <View style={[styles.content, { backgroundColor: theme.Background }]}>
         <ProfileHeader
           marginStart={30}
@@ -61,5 +70,5 @@ const styles = StyleSheet.create({
   statsContainer: {
     marginHorizontal: 30,
     marginTop: 20,
-  }
+  },
 });
