@@ -188,6 +188,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 16,
     height: "100%",
+    width: 25,
     justifyContent: "center",
   },
   suggestionsContainer: {

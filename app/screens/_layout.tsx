@@ -42,12 +42,14 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
     "/screens/book"
   ];
 
+  const { themeName } = useTheme();
+
   return (
     <>
       <StatusBar
         translucent
         backgroundColor="transparent"
-        barStyle="dark-content"
+        barStyle={themeName === "dark" ? "light-content" : "dark-content"}
       />
 
       <LongPressGestureHandler
