@@ -26,8 +26,13 @@ export default function SearchAPI() {
   const searchBooks = async (term: string) => {
     const token = await getAuthToken();
     try {
-      const response = await axiosInstance.get(`/search?${term}`, {
-        params: { term },
+      // Encoda o termo de busca para evitar problemas com caracteres especiais
+      const encodedTerm = encodeURIComponent(term);
+      
+      const response = await axiosInstance.get(`/search`, {
+        params: { 
+          term: encodedTerm 
+        },
         headers: {
           Authorization: `Bearer ${token}`,
         },
