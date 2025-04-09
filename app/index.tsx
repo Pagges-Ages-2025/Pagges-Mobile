@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useRouter } from "expo-router";
-import { View, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator, Text } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useLoadFonts from "./hooks/useLoadFonts";
 
@@ -12,9 +12,9 @@ export default function Index() {
     const checkUserToken = async () => {
       const userToken = await AsyncStorage.getItem("userToken");
       if (userToken) {
-        router.replace("/screens/book");
+        router.replace("/screens/splash");
       } else {
-        router.replace("/screens/login");
+        router.replace("/screens/splash"); 
       }
     };
 

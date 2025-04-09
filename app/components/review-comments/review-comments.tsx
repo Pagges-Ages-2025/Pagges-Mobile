@@ -23,7 +23,7 @@ interface BookPageProps {
 
 type CombinedProps = Props & BookPageProps;
 
-export const ReviewComment = forwardRef((props: CombinedProps) => {
+export const ReviewComment = forwardRef((props: CombinedProps, ref: React.Ref<any>) => {
   const {
     comment,
     byAuthor,
