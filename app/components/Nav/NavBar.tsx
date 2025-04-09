@@ -32,7 +32,7 @@ export default function NavBar() {
     try {
       await AsyncStorage.removeItem("userToken");
       await AsyncStorage.removeItem("userEmail");
-      router.replace("/");
+      router.replace("/screens/login");
     } catch (error) {
       console.error("Error during logout:", error);
     }

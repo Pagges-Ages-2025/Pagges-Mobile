@@ -34,7 +34,13 @@ export default function ScreensLayout() {
 function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
   const pathname = usePathname();
 
-  const removeNavbarFromPageList = ["/screens/login", "/screens/register", "/screens/book"]
+  const removeNavbarFromPageList = [
+    "/screens/login", 
+    "/screens/register", 
+    "/screens/splash",
+    "/screens/welcome",
+    "/screens/book"
+  ];
 
   return (
     <>
@@ -54,13 +60,15 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
               headerShown: false,
               gestureEnabled: true,
             }}
-          >
-            {/*as rotas sao aqui */}
+          >{/*as rotas sao aqui */}
+            <Stack.Screen name="splash" />
+            <Stack.Screen name="welcome" />
             <Stack.Screen name="login" />
-            <Stack.Screen name="searchPage" />
             <Stack.Screen name="register" />
+            <Stack.Screen name="searchPage" />
             <Stack.Screen name="tests/teste" />
             <Stack.Screen name="book"/>
+            <Stack.Screen name="profile" />
           </Stack>
           {!removeNavbarFromPageList.includes(pathname) && <NavBar />}
         </View>
