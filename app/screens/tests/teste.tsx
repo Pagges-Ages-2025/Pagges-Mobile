@@ -16,6 +16,7 @@ import SearchBarSection from "./sections/searchbarSection";
 import BooksSection from "./sections/booksSection";
 import CarouselSection from "./sections/carouselSection";
 import ColorsSection from "./sections/colorsSection";
+import CancelPost from "@/app/components/review-comments/cancel-post-buttons";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -73,12 +74,9 @@ export default function TestsScreen() {
 
         {/* Seções */}
         <View style={styles.container}>
-          <ColorsSection />
-          <ButtonSection />
-          <AnimationSection />
-          <SearchBarSection />
-          <BooksSection />
-          <CarouselSection />
+          <CancelPost isFollowing={false} onFollowChange={function (newState: boolean): void {
+            throw new Error("Function not implemented.");
+          } }/>
         </View>
 
         {/* importar aqui o novo componente para poder testar */}
