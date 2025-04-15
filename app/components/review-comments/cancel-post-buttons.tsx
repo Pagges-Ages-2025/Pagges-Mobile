@@ -1,76 +1,69 @@
-import React from "react";
-import SimpleLineIcons from "@expo/vector-icons/build/SimpleLineIcons";
-import { TouchableOpacity, View, StyleSheet } from "react-native";
+import React, { useRef } from "react";
+import { TouchableOpacity, View, StyleSheet, Animated } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import NunitoText from "../Texts/NunitoText";
-
-type Color = 'primary' | 'secondary';
+import { useRouter } from "expo-router";
+import CustomButton from "../Buttons/CustomButton";
 
 interface CancelPostProps {
-  isFollowing: boolean;
-  color?: Color;
-  size?: number;
-  onFollowChange: (newState: boolean) => void;
+  onPost?: () => void;
 }
 
 export default function CancelPost({
-  isFollowing,
-  color = 'primary',
-  size = 40,
-  onFollowChange,
+  onPost
 }: CancelPostProps) {
-  const { theme } = useTheme();
+  const { theme, themeName } = useTheme();
+  const router = useRouter();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
 
-  function onPress() {
-    onFollowChange(!isFollowing);
-  }
+  const navigateTo = () => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: -50,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      router.push(`/screens/login`); //home (não existe a pagina ainda)
+    });
+  };
 
   return (
-    <View>
-      <TouchableOpacity
-        style={[
-          {
-            width: 150,
-            height:100,
-            backgroundColor: "white"
-          },
-        ]}
-        onPress={onPress}
-        activeOpacity={0.8}
-      >
-        <NunitoText style={[styles]}>
-          {"Cancel"}
-        </NunitoText>
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => navigateTo()} activeOpacity={0.7}>
+        <NunitoText style={{
+          color:
+          themeName === "dark"
+          ? theme.primaryText
+          : theme.secondaryText,
+          fontSize: 16 
+        }}>Cancelar</NunitoText>
       </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[
-          {
-            width: 50,
-            height:30,
-            backgroundColor: "#366C6C",
-            alignContent: "center"
-          },
-        ]}
-        onPress={onPress}
-        activeOpacity={0.8}
-      >
-        <NunitoText style={[]}>
-          {"Post"}
-        </NunitoText>
-      </TouchableOpacity>
+          
+      <CustomButton 
+        onPress={() => {onPost}}
+        size='small' 
+        width={90}
+        height={35}
+        title="Publicar" 
+        type="secondary"  
+      />
     </View>
-    
   );
 }
 
 const styles = StyleSheet.create({
-  baseButton: {
-    borderRadius: 30,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  baseText: {
-    textAlign: "center",
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'transparent',
+    height: 40,
   },
 });
