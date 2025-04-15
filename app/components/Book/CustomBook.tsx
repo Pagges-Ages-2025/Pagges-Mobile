@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
-/* eslint-disable react-native/no-color-literals */
-/* eslint-disable react-native/sort-styles */
 import React from "react";
 import {
   TouchableOpacity,
@@ -11,10 +7,11 @@ import {
   ViewStyle,
   Image,
   Text,
+  View,
 } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 
-type BookSize = "small" | "medium" | "large" | "search"; // Adiciona o tipo 'search'
+type BookSize = "small" | "medium" | "large" | "search";
 
 interface CustomBookProps {
   size?: BookSize;
@@ -23,6 +20,8 @@ interface CustomBookProps {
   containerStyle?: StyleProp<ViewStyle>;
   photoPath: string;
   bookId: number;
+  toPersonalLibrary?: boolean;
+  author?: string;
 }
 
 const CustomBook: React.FC<CustomBookProps> = ({
@@ -31,10 +30,11 @@ const CustomBook: React.FC<CustomBookProps> = ({
   onPress,
   photoPath = "https://placehold.co/600x400",
   bookId,
+  toPersonalLibrary,
+  author,
 }) => {
   const { theme } = useTheme();
 
-  // Estilos de tamanho para o botão
   const sizeStyles = {
     small: {
       height: 150,
@@ -49,7 +49,6 @@ const CustomBook: React.FC<CustomBookProps> = ({
       width: 180,
     },
     search: {
-      // Estilo específico para tipo 'search'
       height: 80,
     },
   }[size];
@@ -57,25 +56,48 @@ const CustomBook: React.FC<CustomBookProps> = ({
   const titleStyle = size === "search" ? styles.searchTitle : styles.baseText;
 
   return (
-    <TouchableOpacity
-      style={[
-        size === "search" ? styles.baseSearch : styles.baseBook,
-        size === "search" ? sizeStyles : sizeStyles,
-        {
-          backgroundColor:
-            size === "search" ? theme.Background : theme.placeholder,
-        },
-      ]}
-      onPress={onPress}
-      activeOpacity={0.8}
-    >
-      <Image
-        source={{ uri: photoPath }}
-        style={size === "search" ? styles.searchBookPhoto : styles.bookPhoto}
-      />
+    <View style={{ alignItems: "center" }}>
+      <TouchableOpacity
+        style={[
+          size === "search" ? styles.baseSearch : styles.baseBook,
+          sizeStyles,
+          {
+            backgroundColor:
+              size === "search" ? theme.Background : theme.placeholder,
+          },
+        ]}
+        onPress={onPress}
+        activeOpacity={0.8}
+      >
+        <Image
+          source={{ uri: photoPath }}
+          style={size === "search" ? styles.searchBookPhoto : styles.bookPhoto}
+        />
 
-      {title && <Text style={[titleStyle, {color: theme.primaryText}] }>{title}</Text>}
-    </TouchableOpacity>
+        {/* if it is not a personal library, add the text inside */}
+        {!toPersonalLibrary && title && (
+          <Text style={[titleStyle, { color: theme.primaryText }]}>{title}</Text>
+        )}
+      </TouchableOpacity>
+
+      {/* If it is a personal library, it adds the text below */}
+      {toPersonalLibrary && (
+        <>
+          {title && (
+            <Text style={[styles.bookTitle, { color: theme.secondaryText }]}>
+              {/* {title} */}
+              {title.substring(0, 12)}
+            </Text>
+          )}
+          {author && (
+            <Text style={[styles.bookAuthor, { color: theme.secondaryText }]}>
+              {/* {author} */}
+              {author.substring(0, 15)}
+            </Text>
+          )}
+        </>
+      )}
+    </View>
   );
 };
 
@@ -99,6 +121,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 14,
     color: "black",
+    position: "absolute",
+    bottom: 8,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    paddingHorizontal: 5,
+    borderRadius: 4,
   },
   searchTitle: {
     fontSize: 14,
@@ -113,6 +140,19 @@ const styles = StyleSheet.create({
     width: 45,
     height: 70,
     borderRadius: 5,
+  },
+  bookTitle: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginTop: 10,
+    textAlign: "center",
+  },
+  bookAuthor: {
+    fontSize: 12,
+    // color: "#666",
+    marginTop: 5,
+    textAlign: "center",
+    fontWeight: "regular",
   },
 });
 

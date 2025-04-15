@@ -22,8 +22,9 @@ const { width } = Dimensions.get('window');
 type Book = {
     id: number;
     title: string;
+    author: string;
     photoPath: string;
-    size: 'small' | 'medium' | 'large'; // ou só string se for mais flexível
+    size: 'small' | 'medium' | 'large';
   };
 
 const Library = () => {
@@ -67,20 +68,20 @@ const Library = () => {
   
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: theme.personalLibraryBackground}]}>
       {/* header */}
       <View style={styles.headerPage}>
-        <TouchableOpacity onPress={() => console.log('Back button pressed')} style={styles.circleButton}>
+        <TouchableOpacity onPress={() => console.log('Back button pressed')} style={[styles.circleButton, {backgroundColor: theme.white}]}>
           <Ionicons
             name="return-up-back-outline"
             size={30}
-            color={"#000000"}
+            color={theme.black}
             style={{ paddingRight: 20 }}
           />
         </TouchableOpacity>
 
         <View style={{ paddingLeft: "13%" }}>
-          <NunitoText style={{ fontSize: 20, color: "#000000", fontWeight: "bold" }}>
+          <NunitoText style={{ fontSize: 20, fontWeight: "bold", color: theme.quinaryText }}>
             Biblioteca Pessoal
           </NunitoText>
         </View>
@@ -93,7 +94,7 @@ const Library = () => {
             <Text style={[
               styles.textTabs,
               actualPage === index && styles.activeTab,
-              { color: actualPage === index ? "#000000" : "#8C8C8C" }
+              { color: actualPage === index ? theme.quinaryText : theme.placeholder }
             ]}>
               {nome}
             </Text>
@@ -135,9 +136,11 @@ const Library = () => {
                             key={book.id}
                             size={book.size}
                             title={book.title}
+                            author={book.author}
                             photoPath={book.photoPath}
                             onPress={handlePress}
                             bookId={book.id}
+                            toPersonalLibrary={true}
                         />
                     </View>
                 ))}
@@ -191,7 +194,6 @@ export default Library;
 
 const styles = StyleSheet.create({
   activeTab: {
-    color: '#000',
     fontWeight: 'bold',
   },
   barContainer: {
@@ -208,7 +210,6 @@ const styles = StyleSheet.create({
   },
   circleButton: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     height: 40,
     justifyContent: 'center',
@@ -216,7 +217,6 @@ const styles = StyleSheet.create({
     width: 40,
   },
   container: {
-    backgroundColor: "#F4F4F4",
     flex: 1,
     width: '100%',
     alignItems: 'center',

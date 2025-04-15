@@ -80,7 +80,7 @@ export const ReviewComment = forwardRef((props: CombinedProps) => {
 
   return (
     <View style={styles.container}>
-      {byAuthor && <View style={[styles.authorBackground, {backgroundColor: theme.authorBackground}]} />}
+      {byAuthor && <View style={[styles.authorBackground, {backgroundColor: theme.authorBackgroundComment}]} />}
       <View style={styles.authorInfosContainer}>
         <Image source={photo} style={styles.authorPostImage} />
         <NunitoText
