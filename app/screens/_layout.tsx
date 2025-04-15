@@ -8,18 +8,22 @@ import React from "react";
 import { StatusBar, View } from "react-native";
 import BookPage from "./book";
 
+import { Redirect } from "expo-router";
+
+
 export default function ScreensLayout() {
   const router = useRouter();
   const pathname = usePathname();
 
   const handleLongPress = ({ nativeEvent }: any) => {
-    if (nativeEvent.state === 4) {
-      if (pathname !== "screens/tests/teste") {
-        router.push("screens/tests/teste" as any);
-      } else {
-        router.back();
-      }
-    }
+    // if (nativeEvent.state === 4) {
+    //   if (pathname !== "screens/tests/teste") {
+    //     router.push("screens/tests/teste" as any);
+    //   } else {
+    //     router.back();
+    //   }
+    // }
+    router.push("/screens/personalLibrary");
   };
 
   return (
@@ -59,6 +63,7 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
             <Stack.Screen name="register" />
             <Stack.Screen name="tests/teste" />
             <Stack.Screen name="book"/>
+            <Stack.Screen name="personalLibrary" />
           </Stack>
         </View>
       </LongPressGestureHandler>
