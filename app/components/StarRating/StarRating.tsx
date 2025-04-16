@@ -23,7 +23,7 @@ const StarRating: React.FC<UserStatsProps> = ({ stars }) => {
         <TouchableOpacity key={index} onPress={() => handlePress(index)}>
           <AntDesign
             name={index < selectedStars ? "star" : "staro"}
-            color={index < selectedStars ? "#F4D06F" : theme.secondaryText}
+            color={index < selectedStars ? theme.starColor : theme.secondaryText}
             size={20}
           />
         </TouchableOpacity>
