@@ -83,9 +83,6 @@ export default function TestsScreen() {
         </View>
 
         {/* importar aqui o novo componente para poder testar */}
-        <View style={styles.container}>
-          <StarRating stars={0}></StarRating>
-        </View>
       
       </ScrollView>
     </SafeAreaView>
