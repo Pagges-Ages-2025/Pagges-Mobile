@@ -71,7 +71,7 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
             <Stack.Screen name="tests/teste" />
             <Stack.Screen name="book"/>
             <Stack.Screen name="profile" />
-            <Stack.Screen name="reviewComments/add" />
+            <Stack.Screen name="reviewComments/create" />
           </Stack>
           {!removeNavbarFromPageList.includes(pathname) && <NavBar />}
         </View>
