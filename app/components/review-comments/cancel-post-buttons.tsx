@@ -16,7 +16,7 @@ export default function CancelPost({
   const router = useRouter();
 
   const navigateTo = () => {
-    router.push(`/screens/login`); //home (não existe a pagina ainda)
+    router.push(`/screens/searchPage`); //home (não existe a pagina ainda)
   };
 
   return (
