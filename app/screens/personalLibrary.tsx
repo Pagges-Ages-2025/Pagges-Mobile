@@ -71,11 +71,11 @@ const Library = () => {
     <View style={[styles.container, {backgroundColor: theme.personalLibraryBackground}]}>
       {/* header */}
       <View style={styles.headerPage}>
-        <TouchableOpacity onPress={() => console.log('Back button pressed')} style={[styles.circleButton, {backgroundColor: theme.white}]}>
+        <TouchableOpacity onPress={() => console.log('Back button pressed')} style={[styles.circleButton]}>
           <Ionicons
             name="return-up-back-outline"
             size={30}
-            color={theme.black}
+            color={theme.primaryText}
             style={{ paddingRight: 20 }}
           />
         </TouchableOpacity>
