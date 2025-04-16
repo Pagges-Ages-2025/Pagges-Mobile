@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { TouchableOpacity, View, StyleSheet, Animated } from "react-native";
+import { TouchableOpacity, View, StyleSheet } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import NunitoText from "../Texts/NunitoText";
 import { useRouter } from "expo-router";
@@ -14,24 +14,9 @@ export default function CancelPost({
 }: CancelPostProps) {
   const { theme, themeName } = useTheme();
   const router = useRouter();
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
 
   const navigateTo = () => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: -50,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      router.push(`/screens/login`); //home (não existe a pagina ainda)
-    });
+    router.push(`/screens/login`); //home (não existe a pagina ainda)
   };
 
   return (
