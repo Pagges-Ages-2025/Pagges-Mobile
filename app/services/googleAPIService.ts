@@ -1,47 +1,75 @@
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SearchAPI() {
-  // Função para obter o token de autorização (exemplo com localStorage)
-  const getAuthToken = () => {
-    // Aqui você pode pegar o token de onde for armazenado (localStorage, AsyncStorage, Context, etc.)
-    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImVtYWlsIjoiYWxpY2VCQGV4YW1wbGUuY29tIiwiaWQiOjQsImlhdCI6MTc0NDA2MTYxNCwiZXhwIjoxNzQ0MTQ4MDE0fQ.mHCBZAZmX7ZK05XlA4TzvrxjHiCdeR4hQABxp9dW-O0"; // Exemplo com localStorage
+  const API_BASE_URL = 'http://localhost:3000/google-integration';
+
+  // Configure axios defaults
+  const axiosInstance = axios.create({
+    baseURL: API_BASE_URL,
+    timeout: 10000, // 10 seconds timeout
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  });
+
+  const getAuthToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      return token || '';
+    } catch (error) {
+      console.error('Error getting auth token:', error);
+      return '';
+    }
   };
 
-  // Função para buscar livros por termo
   const searchBooks = async (term: string) => {
-    const token = getAuthToken(); // Obtém o token de autorização
+    const token = await getAuthToken();
     try {
-      const response = await axios.get(`http://localhost:3000/google-integration/search`, {
-        params: { term },
+      // Encoda o termo de busca para evitar problemas com caracteres especiais
+      const encodedTerm = encodeURIComponent(term);
+      
+      const response = await axiosInstance.get(`/search`, {
+        params: { 
+          term: encodedTerm 
+        },
         headers: {
-          Authorization: `Bearer ${token}`, // Passa o token no header
-        }
+          Authorization: `Bearer ${token}`,
+        },
+        validateStatus: (status) => status < 500,
       });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+        console.error('Erro de conexão com o servidor. Verifique se o servidor está rodando.');
+        throw new Error('Erro de conexão com o servidor. Verifique se o servidor está rodando.');
+      }
       console.error('Erro ao buscar livros:', error);
       throw error;
     }
   };
 
-  // Função para buscar livros por gênero
   const searchByGenre = async (genero: string) => {
-    const token = getAuthToken(); // Obtém o token de autorização
+    const token = await getAuthToken();
     try {
-      const response = await axios.get(`http://localhost:3000/google-integration/genre`, {
+      const response = await axiosInstance.get(`/genre/${genero}`, {
         params: { genero },
         headers: {
-          Authorization: `Bearer ${token}`, // Passa o token no header
-        }
+          Authorization: `Bearer ${token}`,
+        },
+        validateStatus: (status) => status < 500,
       });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+        console.error('Erro de conexão com o servidor. Verifique se o servidor está rodando.');
+        throw new Error('Erro de conexão com o servidor. Verifique se o servidor está rodando.');
+      }
       console.error('Erro ao buscar por gênero:', error);
       throw error;
     }
   };
 
-  // Expondo as funções para o uso no front-end
   return {
     searchBooks,
     searchByGenre

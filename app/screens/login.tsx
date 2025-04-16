@@ -39,7 +39,7 @@ export default function LoginScreen() {
 
     try {
       const response = await axios.post(
-        `${process.env.API_URL}/auth/login`,
+        `http://localhost:3000/auth/login`,
         {
           email,
           password,
@@ -49,8 +49,9 @@ export default function LoginScreen() {
       const data = response.data;
 
       await AsyncStorage.setItem("userToken", data.accessToken);
+      await AsyncStorage.setItem("userEmail", email);
 
-      router.replace("/screens/book");
+      router.replace("/screens/searchPage");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(
