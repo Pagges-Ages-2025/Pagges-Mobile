@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import {
-  TouchableOpacity,
   StyleSheet,
   View,
   Image,
   TextStyle,
 } from "react-native";
-import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
-import Strings from "@/app/constants/Strings";
 import { TextInput } from "react-native";
 
 type FontWeight = "light" | "regular" | "semibold" | "bold";
@@ -57,9 +54,6 @@ const styles = StyleSheet.create({
         alignItems:"flex-start",
         justifyContent:"center",
         padding:10,
-        borderRadius:10,
-        borderWidth:1,
-        borderColor:"#ccc",
         minHeight:100
     },
     textArea:{
