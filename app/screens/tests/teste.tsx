@@ -16,7 +16,6 @@ import SearchBarSection from "./sections/searchbarSection";
 import BooksSection from "./sections/booksSection";
 import CarouselSection from "./sections/carouselSection";
 import ColorsSection from "./sections/colorsSection";
-import StarRating from "@/app/components/StarRating/StarRating";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -83,10 +82,6 @@ export default function TestsScreen() {
         </View>
 
         {/* importar aqui o novo componente para poder testar */}
-        <View style={styles.container}>
-          <StarRating stars={0}/>
-        </View>
-
       
       </ScrollView>
     </SafeAreaView>
