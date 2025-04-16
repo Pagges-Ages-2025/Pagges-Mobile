@@ -10,32 +10,24 @@ import {
 import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
 
-type ButtonType = "primary" | "outlined" | "secondary" | "outlinedSecondary";
-type ButtonSize = "small" | "medium" | "large";
-type FontWeight = "light" | "regular" | "semibold" | "bold";
+type ButtonType = "primary" | "outlined" ;
 
 interface SelectionButtonProps {
   type?: ButtonType;
-  size?: ButtonSize;
   isSelect?: boolean;
-  fontWeight?: FontWeight;
   title: string;
   onPress?: (event: GestureResponderEvent) => void;
   containerStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
-  height?: number;
 }
 
 const SelectionButton: React.FC<SelectionButtonProps> = ({
   type = "outlined",
-  size = "medium",
-  fontWeight = "regular",
   title,
   onPress,
   containerStyle,
   textStyle,
   isSelect = false,
-  height,
 }) => {
   const { theme, themeName } = useTheme();
   const [isSelected, setIsSelected] = useState(false);
@@ -46,56 +38,26 @@ const SelectionButton: React.FC<SelectionButtonProps> = ({
   };
 
   const isOutlined = type === "outlined";
-  const isSecondary = type === "secondary";
-  const isOutlinedSecondary = type === "outlinedSecondary";
 
-  const sizeStyles = {
-    small: {
-      height: 40,
-      paddingHorizontal: 20,
-      fontSize: 14,
-    },
-    medium: {
-      height: 50,
-      paddingHorizontal: 24,
-      fontSize: 16,
-    },
-    large: {
-      height: 60,
-      paddingHorizontal: 28,
-      fontSize: 18,
-    },
-  }[size];
-
-  const fontWeightMap: Record<FontWeight, TextStyle["fontWeight"]> = {
-    light: "300",
-    regular: "500",
-    semibold: "700",
-    bold: "900",
-  };
 
   const dynamicButtonStyle: ViewStyle = {
     backgroundColor: isSelected
       ? theme.primary
-      : isOutlined || isOutlinedSecondary
+      : isOutlined 
         ? "transparent"
-        : isSecondary
-          ? theme.secondary
           : theme.primary,
     borderColor: isOutlined
       ? theme.primary
-      : isOutlinedSecondary
-        ? theme.secondary
         : undefined,
-    borderWidth: isOutlined || isOutlinedSecondary ? 2 : undefined,
-    height: height ?? sizeStyles.height,
-    paddingHorizontal: sizeStyles.paddingHorizontal,
-    alignSelf: "flex-start", // 👈 importante pra permitir largura dinâmica
+    borderWidth: isOutlined ? 2 : undefined,
+    height: 40,
+    paddingHorizontal: 20,
+    alignSelf: "flex-start",
   };
 
   const dynamicTextStyle: TextStyle = {
     color:
-      isOutlined || isOutlinedSecondary
+      isOutlined
         ? isSelected
           ? theme.white
           : themeName === "dark"
@@ -104,8 +66,8 @@ const SelectionButton: React.FC<SelectionButtonProps> = ({
               ? theme.primary
               : theme.secondary
         : "white",
-    fontSize: sizeStyles.fontSize,
-    fontWeight: fontWeightMap[fontWeight],
+    fontSize: 14,
+    fontWeight: "regular",
   };
 
   return (
