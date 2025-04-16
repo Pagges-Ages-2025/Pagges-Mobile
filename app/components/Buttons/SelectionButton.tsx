@@ -16,25 +16,18 @@ interface SelectionButtonProps {
   type?: ButtonType;
   isSelect?: boolean;
   title: string;
-  onPress?: (event: GestureResponderEvent) => void;
-  containerStyle?: StyleProp<ViewStyle>;
-  textStyle?: StyleProp<TextStyle>;
 }
 
 const SelectionButton: React.FC<SelectionButtonProps> = ({
   type = "outlined",
   title,
-  onPress,
-  containerStyle,
-  textStyle,
-  isSelect = false,
+  
 }) => {
   const { theme, themeName } = useTheme();
   const [isSelected, setIsSelected] = useState(false);
 
-  const handlePress = (event: GestureResponderEvent) => {
-    setIsSelected(!isSelected);
-    onPress?.(event);
+  const handlePress = () => {
+    setIsSelected((x)=>x=!x)
   };
 
   const isOutlined = type === "outlined";
@@ -72,12 +65,12 @@ const SelectionButton: React.FC<SelectionButtonProps> = ({
 
   return (
     <TouchableOpacity
-      style={[styles.baseButton, dynamicButtonStyle, containerStyle]}
+      style={[styles.baseButton, dynamicButtonStyle]}
       onPress={handlePress}
-      disabled={isSelect}
+     
       activeOpacity={0.8}
     >
-      <NunitoText style={[styles.baseText, dynamicTextStyle, textStyle]}>
+      <NunitoText style={[styles.baseText, dynamicTextStyle]}>
         {title}
       </NunitoText>
     </TouchableOpacity>
