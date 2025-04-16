@@ -1,74 +1,51 @@
-import React, { useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Image,
-  TextStyle,
-} from "react-native";
+import { StyleSheet, View, Image, TextInput } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
-import { TextInput } from "react-native";
-
-type FontWeight = "light" | "regular" | "semibold" | "bold";
 
 interface TextFieldProps {
-    profile: string;
+  profile: string;
 }
 
-const fontWeightMap: Record<FontWeight, TextStyle["fontWeight"]> = {
-  light: "300",
-  regular: "400",
-  semibold: "600",
-  bold: "700",
-};
-
-const TextField: React.FC<TextFieldProps> = ({
-    profile
-}) => {
+const TextField: React.FC<TextFieldProps> = ({ profile }) => {
   const { theme } = useTheme();
 
   const primaryTextColorplaceholder = theme.textColorReview;
   const primaryTextColor = theme.primaryText;
   const backgroundColor = theme.Background;
 
-
-
   return (
-        <View style={[styles.container, {backgroundColor}]}>
-                <Image 
-                    style={styles.imageArea}
-                    source={{ uri: profile }}>
-                </Image>
-                <TextInput 
-                    style={[styles.textArea, {color : primaryTextColor}]} 
-                    placeholder="Algo a falar sobre seu livro?"
-                    placeholderTextColor={primaryTextColorplaceholder}
-                    multiline
-                    textAlignVertical="top"/>
-        </View>
+    <View style={[styles.container, { backgroundColor }]}>
+      <Image style={styles.imageArea} source={{ uri: profile }}></Image>
+      <TextInput
+        style={[styles.textArea, { color: primaryTextColor }]}
+        placeholder="Algo a falar sobre seu livro?"
+        placeholderTextColor={primaryTextColorplaceholder}
+        multiline
+        textAlignVertical="top"
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-    container:{
-        flexDirection: "row",
-        alignItems:"flex-start",
-        justifyContent:"center",
-        padding:10,
-        minHeight:100
-    },
-    textArea:{
-        flex:1,
-        fontSize:16,
-        minHeight:80,
-        paddingTop:5
-    },
-    imageArea:{
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        marginRight: 10,
-    }
-  
+  container: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    padding: 10,
+    minHeight: 100,
+  },
+  textArea: {
+    flex: 1,
+    fontSize: 16,
+    minHeight: 80,
+    paddingTop: 5,
+  },
+  imageArea: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 10,
+  },
 });
 
 export default TextField;
