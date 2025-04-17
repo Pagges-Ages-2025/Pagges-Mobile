@@ -21,6 +21,13 @@ interface PaggesTextInputIconNameProps {
   isSecureTextEntry?: boolean;
   onChangeText: (text: string) => void;
   onRightIconClick?: () => void;
+  keyboardType?:
+    | "default"
+    | "email-address"
+    | "numeric"
+    | "phone-pad"
+    | "number-pad"
+    | "decimal-pad";
 }
 
 const PaggesTextInput: React.FC<PaggesTextInputIconNameProps> = ({
@@ -33,6 +40,7 @@ const PaggesTextInput: React.FC<PaggesTextInputIconNameProps> = ({
   isSecureTextEntry = false,
   onChangeText,
   onRightIconClick,
+  keyboardType = "default",
 }) => {
   const { theme } = useTheme();
   return (
@@ -67,6 +75,7 @@ const PaggesTextInput: React.FC<PaggesTextInputIconNameProps> = ({
       }
       isSecureTextEntry={isSecureTextEntry}
       onChangeText={onChangeText}
+      keyboardType={keyboardType}
     />
   );
 };
@@ -79,6 +88,14 @@ interface PaggesTextInputCustomIconsProps {
   rightIcon?: React.ReactNode;
   isSecureTextEntry?: boolean;
   onChangeText: (text: string) => void;
+  keyboardType?:
+    | "default"
+    | "number-pad"
+    | "decimal-pad"
+    | "numeric"
+    | "email-address"
+    | "phone-pad"
+    | "url";
 }
 
 const PaggesTextInputCustomIcons: React.FC<PaggesTextInputCustomIconsProps> = ({
@@ -89,6 +106,7 @@ const PaggesTextInputCustomIcons: React.FC<PaggesTextInputCustomIconsProps> = ({
   rightIcon,
   isSecureTextEntry = false,
   onChangeText,
+  keyboardType = "default",
 }) => {
   const { theme } = useTheme();
   return (
@@ -105,6 +123,7 @@ const PaggesTextInputCustomIcons: React.FC<PaggesTextInputCustomIconsProps> = ({
         onChangeText={onChangeText}
         autoCapitalize="none"
         secureTextEntry={isSecureTextEntry}
+        keyboardType={keyboardType}
       />
       {rightIcon}
     </View>
