@@ -16,6 +16,8 @@ import CustomButton from "../components/Buttons/CustomButton";
 import NunitoText from "../components/Texts/NunitoText";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { PaggesTextInput } from "../components/Texts/TextInput";
+import Strings from "../constants/Strings";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -38,13 +40,10 @@ export default function LoginScreen() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        `http://localhost:3000/auth/login`,
-        {
-          email,
-          password,
-        }
-      );
+      const response = await axios.post(`http://localhost:3000/auth/login`, {
+        email,
+        password,
+      });
 
       const data = response.data;
 
@@ -128,65 +127,44 @@ export default function LoginScreen() {
               autoPlay={true}
               loop={true}
             />
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="person-outline"
-                size={20}
-                color="#A9A8A9"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="E-mail ou nome de usuário"
-                placeholderTextColor="#999"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-              />
-            </View>
 
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={20}
-                color="#A9A8A9"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Senha"
-                placeholderTextColor="#999"
-                secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={setPassword}
-              />
-              <TouchableOpacity
-                style={styles.eyeIcon}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons
-                  name={showPassword ? "eye-outline" : "eye-off-outline"}
-                  size={20}
-                  color="#A9A8A9"
-                />
-              </TouchableOpacity>
-            </View>
+            <PaggesTextInput
+              style={styles.inputContainer}
+              placeholder={Strings.emailOrUsernamePlaceholder}
+              value={email}
+              onChangeText={setEmail}
+              leftIconName="person-outline"
+            />
+
+            <PaggesTextInput
+              style={styles.inputContainer}
+              placeholder={Strings.passwordPlaceholder}
+              value={password}
+              onChangeText={setPassword}
+              leftIconName="lock-closed-outline"
+              rightIconName={showPassword ? "eye-outline" : "eye-off-outline"}
+              isRightIconEnabled={true}
+              isSecureTextEntry={!showPassword}
+              onRightIconClick={() => setShowPassword(!showPassword)}
+            />
 
             <TouchableOpacity style={styles.forgotPassword}>
               <NunitoText style={styles.forgotPasswordText}>
-                Esqueceu a senha?
+                {Strings.forgotPassword}
               </NunitoText>
             </TouchableOpacity>
-            
+
             {error && (
-              <NunitoText style={{ color: 'red', marginBottom: 16, textAlign: 'center' }}>
-              {error}
+              <NunitoText
+                style={{ color: "red", marginBottom: 16, textAlign: "center" }}
+              >
+                {error}
               </NunitoText>
             )}
-            
-            <CustomButton 
-              title={isLoading ? "Entrando..." : "Entrar"} 
-              onPress={handleLogin} 
+
+            <CustomButton
+              title={isLoading ? "Entrando..." : "Entrar"}
+              onPress={handleLogin}
               isDisabled={isLoading}
             />
 
@@ -243,17 +221,8 @@ const styles = StyleSheet.create({
     height: 150,
     marginBottom: 30,
   },
-
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#A9A8A9",
-    borderRadius: 15,
     marginBottom: 16,
-    paddingHorizontal: 16,
   },
   inputIcon: {
     marginRight: 10,
