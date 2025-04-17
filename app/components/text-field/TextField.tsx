@@ -1,11 +1,18 @@
 import { StyleSheet, View, Image, TextInput } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
+import defaultImage from "../../assets/images/profile-user.png";
 
 interface TextFieldProps {
-  profile: string;
+  profileImage?: string;
+  value?: string;
+  onChangeText?: (text: string) => void;
 }
 
-const TextField: React.FC<TextFieldProps> = ({ profile }) => {
+const TextField: React.FC<TextFieldProps> = ({
+  profileImage,
+  value,
+  onChangeText,
+}) => {
   const { theme } = useTheme();
 
   const primaryTextColorplaceholder = theme.textColorReview;
@@ -14,13 +21,18 @@ const TextField: React.FC<TextFieldProps> = ({ profile }) => {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Image style={styles.imageArea} source={{ uri: profile }}></Image>
+      <Image
+        style={styles.imageArea}
+        source={profileImage ? { uri: profileImage } : defaultImage}
+      ></Image>
       <TextInput
         style={[styles.textArea, { color: primaryTextColor }]}
         placeholder="Algo a falar sobre seu livro?"
         placeholderTextColor={primaryTextColorplaceholder}
         multiline
         textAlignVertical="top"
+        value={value}
+        onChangeText={onChangeText}
       />
     </View>
   );
