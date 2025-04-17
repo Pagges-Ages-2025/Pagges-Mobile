@@ -15,11 +15,12 @@ interface PaggesTextInputIconNameProps {
   style?: StyleProp<ViewStyle>;
   placeholder: string;
   value: string;
-  leftIconName: IoniconsName | null;
-  rightIconName: IoniconsName | null;
-  isRightIconEnabled: boolean;
+  leftIconName?: IoniconsName;
+  rightIconName?: IoniconsName;
+  isRightIconEnabled?: boolean;
+  isSecureTextEntry?: boolean;
   onChangeText: (text: string) => void;
-  onRightTextClick: () => void;
+  onRightIconClick?: () => void;
 }
 
 const PaggesTextInput: React.FC<PaggesTextInputIconNameProps> = ({
@@ -28,9 +29,10 @@ const PaggesTextInput: React.FC<PaggesTextInputIconNameProps> = ({
   value,
   leftIconName,
   rightIconName,
-  isRightIconEnabled,
+  isRightIconEnabled = true,
+  isSecureTextEntry = false,
   onChangeText,
-  onRightTextClick,
+  onRightIconClick,
 }) => {
   const { theme } = useTheme();
   return (
@@ -52,7 +54,7 @@ const PaggesTextInput: React.FC<PaggesTextInputIconNameProps> = ({
         rightIconName && (
           <TouchableOpacity
             disabled={!isRightIconEnabled}
-            onPress={onRightTextClick}
+            onPress={onRightIconClick}
           >
             <Ionicons
               name={rightIconName}
@@ -63,6 +65,7 @@ const PaggesTextInput: React.FC<PaggesTextInputIconNameProps> = ({
           </TouchableOpacity>
         )
       }
+      isSecureTextEntry={isSecureTextEntry}
       onChangeText={onChangeText}
     />
   );
@@ -74,6 +77,7 @@ interface PaggesTextInputCustomIconsProps {
   value: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  isSecureTextEntry?: boolean;
   onChangeText: (text: string) => void;
 }
 
@@ -83,6 +87,7 @@ const PaggesTextInputCustomIcons: React.FC<PaggesTextInputCustomIconsProps> = ({
   value,
   leftIcon,
   rightIcon,
+  isSecureTextEntry = false,
   onChangeText,
 }) => {
   const { theme } = useTheme();
@@ -99,6 +104,7 @@ const PaggesTextInputCustomIcons: React.FC<PaggesTextInputCustomIconsProps> = ({
         numberOfLines={1}
         onChangeText={onChangeText}
         autoCapitalize="none"
+        secureTextEntry={isSecureTextEntry}
       />
       {rightIcon}
     </View>
