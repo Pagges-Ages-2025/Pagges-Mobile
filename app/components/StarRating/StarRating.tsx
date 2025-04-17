@@ -4,11 +4,11 @@ import { useTheme } from "../../context/ThemeContext";
 import { Theme } from "@/app/constants/Theme";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
-interface UserStatsProps {
+interface StarRatingProps {
   stars: number;
 }
 
-const StarRating: React.FC<UserStatsProps> = ({ stars }) => {
+const StarRating: React.FC<StarRatingProps> = ({ stars }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const [selectedStars, setSelectedStars] = useState(stars);
