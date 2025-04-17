@@ -54,7 +54,7 @@ const PaggesTextInput: React.FC<PaggesTextInputIconNameProps> = ({
             name={leftIconName}
             size={24}
             color={theme.placeholder}
-            style={styles.leftIcon}
+            style={styles.icon}
           />
         )
       }
@@ -68,7 +68,7 @@ const PaggesTextInput: React.FC<PaggesTextInputIconNameProps> = ({
               name={rightIconName}
               size={24}
               color={theme.placeholder}
-              style={styles.rightIcon}
+              style={styles.icon}
             />
           </TouchableOpacity>
         )
@@ -138,10 +138,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 15,
   },
-  leftIcon: {
-    margin: 12,
-  },
-  rightIcon: {
+  icon: {
     margin: 12,
   },
   input: {
