@@ -11,4 +11,5 @@ export default {
   usernamePlaceholder: "Nome de usuário",
   emailPlaceholder: "E-mail",
   confirmPasswordPlaceholder: "Confirmar senha",
+  placeholderReview:"Algo a falar sobre seu livro ?"
 };
