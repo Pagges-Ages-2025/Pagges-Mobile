@@ -4,6 +4,11 @@ export default {
   readLess: "Mostrar menos",
   spoilerWarning: "⚠ Contém spoiler ⚠",
   spoilerWarningSecondary: "Clique para ler",
-  placeholderReview:"Algo a falar sobre seu livro ?"
+  emailOrUsernamePlaceholder: "E-mail ou nome de usuário",
+  passwordPlaceholder: "Senha",
+  forgotPassword: "Esqueceu a senha?",
+  fullNamePlaceholder: "Nome Completo",
+  usernamePlaceholder: "Nome de usuário",
+  emailPlaceholder: "E-mail",
+  confirmPasswordPlaceholder: "Confirmar senha",
 };
-

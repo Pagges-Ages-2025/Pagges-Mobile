@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  TouchableWithoutFeedback,
+  Keyboard
 } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import CustomBook from "../Book/CustomBook";
@@ -87,68 +89,86 @@ export default function BookSearch({
   const handleSearch = (text: string) => {
     setQuery(text);
     setShowSuggestions(true);
-    if (onSearch) {
+    // Só dispara a busca se o texto não estiver vazio
+    if (onSearch && text.trim().length > 0) {
       onSearch(text);
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <View
-        style={[
-          styles.searchContainer,
-          {
-            height: dynamicStyles.height,
-            borderColor: dynamicStyles.borderColor,
-            borderWidth: dynamicStyles.borderWidth,
-            borderRadius: dynamicStyles.borderRadius,
-          },
-        ]}
-      >
-        <TextInput
-          style={[styles.input, dynamicStyles.inputPaddingStyle, {backgroundColor: theme.Background, color: theme.primaryText}]}
-          value={query}
-          onChangeText={handleSearch}
-          placeholder={placeholder}
-          placeholderTextColor={theme.placeholder}
-          onFocus={() => setShowSuggestions(true)}
-        />
-        <View
-          style={[styles.searchIconContainer, dynamicStyles.iconPositionStyle]}
-        >
-          <Ionicons name="search" size={20} color={dynamicStyles.iconColor} />
-        </View>
-      </View>
+  // Função para fechar sugestões e teclado
+  const handlePressOutside = () => {
+    setShowSuggestions(false);
+    setQuery(""); // Limpa o texto da busca
+    Keyboard.dismiss();
+  };
 
-      {showSuggestions && query.length > 0 && (
-        <View style={styles.suggestionsContainer}>
-          <FlatList
-            style={{ maxHeight: 200, backgroundColor: theme.postCardBackground}}
-            data={books}
-            nestedScrollEnabled={true}
-            keyboardShouldPersistTaps="handled"
-            renderItem={({ item }) => (
-              <CustomBook
-                size="search"
-                title={item.titulo}
-                photoPath={item.capa}
-                bookId={item.id}
-                onPress={() => handleSelectBook(item)}
+  return (
+    <TouchableWithoutFeedback onPress={handlePressOutside}>
+      <View style={styles.outerContainer}>
+        <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+          <View style={styles.container}>
+            <View
+              style={[
+                styles.searchContainer,
+                {
+                  height: dynamicStyles.height,
+                  borderColor: dynamicStyles.borderColor,
+                  borderWidth: dynamicStyles.borderWidth,
+                  borderRadius: dynamicStyles.borderRadius,
+                },
+              ]}
+            >
+              <TextInput
+                style={[styles.input, dynamicStyles.inputPaddingStyle, {backgroundColor: theme.Background, color: theme.primaryText}]}
+                value={query}
+                onChangeText={handleSearch}
+                placeholder={placeholder}
+                placeholderTextColor={theme.placeholder}
+                onFocus={() => setShowSuggestions(true)}
               />
-            )}
-            ListEmptyComponent={() => (
-              <View style={styles.emptyContainer}>
-                <Text style={[styles.emptyText, {color: theme.primaryText}]}>Nenhum livro encontrado</Text>
+              <View
+                style={[styles.searchIconContainer, dynamicStyles.iconPositionStyle]}
+              >
+                <Ionicons name="search" size={20} color={dynamicStyles.iconColor} />
+              </View>
+            </View>
+
+            {showSuggestions && query.length > 0 && (
+              <View style={styles.suggestionsContainer}>
+                <FlatList
+                  style={{ maxHeight: 200, backgroundColor: theme.postCardBackground}}
+                  data={books}
+                  nestedScrollEnabled={true}
+                  keyboardShouldPersistTaps="handled"
+                  renderItem={({ item }) => (
+                    <CustomBook
+                      size="search"
+                      title={item.titulo}
+                      photoPath={item.capa}
+                      bookId={item.id}
+                      onPress={() => handleSelectBook(item)}
+                    />
+                  )}
+                  ListEmptyComponent={() => (
+                    <View style={styles.emptyContainer}>
+                      <Text style={[styles.emptyText, {color: theme.primaryText}]}>Nenhum livro encontrado</Text>
+                    </View>
+                  )}
+                />
               </View>
             )}
-          />
-        </View>
-      )}
-    </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    width: "100%",
+  },
   container: {
     width: "100%",
     zIndex: 1,
@@ -168,6 +188,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 16,
     height: "100%",
+    width: 25,
     justifyContent: "center",
   },
   suggestionsContainer: {

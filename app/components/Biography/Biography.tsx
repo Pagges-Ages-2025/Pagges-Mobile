@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -12,15 +12,22 @@ import { Feather } from "@expo/vector-icons";
 
 interface BiographyProps {
   biographyText: string;
+  onBioChange: (newBio: string) => void;
 }
 
-const Biography: React.FC<BiographyProps> = ({ biographyText }) => {
+const Biography: React.FC<BiographyProps> = ({ biographyText, onBioChange }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
   const [editing, setEditing] = useState(false);
   const [bioText, setBioText] = useState(biographyText);
-  const [originalBio, setOriginalBio] = useState(biographyText); // novo estado
+  const [originalBio, setOriginalBio] = useState(biographyText);
+
+  // Add this effect to sync with prop changes
+  useEffect(() => {
+    setBioText(biographyText);
+    setOriginalBio(biographyText);
+  }, [biographyText]);
 
   const startEditing = () => {
     setOriginalBio(bioText); // salva o texto antes da edição
@@ -28,6 +35,8 @@ const Biography: React.FC<BiographyProps> = ({ biographyText }) => {
   };
 
   const saveBiography = () => {
+    setBioText(bioText);
+    onBioChange(bioText);
     setEditing(false);
   };
 
@@ -50,7 +59,7 @@ const Biography: React.FC<BiographyProps> = ({ biographyText }) => {
             </TouchableOpacity>
           </View>
         ) : (
-          <TouchableOpacity onPress={() => setEditing(true)}>
+          <TouchableOpacity onPress={startEditing}>
             <Feather name="edit" size={18} color={theme.secondaryText} />
           </TouchableOpacity>
         )}

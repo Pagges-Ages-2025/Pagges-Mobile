@@ -26,6 +26,7 @@ import CustomBook from "../components/Book/CustomBook";
 import { ReviewComment } from "../components/review-comments/review-comments";
 import CustomModal from "../components/review-comments/pop-up-modal";
 import CustomButton from "../components/Buttons/CustomButton";
+import { router } from "expo-router";
 
 interface ModalBookDetailsProps {
   visible: boolean;
@@ -485,7 +486,7 @@ export default function ModalBookDetails({
       visible={visible}
       animationType="slide"
       presentationStyle="fullScreen"
-      onRequestClose={onClose}
+      onRequestClose={onClose || router.replace("/screens/searchPage")}
     >
       <BookContent />
     </Modal>
