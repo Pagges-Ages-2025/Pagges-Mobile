@@ -10,38 +10,33 @@ import {
 import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
 
-type ButtonType = "primary" | "outlined" ;
+type ButtonType = "primary" | "outlined";
 
 interface SelectionButtonProps {
   type?: ButtonType;
-  isSelect?: boolean;
   title: string;
 }
 
 const SelectionButton: React.FC<SelectionButtonProps> = ({
   type = "outlined",
   title,
-  
 }) => {
   const { theme, themeName } = useTheme();
   const [isSelected, setIsSelected] = useState(false);
 
   const handlePress = () => {
-    setIsSelected((x)=>x=!x)
+    setIsSelected(!isSelected);
   };
 
   const isOutlined = type === "outlined";
 
-
   const dynamicButtonStyle: ViewStyle = {
     backgroundColor: isSelected
       ? theme.primary
-      : isOutlined 
+      : isOutlined
         ? "transparent"
-          : theme.primary,
-    borderColor: isOutlined
-      ? theme.primary
-        : undefined,
+        : theme.primary,
+    borderColor: isOutlined ? theme.primary : undefined,
     borderWidth: isOutlined ? 2 : undefined,
     height: 40,
     paddingHorizontal: 20,
@@ -49,25 +44,22 @@ const SelectionButton: React.FC<SelectionButtonProps> = ({
   };
 
   const dynamicTextStyle: TextStyle = {
-    color:
-      isOutlined
-        ? isSelected
-          ? theme.white
-          : themeName === "dark"
-            ? theme.primaryText
-            : isOutlined
-              ? theme.primary
-              : theme.secondary
-        : "white",
+    color: isSelected
+      ? theme.white
+      : themeName === "dark"
+        ? theme.primaryText
+        : isOutlined
+          ? theme.primary
+          : theme.secondary,
+
     fontSize: 14,
-    fontWeight: "regular",
+    fontWeight: "900",
   };
 
   return (
     <TouchableOpacity
       style={[styles.baseButton, dynamicButtonStyle]}
       onPress={handlePress}
-     
       activeOpacity={0.8}
     >
       <NunitoText style={[styles.baseText, dynamicTextStyle]}>
