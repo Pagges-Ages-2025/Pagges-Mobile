@@ -2,42 +2,33 @@ import React, { useState } from "react";
 import {
   TouchableOpacity,
   StyleSheet,
-  GestureResponderEvent,
-  StyleProp,
   ViewStyle,
   TextStyle,
 } from "react-native";
 import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
 
-type ButtonType = "primary" | "outlined";
-
 interface SelectionButtonProps {
-  type?: ButtonType;
   title: string;
+  isSelected: boolean;
+  onSelectChange: (selected: boolean) => void;
 }
 
 const SelectionButton: React.FC<SelectionButtonProps> = ({
-  type = "outlined",
   title,
+  isSelected,
+  onSelectChange,
 }) => {
   const { theme, themeName } = useTheme();
-  const [isSelected, setIsSelected] = useState(false);
 
   const handlePress = () => {
-    setIsSelected(!isSelected);
+    onSelectChange(!isSelected);
   };
 
-  const isOutlined = type === "outlined";
-
   const dynamicButtonStyle: ViewStyle = {
-    backgroundColor: isSelected
-      ? theme.primary
-      : isOutlined
-        ? "transparent"
-        : theme.primary,
-    borderColor: isOutlined ? theme.primary : undefined,
-    borderWidth: isOutlined ? 2 : undefined,
+    backgroundColor: isSelected ? theme.primary : "transparent",
+    borderColor: theme.primary,
+    borderWidth: 2,
     height: 40,
     paddingHorizontal: 20,
     alignSelf: "flex-start",
@@ -48,9 +39,7 @@ const SelectionButton: React.FC<SelectionButtonProps> = ({
       ? theme.white
       : themeName === "dark"
         ? theme.primaryText
-        : isOutlined
-          ? theme.primary
-          : theme.secondary,
+        : theme.primary,
 
     fontSize: 14,
     fontWeight: "900",
