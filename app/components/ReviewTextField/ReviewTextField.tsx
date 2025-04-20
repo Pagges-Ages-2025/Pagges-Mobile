@@ -50,12 +50,12 @@ const styles = StyleSheet.create({
   textArea: {
     flex: 1,
     fontSize: 16,
-    minHeight: 40,
-    paddingTop: 5,
+    minHeight: 200,
+    paddingTop: 10,
   },
   imageArea: {
-    width: 30,
-    height: 30,
+    width: 40,
+    height: 40,
     borderRadius: 15,
     marginRight: 10,
   },
