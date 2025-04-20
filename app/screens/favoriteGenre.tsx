@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { View, StyleSheet, SafeAreaView } from "react-native";
-import BookSearch, { Book } from "../components/SearchBar/SearchBar";
 import { useTheme } from "../context/ThemeContext";
-import SearchAPI from "../services/googleAPIService";
-import ModalBookDetails from "./book";
 import NunitoText from "../components/Texts/NunitoText";
 import Strings from "../constants/Strings";
 import SelectionButton from "../components/Buttons/SelectionButton";
