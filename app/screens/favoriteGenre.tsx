@@ -70,6 +70,7 @@ const FavoriteGenre: React.FC = () => {
           <SelectionButton
             title={title}
             isSelected={selectedItens.includes(title)}
+            key={title}
             onSelectChange={() => toggleSelection(title)}
           />
         ))}
