@@ -4,5 +4,7 @@ export default {
   readLess: "Mostrar menos",
   spoilerWarning: "⚠ Contém spoiler ⚠",
   spoilerWarningSecondary: "Clique para ler",
+  cancel: "Cancelar",
+  post: "Publicar",
 };
 
