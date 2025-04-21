@@ -2,7 +2,7 @@ import NunitoText from "@/app/components/Texts/NunitoText";
 import { StyleSheet, View } from "react-native";
 
 
-export default function AddScreen() {  
+export default function CreateReviewCommentScreen() {  
   return (
     <View style={[styles.container]}>
         <NunitoText style={[{ color: 'black'}]}>
