@@ -6,15 +6,19 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 
 interface StarRatingProps {
   stars: number;
+  onPressStar?: (starIndex: number) => void;
 }
 
-const StarRating: React.FC<StarRatingProps> = ({ stars }) => {
+const StarRating: React.FC<StarRatingProps> = ({ stars, onPressStar }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const [selectedStars, setSelectedStars] = useState(stars);
 
   const handlePress = (index: number) => {
     setSelectedStars(index + 1);
+    if (onPressStar) {
+      onPressStar(index + 1);
+    }
   };
 
   return (
