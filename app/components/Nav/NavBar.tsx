@@ -49,7 +49,7 @@ export default function NavBar() {
       icon: themeName === 'dark' ? 'sunny' : 'moon',
       action: toggleTheme
     },
-    { name: 'Add', icon: 'add', route: '/add' },
+    { name: 'Add', icon: 'add', route: '/screens/createReviewComment' },
     { 
       name: 'Sair', 
       icon: 'log-out-outline', 
