@@ -14,6 +14,7 @@ import CustomButton from "../components/Buttons/CustomButton";
 import NunitoText from "../components/Texts/NunitoText";
 import { PaggesTextInput } from "../components/Texts/TextInput";
 import Strings from "../constants/Strings";
+import axios from "axios";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export default function RegisterScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [userType, setUserType] = useState("reader");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
     Animated.parallel([
@@ -45,6 +47,23 @@ export default function RegisterScreen() {
     ]).start();
   }, []);
 
+  useEffect(() => {
+    const nameValid = fullName.length > 5;
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const passwordValid = (password == confirmPassword);
+    setIsFormValid(nameValid && emailValid && passwordValid);
+
+  }, [fullName, email, password, confirmPassword]);
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(`http://10.0.2.2:3000/auth/register`, {email, password, name : fullName, username,  isAuthor: userType === 'reader' ? false : true})
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+ 
   const navigateTo = (screen: "login" | "register") => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -204,7 +223,7 @@ export default function RegisterScreen() {
               </TouchableOpacity>
 
               <View style={{ marginTop: 30 }}>
-                <CustomButton title={"Cadastrar"} onPress={() => {}} />
+                <CustomButton title={"Cadastrar"} onPress={handleSubmit} isDisabled = {!isFormValid} />
               </View>
 
               <TouchableOpacity
