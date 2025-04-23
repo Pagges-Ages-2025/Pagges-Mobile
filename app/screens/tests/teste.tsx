@@ -17,11 +17,14 @@ import BooksSection from "./sections/booksSection";
 import CarouselSection from "./sections/carouselSection";
 import ColorsSection from "./sections/colorsSection";
 import ErrorsModalsSection from "./sections/ErrorsModalsSection";
+import RatingModal from "@/app/components/RatingModal/RatingModal";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const { themeName, setThemeName, theme } = useTheme();
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   const [open, setOpen] = useState({
     buttons: true,
@@ -81,6 +84,16 @@ export default function TestsScreen() {
           <BooksSection />
           <CarouselSection />
           <ErrorsModalsSection />
+          <TouchableOpacity onPress={() => setModalVisible(true)} style={[styles.themeToggle, { backgroundColor: theme.borders }]}/>
+        <RatingModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          onRate={() => {
+    
+          setModalVisible(false);
+          }}
+          bookName="Memórias da Meia-Noite"
+        />
         </View>
       </ScrollView>
     </SafeAreaView>
