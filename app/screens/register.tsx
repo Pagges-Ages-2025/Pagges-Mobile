@@ -1,26 +1,25 @@
 import React, { useEffect, useRef, useState } from "react";
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TextInput, 
-  TouchableOpacity, 
-  Animated, 
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  GestureResponderEvent
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import CustomButton from "../components/Buttons/CustomButton";
 import NunitoText from "../components/Texts/NunitoText";
+import { PaggesTextInput } from "../components/Texts/TextInput";
+import Strings from "../constants/Strings";
 
 export default function RegisterScreen() {
   const router = useRouter();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
-  
+
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -28,7 +27,7 @@ export default function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [userType, setUserType] = useState("reader"); 
+  const [userType, setUserType] = useState("reader");
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
@@ -68,7 +67,10 @@ export default function RegisterScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer} scrollEnabled={false}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        scrollEnabled={false}
+      >
         <View style={styles.container}>
           <Animated.View
             style={[
@@ -81,146 +83,139 @@ export default function RegisterScreen() {
           >
             <NunitoText style={styles.welcomeText}>Bem-vindo à</NunitoText>
             <NunitoText style={styles.title}>Pagges</NunitoText>
-            
+
             <View style={styles.form}>
-            <View style={styles.inputsContainer}>
-              <View style={styles.inputContainer}>
-                <Ionicons name="person" size={20} color="#A9A8A9" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nome Completo"
-                  placeholderTextColor="#999"
+              <View style={styles.inputsContainer}>
+                <PaggesTextInput
+                  placeholder={Strings.fullNamePlaceholder}
                   value={fullName}
+                  leftIconName="person"
                   onChangeText={setFullName}
                 />
-              </View>
-              
-              <View style={styles.inputContainer}>
-                <Ionicons name="at" size={20} color="#A9A8A9" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nome de usuário"
-                  placeholderTextColor="#999"
+
+                <PaggesTextInput
+                  placeholder={Strings.usernamePlaceholder}
                   value={username}
+                  leftIconName="at"
                   onChangeText={setUsername}
-                  autoCapitalize="none"
                 />
-              </View>
-            
-              
-              <View style={styles.inputContainer}>
-                <Ionicons name="mail-outline" size={20} color="#A9A8A9" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="E-mail"
-                  placeholderTextColor="#999"
+
+                <PaggesTextInput
+                  placeholder={Strings.emailPlaceholder}
                   value={email}
+                  leftIconName="mail-outline"
                   onChangeText={setEmail}
                   keyboardType="email-address"
-                  autoCapitalize="none"
                 />
-              </View>
-              
-              <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed-outline" size={20} color="#A9A8A9" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Senha"
-                  placeholderTextColor="#999"
-                  secureTextEntry={!showPassword}
+
+                <PaggesTextInput
+                  placeholder={Strings.passwordPlaceholder}
                   value={password}
+                  leftIconName="lock-closed-outline"
+                  rightIconName={
+                    showPassword ? "eye-outline" : "eye-off-outline"
+                  }
+                  isRightIconEnabled={true}
+                  isSecureTextEntry={!showPassword}
+                  onRightIconClick={() => setShowPassword(!showPassword)}
                   onChangeText={setPassword}
                 />
-                <TouchableOpacity 
-                  style={styles.eyeIcon} 
-                  onPress={() => setShowPassword(!showPassword)}
-                >
-                  <Ionicons 
-                    name={showPassword ? "eye-outline" : "eye-off-outline"} 
-                    size={20} 
-                    color="#A9A8A9" 
-                  />
-                </TouchableOpacity>
-              </View>
-              
-              <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed-outline" size={20} color="#A9A8A9" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Confirmar senha"
-                  placeholderTextColor="#999"
-                  secureTextEntry={!showConfirmPassword}
+
+                <PaggesTextInput
+                  placeholder={Strings.confirmPasswordPlaceholder}
                   value={confirmPassword}
+                  leftIconName="lock-closed-outline"
+                  rightIconName={
+                    showConfirmPassword ? "eye-outline" : "eye-off-outline"
+                  }
+                  isRightIconEnabled={true}
+                  isSecureTextEntry={!showConfirmPassword}
+                  onRightIconClick={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
                   onChangeText={setConfirmPassword}
                 />
-                <TouchableOpacity 
-                  style={styles.eyeIcon} 
-                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  <Ionicons 
-                    name={showConfirmPassword ? "eye-outline" : "eye-off-outline"} 
-                    size={20} 
-                    color="#A9A8A9" 
-                  />
-                </TouchableOpacity>
+
+                <View style={styles.radioContainer}>
+                  <TouchableOpacity
+                    style={styles.radioOption}
+                    onPress={() => setUserType("reader")}
+                  >
+                    <View
+                      style={[
+                        styles.radioButton,
+                        userType === "reader" && styles.radioButtonSelected,
+                      ]}
+                    >
+                      {userType === "reader" && (
+                        <View style={styles.radioButtonInner} />
+                      )}
+                    </View>
+                    <NunitoText style={styles.radioLabel}>
+                      Sou leitor(a)
+                    </NunitoText>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.radioOption}
+                    onPress={() => setUserType("author")}
+                  >
+                    <View
+                      style={[
+                        styles.radioButton,
+                        userType === "author" && styles.radioButtonSelected,
+                      ]}
+                    >
+                      {userType === "author" && (
+                        <View style={styles.radioButtonInner} />
+                      )}
+                    </View>
+                    <NunitoText style={styles.radioLabel}>
+                      Sou autor(a)
+                    </NunitoText>
+                  </TouchableOpacity>
+                </View>
               </View>
 
-              <View style={styles.radioContainer}>
-                <TouchableOpacity 
-                  style={styles.radioOption} 
-                  onPress={() => setUserType("reader")}
-                >
-                  <View style={[
-                    styles.radioButton, 
-                    userType === "reader" && styles.radioButtonSelected
-                  ]}>
-                    {userType === "reader" && <View style={styles.radioButtonInner} />}
-                  </View>
-                  <NunitoText style={styles.radioLabel}>Sou leitor(a)</NunitoText>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={styles.radioOption} 
-                  onPress={() => setUserType("author")}
-                >
-                  <View style={[
-                    styles.radioButton, 
-                    userType === "author" && styles.radioButtonSelected
-                  ]}>
-                    {userType === "author" && <View style={styles.radioButtonInner} />}
-                  </View>
-                  <NunitoText style={styles.radioLabel}>Sou autor(a)</NunitoText>
-                </TouchableOpacity>
-              </View>
-              </View>
-              
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.termsContainer}
                 onPress={() => setTermsAccepted(!termsAccepted)}
               >
-                <View style={[
-                  styles.checkbox, 
-                  termsAccepted && styles.checkboxSelected
-                ]}>
-                  {termsAccepted && <Ionicons name="checkmark" size={14} color="white" />}
+                <View
+                  style={[
+                    styles.checkbox,
+                    termsAccepted && styles.checkboxSelected,
+                  ]}
+                >
+                  {termsAccepted && (
+                    <Ionicons name="checkmark" size={14} color="white" />
+                  )}
                 </View>
                 <NunitoText style={styles.termsText}>
                   Declaro que li e concordo com os{" "}
-                  <NunitoText style={styles.termsLink}>Termos de Uso</NunitoText> e a{" "}
-                  <NunitoText style={styles.termsLink}>Política de Privacidade</NunitoText>
+                  <NunitoText style={styles.termsLink}>
+                    Termos de Uso
+                  </NunitoText>{" "}
+                  e a{" "}
+                  <NunitoText style={styles.termsLink}>
+                    Política de Privacidade
+                  </NunitoText>
                 </NunitoText>
               </TouchableOpacity>
 
-              <View style={{marginTop:30}}>
-              <CustomButton title={"Cadastrar"}  onPress={() => {}} />
+              <View style={{ marginTop: 30 }}>
+                <CustomButton title={"Cadastrar"} onPress={() => {}} />
               </View>
-              
-              <TouchableOpacity 
-                style={styles.loginLink} 
+
+              <TouchableOpacity
+                style={styles.loginLink}
                 onPress={() => navigateTo("login")}
               >
                 <NunitoText style={styles.loginLinkText}>
-                  Já possui uma conta? <NunitoText style={styles.loginLinkHighlight}>Login</NunitoText>
+                  Já possui uma conta?{" "}
+                  <NunitoText style={styles.loginLinkHighlight}>
+                    Login
+                  </NunitoText>
                 </NunitoText>
               </TouchableOpacity>
             </View>
@@ -261,9 +256,9 @@ const styles = StyleSheet.create({
   form: {
     width: "100%",
   },
-  inputsContainer:{
-    display:"flex",
-    flexDirection:"column",
+  inputsContainer: {
+    display: "flex",
+    flexDirection: "column",
     gap: 10,
   },
   inputContainer: {
@@ -285,7 +280,7 @@ const styles = StyleSheet.create({
     height: "100%",
     color: "#333",
     fontSize: 16,
-    fontFamily:"Nunito"
+    fontFamily: "Nunito",
   },
   eyeIcon: {
     padding: 10,
