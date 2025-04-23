@@ -14,7 +14,7 @@ export default function Index() {
       if (userToken) {
         router.replace("/screens/book");
       } else {
-        router.replace("/screens/login");
+        router.replace("/screens/personalLibrary");
       }
     };
 

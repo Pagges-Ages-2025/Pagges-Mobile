@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import NunitoText from '../components/Texts/NunitoText';
@@ -27,9 +28,20 @@ type Book = {
     size: 'small' | 'medium' | 'large';
   };
 
-const Library = () => {
+  interface LibraryProps{
+    isVisible: boolean;
+    onClose: () => void;
+    pageIndex: Number;
+
+  }
+
+const Library: React.FC<LibraryProps> = ({
+  isVisible,
+  onClose,
+  pageIndex = 0,
+}) => {
   const { theme } = useTheme();
-  const [actualPage, setActualPage] = useState(0);
+  const [actualPage, setActualPage] = useState(pageIndex);
   const [readBooks, setReadBooks] = useState<Book[]>([]);
   const [readingBooks, setReadingBooks] = useState<Book[]>([]);
   const [toReadBooks, setToReadBooks] = useState<Book[]>([]);
@@ -68,6 +80,12 @@ const Library = () => {
   
 
   return (
+    <Modal
+     animationType='slide'
+     visible={isVisible}
+     onRequestClose={onClose}
+     presentationStyle='fullScreen'
+    >
     <View style={[styles.container, {backgroundColor: theme.personalLibraryBackground}]}>
       {/* header */}
       <View style={styles.headerPage}>
@@ -187,6 +205,7 @@ const Library = () => {
         )}
       </View>
     </View>
+    </Modal>
   );
 };
 
