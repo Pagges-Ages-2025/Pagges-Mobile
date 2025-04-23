@@ -11,4 +11,6 @@ export default {
   usernamePlaceholder: "Nome de usuário",
   emailPlaceholder: "E-mail",
   confirmPasswordPlaceholder: "Confirmar senha",
+  cancel: "Cancelar",
+  post: "Publicar",
 };
