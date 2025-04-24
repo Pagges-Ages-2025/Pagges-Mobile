@@ -13,4 +13,6 @@ export default {
   confirmPasswordPlaceholder: "Confirmar senha",
   cancel: "Cancelar",
   post: "Publicar",
+  review:"Resenha",
+  spoilerWarningPlain: "Contém spoiler",
 };
