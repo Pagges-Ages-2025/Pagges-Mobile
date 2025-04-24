@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { View, StyleSheet, SafeAreaView } from "react-native";
+import { View, StyleSheet, SafeAreaView, GestureResponderEvent } from "react-native";
 import { useTheme } from "../context/ThemeContext";
 import NunitoText from "../components/Texts/NunitoText";
 import Strings from "../constants/Strings";
 import SelectionButton from "../components/Buttons/SelectionButton";
+import CustomButton from "../components/Buttons/CustomButton";
 
 const FavoriteGenre: React.FC = () => {
-  const { theme } = useTheme();
+  const { theme, themeName } = useTheme();
   const gener = [
     "Família",
     "Ficção Científica",
@@ -49,7 +50,7 @@ const FavoriteGenre: React.FC = () => {
       style={[styles.container, { backgroundColor: theme.Background }]}
     >
       <View style={[styles.containerView]}>
-        <NunitoText style={[styles.h1, { color: theme.primary }]}>
+        <NunitoText style={[styles.h1, { color:themeName==="dark" ?theme.white :theme.primary }]}>
           {Strings.genreTitle}
         </NunitoText>
       </View>
@@ -57,10 +58,11 @@ const FavoriteGenre: React.FC = () => {
         style={{
           flexDirection: "row",
           columnGap: 10,
-          rowGap: 20,
+          rowGap: 15,
           flexWrap: "wrap",
           paddingInline: 15,
           justifyContent: "center",
+          marginBottom: 80
         }}
       >
         {gener.map((title) => (
@@ -69,9 +71,16 @@ const FavoriteGenre: React.FC = () => {
             isSelected={selectedItens.includes(title)}
             key={title}
             onSelectChange={() => toggleSelection(title)}
+            isDisable={selectedItens.length==3 && !selectedItens.includes(title)}
           />
-        ))}
-      </View>
+        ))}    
+        </View>
+        <View style={{alignSelf: "center" , width: 250, bottom:40, position: "absolute" }}>    
+        <CustomButton title={"Salvar"} size="small" fontWeight="bold" onPress={function (event: GestureResponderEvent): void {
+          throw new Error("Function not implemented.");
+        } }
+        />  
+        </View>
     </SafeAreaView>
   );
 };
@@ -90,6 +99,12 @@ const styles = StyleSheet.create({
     marginTop: 70,
     marginBottom: 40,
   },
+  buttonView:{
+    justifyContent: "center",
+    marginTop: 70,
+    marginBottom: 40,
+    
+  }
 });
 
 export default FavoriteGenre;
