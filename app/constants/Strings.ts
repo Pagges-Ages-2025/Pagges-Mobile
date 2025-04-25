@@ -11,5 +11,6 @@ export default {
   usernamePlaceholder: "Nome de usuário",
   emailPlaceholder: "E-mail",
   confirmPasswordPlaceholder: "Confirmar senha",
-  genreTitle: "Escolha seus favoritos"
+  genreTitle: "Escolha seus favoritos",
+  save: "Salvar"
 };
