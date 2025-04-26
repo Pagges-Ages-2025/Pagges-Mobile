@@ -50,7 +50,7 @@ export default function RegisterScreen() {
   useEffect(() => {
     const nameValid = fullName.length > 5;
     const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const passwordValid = (password == confirmPassword);
+    const passwordValid = (password.length > 0 && password == confirmPassword);
     setIsFormValid(nameValid && emailValid && passwordValid);
 
   }, [fullName, email, password, confirmPassword]);
