@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/app/context/ThemeContext';
 import BookSearch, { Book } from '../SearchBar/SearchBar';
 import SearchAPI from '@/app/services/googleAPIService';
+import ModalBookDetails from '@/app/screens/book';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -20,6 +21,8 @@ const SelectBook = forwardRef((props, ref) => {
   const [loading, setLoading] = useState(false);
   const { searchBooks } = SearchAPI();
   const [books, setBooks] = useState<Book[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
   const handleOpen = useCallback(() => {
     bottomSheetRef.current?.expand();
@@ -34,7 +37,21 @@ const SelectBook = forwardRef((props, ref) => {
 
   const handleSelectBook = (book: Book) => {
     console.log("Livro selecionado:", book);
+    
+    // Garantir que a URL da capa tenha 'zoom=6'
+    let updatedCapa = book.capa;
+    if (updatedCapa && updatedCapa.includes('zoom=1')) {
+      updatedCapa = updatedCapa.replace('zoom=1', 'zoom=6');
+    }
+
+    setSelectedBook({ ...book, capa: updatedCapa });
+    setModalVisible(true);
   };
+  
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
   const handleSearch = async (term: string) => {
     setLoading(true);
     try {
@@ -50,38 +67,58 @@ const SelectBook = forwardRef((props, ref) => {
 
   return (
     <>
-    <GestureHandlerRootView style={[styles.container, { backgroundColor: theme.Background }]}>
-      <BottomSheet
-        ref={bottomSheetRef}
-        snapPoints={snapPoints}
-        enablePanDownToClose={true}
-        index={-1}
-        backgroundStyle={styles.bottomSheet}
-        onClose={handleCloseBottomSheet}
-        backdropComponent={(props) => (
-          <BottomSheetBackdrop
-            {...props}
-            disappearsOnIndex={-1} 
-            appearsOnIndex={0}     
-            opacity={0.2}          
-          />
-        )}
-      >
-        <BottomSheetScrollView>
-          <BookSearch
-              SearchSize="md"
-              iconPosition="left"
-              iconColor="grey"
-              borderRadius="md"
-              books={books}
-              onSelectBook={handleSelectBook} 
-              onSearch={handleSearch}
+      <GestureHandlerRootView style={[styles.container, { backgroundColor: theme.Background }]}>
+        <BottomSheet
+          ref={bottomSheetRef}
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+          
+          backgroundStyle={styles.bottomSheet}
+          onClose={handleCloseBottomSheet}
+          backdropComponent={(props) => (
+            <BottomSheetBackdrop
+              {...props}
+              disappearsOnIndex={-1} 
+              appearsOnIndex={0}     
+              opacity={0.2}          
             />
-          <NunitoText>Buscar livros e exibir (nova task)</NunitoText>
-        </BottomSheetScrollView>
-        
-      </BottomSheet>
-    </GestureHandlerRootView>
+          )}
+        >
+          <BottomSheetScrollView>
+            <View style={styles.search}>
+              <BookSearch
+                SearchSize="md"
+                iconPosition="left"
+                iconColor="grey"
+                borderRadius="md"
+                books={books}
+                onSelectBook={handleSelectBook} 
+                onSearch={handleSearch}
+              />
+            </View>
+            {selectedBook && (
+              <ModalBookDetails
+                visible={modalVisible}
+                onClose={handleCloseModal}
+                titulo={selectedBook.titulo}
+                author={selectedBook.autores?.join(", ") || "Autor desconhecido"}
+                capa={selectedBook.capa}  // Capa com 'zoom=6'
+                paginas={selectedBook.paginas || 0}
+                sinopse={selectedBook.sinopse || "Sinopse não disponível"}
+                rating={4.0} 
+                readersNumber={100} 
+                rankingNumber={"5"}
+                review="Sem avaliações disponíveis ainda." 
+                publicationDate={ "Ano desconhecido"} 
+                genre={ "Gênero não especificado"} 
+                onCreateReview={() => console.log("Criar resenha para:", selectedBook.titulo)}
+                onShare={() => console.log("Compartilhar:", selectedBook.titulo)}
+              />
+            )}
+          </BottomSheetScrollView>
+        </BottomSheet>
+      </GestureHandlerRootView>
+
       {buttonVisible && (
         <View style={[styles.selectText, { backgroundColor: theme.Background }]}>
           <TouchableOpacity onPress={handleOpen} style={styles.selectButton}>
@@ -122,4 +159,8 @@ const styles = StyleSheet.create({
     flexDirection: "row", 
     alignItems: "center", 
   },
+  search:{
+    width:"90%",
+    alignSelf: 'center',
+  }
 });
