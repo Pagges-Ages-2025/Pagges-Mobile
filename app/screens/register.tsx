@@ -69,6 +69,8 @@ export default function RegisterScreen() {
 
       await AsyncStorage.setItem("userToken", response.accessToken);
       await AsyncStorage.setItem("userEmail", email);
+
+      router.replace("/screens/favoriteGenre");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(error.response?.data.message);
