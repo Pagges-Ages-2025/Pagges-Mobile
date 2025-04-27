@@ -1,13 +1,25 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+// CheckBoxOptions.tsx
+
+import React from "react";
+import { View, StyleSheet } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import Checkbox from "expo-checkbox";
 import NunitoText from "../Texts/NunitoText";
 import Strings from "@/app/constants/Strings";
 
-const CheckBoxOptions = () => {
-  const [isReviewChecked, setIsReviewChecked] = useState(false);
-  const [isSpoilerChecked, setIsSpoilerChecked] = useState(false);
+interface CheckBoxOptionsProps {
+  isReviewChecked: boolean;
+  isSpoilerChecked: boolean;
+  onReviewChange: (checked: boolean) => void;
+  onSpoilerChange: (checked: boolean) => void;
+}
+
+const CheckBoxOptions: React.FC<CheckBoxOptionsProps> = ({
+  isReviewChecked,
+  isSpoilerChecked,
+  onReviewChange,
+  onSpoilerChange,
+}) => {
   const { theme } = useTheme();
 
   return (
@@ -15,7 +27,7 @@ const CheckBoxOptions = () => {
       <View style={styles.checkboxContainer}>
         <Checkbox
           value={isReviewChecked}
-          onValueChange={() => setIsReviewChecked(!isReviewChecked)}
+          onValueChange={onReviewChange}
           color={isReviewChecked ? theme.successColor : undefined}
           style={styles.checkbox}
         />
@@ -26,7 +38,7 @@ const CheckBoxOptions = () => {
       <View style={styles.checkboxContainer}>
         <Checkbox
           value={isSpoilerChecked}
-          onValueChange={() => setIsSpoilerChecked(!isSpoilerChecked)}
+          onValueChange={onSpoilerChange}
           color={isSpoilerChecked ? theme.successColor : undefined}
           style={styles.checkbox}
         />
@@ -41,11 +53,9 @@ const CheckBoxOptions = () => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    padding: 10,
   },
   checkboxContainer: {
     flexDirection: "row",
-    alignItems: "center",
     marginRight: 20,
     justifyContent: "space-between",
     gap: 6,
