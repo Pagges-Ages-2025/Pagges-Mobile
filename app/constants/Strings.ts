@@ -13,4 +13,5 @@ export default {
   confirmPasswordPlaceholder: "Confirmar senha",
   cancel: "Cancelar",
   post: "Publicar",
+  selectBook: "Selecionar um livro"
 };
