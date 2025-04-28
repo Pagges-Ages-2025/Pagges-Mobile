@@ -15,5 +15,8 @@ export default {
   post: "Publicar",
   placeholderReview:"Algo a falar sobre seu livro ?",
   genreTitle: "Escolha seus favoritos",
-  save: "Salvar"
+  save: "Salvar",
+   review:"Resenha",
+  spoilerWarningPlain: "Contém spoiler",
+
 };
