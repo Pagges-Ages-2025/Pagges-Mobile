@@ -27,6 +27,8 @@ import { ReviewComment } from "../components/review-comments/review-comments";
 import CustomModal from "../components/review-comments/pop-up-modal";
 import CustomButton from "../components/Buttons/CustomButton";
 import { router } from "expo-router";
+import StaticStars from "../components/StaticStars/StaticStars";
+import RatingModal from "../components/RatingModal/RatingModal";
 
 interface ModalBookDetailsProps {
   visible: boolean;
@@ -267,16 +269,17 @@ export default function ModalBookDetails({
             }}
           >
             <View style={styles.starsContainer}>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <AntDesign
-                  key={index}
-                  name={index < roundedStars ? "star" : "staro"}
-                  size={20}
-                  color={
-                    index < roundedStars ? theme.starColor : theme.white
-                  }
-                />
-              ))}
+            <StaticStars
+              rating={rating}
+              onPress={() => setModalVisible(true)}
+            />
+            <RatingModal
+              visible={modalVisible}
+              onClose={() => setModalVisible(false)}
+              onRate={() => {setModalVisible(false);
+              }}
+              book_id="Memórias da Meia-Noite"
+            />
             </View>
 
             <TouchableOpacity

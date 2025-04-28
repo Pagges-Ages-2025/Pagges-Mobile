@@ -18,6 +18,7 @@ import CarouselSection from "./sections/carouselSection";
 import ColorsSection from "./sections/colorsSection";
 import ErrorsModalsSection from "./sections/ErrorsModalsSection";
 import RatingModal from "@/app/components/RatingModal/RatingModal";
+import StaticStars from "@/app/components/StaticStars/StaticStars";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -84,7 +85,10 @@ export default function TestsScreen() {
           <BooksSection />
           <CarouselSection />
           <ErrorsModalsSection />
-          <TouchableOpacity onPress={() => setModalVisible(true)} style={[styles.themeToggle, { backgroundColor: theme.borders }]}/>
+          <StaticStars
+        rating={4}
+        onPress={() => setModalVisible(true)}
+      />
         <RatingModal
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
@@ -92,7 +96,7 @@ export default function TestsScreen() {
     
           setModalVisible(false);
           }}
-          bookName="Memórias da Meia-Noite"
+          book_id="Memórias da Meia-Noite"
         />
         </View>
       </ScrollView>

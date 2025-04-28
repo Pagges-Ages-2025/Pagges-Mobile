@@ -8,21 +8,20 @@ import {
 } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import { Theme } from "@/app/constants/Theme";
-//import StarRating from "../components/StarRating";
-//<StarRating rating={rating} onChange={setRating} />
+import StarRating from "../StarRating/StarRating";
 
 interface RatingModalProps {
   visible: boolean;
   onClose: () => void;
   onRate: () => void;
-  bookName: string;
+  book_id: string;
 }
 
 const RatingModal: React.FC<RatingModalProps> = ({
   visible,
   onClose,
   onRate,
-  bookName,
+  book_id,
 }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
@@ -37,9 +36,9 @@ const RatingModal: React.FC<RatingModalProps> = ({
           </TouchableOpacity>
 
           <Text style={styles.title}>Avalie o livro</Text>
-          <Text style={styles.bookName}>{bookName}</Text>
+          <Text style={styles.bookName}>{book_id}</Text>
 
-          
+          <StarRating stars={rating} onPressStar={(starIndex) => setRating(starIndex)} />
 
           <Text style={styles.infoText}>
             Sua avaliação será somada com as demais na nota do livro
