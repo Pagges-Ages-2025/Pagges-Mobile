@@ -9,6 +9,7 @@ import { useTheme } from "../context/ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Biography from "../components/Biography/Biography";
 import Achievement from "../components/Achievements/Achievement";
+import { useRouter } from "expo-router";
 
 const getToken = async () => {
   const userToken = await AsyncStorage.getItem("userToken");
@@ -18,6 +19,7 @@ const getToken = async () => {
 export default function ProfileScreen() {
   const [data, setData] = useState<User>();
   const { theme } = useTheme();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -36,6 +38,10 @@ export default function ProfileScreen() {
   }, []);
 
   console.log("Current data state:", data);
+
+  const handleEditProfile = () => {
+    router.push("/screens/editProfile"); 
+  };
 
   const handleBioChange = async (newBio: string) => {
     const token = await getToken();
@@ -61,6 +67,8 @@ export default function ProfileScreen() {
           profileImageUrl="https://upload.wikimedia.org/wikipedia/pt/6/62/Kermit_the_Frog.jpg"
           name={data?.name || "Seu Perfil"}
           isAuthor={data?.isAuthor || false}
+          bEdit={true}
+          onPressEdit={handleEditProfile}
         />
         <View style={styles.statsContainer}>
           <UserStats

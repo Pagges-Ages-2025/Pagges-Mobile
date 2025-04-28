@@ -5,6 +5,7 @@ import {
   Image,
   ImageBackground,
   TextStyle,
+  TouchableOpacity,
 } from "react-native";
 import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
@@ -18,6 +19,10 @@ interface ProfileHeaderProps {
   profileImageUrl: string;
   name: string;
   isAuthor: boolean;
+  bEdit?: boolean;
+  bEditPicture?: boolean;
+  onPressEdit?: () => void;
+  onPressCameraIcon?: () => void;
 }
 
 const headerImageHeight = 123;
@@ -28,6 +33,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   profileImageUrl,
   name,
   isAuthor,
+  bEdit = false,
+  bEditPicture = false,
+  onPressEdit,
+  onPressCameraIcon,
 }) => {
   const { theme } = useTheme();
 
@@ -46,7 +55,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             source={{ uri: profileImageUrl }}
             style={[styles.profileImage, { marginStart: marginStart }]}
           />
-          <Ionicons name="create-outline" size={32} style={styles.editIcon} />
+
+          {bEdit && (
+            <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
+              <Ionicons name="create-outline" size={32} />
+            </TouchableOpacity>)}
+
+          {bEditPicture && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={onPressCameraIcon}
+              style={styles.cameraIcon}
+            >
+              <Ionicons name="camera" size={48} color={theme.white} />
+            </TouchableOpacity>
+          )}
         </ImageBackground>
       </View>
       <View style={{ marginStart: marginStart }}>
@@ -100,6 +123,11 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 28,
     fontWeight: 700,
+  },
+  cameraIcon: {
+    position: "absolute",
+    top: "90%",
+    left: "12%",
   },
   username: {
     fontSize: 18,
