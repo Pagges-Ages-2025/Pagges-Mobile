@@ -11,6 +11,7 @@ import { useTheme } from "../../context/ThemeContext";
 import VerifiedIcon from "../../assets/images/ic_verified.svg";
 import Strings from "@/app/constants/Strings";
 import DefaultProfileHeaderImage from "../../assets/images/default_profile_header_image.png";
+import { Ionicons } from "@expo/vector-icons";
 
 interface ProfileHeaderProps {
   marginStart: number;
@@ -45,6 +46,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             source={{ uri: profileImageUrl }}
             style={[styles.profileImage, { marginStart: marginStart }]}
           />
+          <Ionicons name="create-outline" size={32} style={styles.editIcon} />
         </ImageBackground>
       </View>
       <View style={{ marginStart: marginStart }}>
@@ -73,6 +75,7 @@ const styles = StyleSheet.create({
   backgroundImage: {
     width: "100%",
     height: headerImageHeight,
+    position: "relative",
   },
   profileImage: {
     width: profileImageSize,
@@ -84,6 +87,11 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     flex: 1,
     height: headerImageHeight * 0.75 + profileImageSize,
+  },
+  editIcon: {
+    position: "absolute",
+    top: "55%",
+    right: "5%",
   },
   genresContainer: {
     flexDirection: "row",
