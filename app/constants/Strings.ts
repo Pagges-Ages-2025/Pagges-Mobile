@@ -13,6 +13,7 @@ export default {
   confirmPasswordPlaceholder: "Confirmar senha",
   cancel: "Cancelar",
   post: "Publicar",
-  review:"Resenha",
-  spoilerWarningPlain: "Contém spoiler",
+  placeholderReview:"Algo a falar sobre seu livro ?",
+  genreTitle: "Escolha seus favoritos",
+  save: "Salvar"
 };

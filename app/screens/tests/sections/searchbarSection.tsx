@@ -4,9 +4,27 @@ import Section from "../components/section";
 import BookSearch, { Book } from "../../../components/SearchBar/SearchBar";
 
 const mockBooks: Book[] = [
-  { id: "1", title: "O Senhor dos Anéis", author: "Tolkien" },
-  { id: "2", title: "Harry Potter", author: "J.K. Rowling" },
-  { id: "3", title: "Dom Casmurro", author: "Machado de Assis" },
+  {
+    id: 1,
+    titulo: "O Senhor dos Anéis",
+    autores: ["Tolkien"],
+    capa: "",
+    paginas: 200,
+  },
+  {
+    id: 2,
+    titulo: "Harry Potter",
+    autores: ["J.K. Rowling"],
+    capa: "",
+    paginas: 200,
+  },
+  {
+    id: 3,
+    titulo: "Dom Casmurro",
+    autores: ["Machado de Assis"],
+    capa: "",
+    paginas: 200,
+  },
 ];
 
 const SearchBarSection = () => {
@@ -40,9 +58,21 @@ const SearchBarSection = () => {
         onToggle={() => toggle("size")}
       >
         <View style={styles.grid}>
-          <BookSearch SearchSize="sm" books={mockBooks} onSelectBook={handleSelectBook} />
-          <BookSearch SearchSize="md" books={mockBooks} onSelectBook={handleSelectBook} />
-          <BookSearch SearchSize="lg" books={mockBooks} onSelectBook={handleSelectBook} />
+          <BookSearch
+            SearchSize="sm"
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
+          <BookSearch
+            SearchSize="md"
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
+          <BookSearch
+            SearchSize="lg"
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
         </View>
       </Section>
 
@@ -52,8 +82,16 @@ const SearchBarSection = () => {
         onToggle={() => toggle("color")}
       >
         <View style={styles.grid}>
-          <BookSearch color="primary" books={mockBooks} onSelectBook={handleSelectBook} />
-          <BookSearch color="secondary" books={mockBooks} onSelectBook={handleSelectBook} />
+          <BookSearch
+            color="primary"
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
+          <BookSearch
+            color="secondary"
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
         </View>
       </Section>
 
@@ -63,8 +101,16 @@ const SearchBarSection = () => {
         onToggle={() => toggle("iconPosition")}
       >
         <View style={styles.grid}>
-          <BookSearch iconPosition="left" books={mockBooks} onSelectBook={handleSelectBook} />
-          <BookSearch iconPosition="right" books={mockBooks} onSelectBook={handleSelectBook} />
+          <BookSearch
+            iconPosition="left"
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
+          <BookSearch
+            iconPosition="right"
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
         </View>
       </Section>
 
@@ -74,9 +120,21 @@ const SearchBarSection = () => {
         onToggle={() => toggle("iconColor")}
       >
         <View style={styles.grid}>
-          <BookSearch iconColor="primary" books={mockBooks} onSelectBook={handleSelectBook} />
-          <BookSearch iconColor="secondary" books={mockBooks} onSelectBook={handleSelectBook} />
-          <BookSearch iconColor="grey" books={mockBooks} onSelectBook={handleSelectBook} />
+          <BookSearch
+            iconColor="primary"
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
+          <BookSearch
+            iconColor="secondary"
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
+          <BookSearch
+            iconColor="grey"
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
         </View>
       </Section>
 
@@ -86,9 +144,21 @@ const SearchBarSection = () => {
         onToggle={() => toggle("borderRadius")}
       >
         <View style={styles.grid}>
-          <BookSearch borderRadius="lg" books={mockBooks} onSelectBook={handleSelectBook} />
-          <BookSearch borderRadius="md" books={mockBooks} onSelectBook={handleSelectBook} />
-          <BookSearch borderRadius="sm" books={mockBooks} onSelectBook={handleSelectBook} />
+          <BookSearch
+            borderRadius="lg"
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
+          <BookSearch
+            borderRadius="md"
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
+          <BookSearch
+            borderRadius="sm"
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
         </View>
       </Section>
 
@@ -98,8 +168,16 @@ const SearchBarSection = () => {
         onToggle={() => toggle("border")}
       >
         <View style={styles.grid}>
-          <BookSearch border={true} books={mockBooks} onSelectBook={handleSelectBook} />
-          <BookSearch border={false} books={mockBooks} onSelectBook={handleSelectBook} />
+          <BookSearch
+            border={true}
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
+          <BookSearch
+            border={false}
+            books={mockBooks}
+            onSelectBook={handleSelectBook}
+          />
         </View>
       </Section>
     </Section>
