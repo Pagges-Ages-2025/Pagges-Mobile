@@ -14,14 +14,14 @@ interface RatingModalProps {
   visible: boolean;
   onClose: () => void;
   onRate: () => void;
-  book_id: string;
+  book: string;
 }
 
 const RatingModal: React.FC<RatingModalProps> = ({
   visible,
   onClose,
   onRate,
-  book_id,
+  book,
 }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
@@ -36,7 +36,7 @@ const RatingModal: React.FC<RatingModalProps> = ({
           </TouchableOpacity>
 
           <Text style={styles.title}>Avalie o livro</Text>
-          <Text style={styles.bookName}>{book_id}</Text>
+          <Text style={styles.bookName}>{book}</Text>
 
           <StarRating stars={rating} onPressStar={(starIndex) => setRating(starIndex)} />
 

@@ -278,7 +278,7 @@ export default function ModalBookDetails({
               onClose={() => setModalVisible(false)}
               onRate={() => {setModalVisible(false);
               }}
-              book_id="Memórias da Meia-Noite"
+              book={titulo}
             />
             </View>
 
