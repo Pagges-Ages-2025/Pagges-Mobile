@@ -71,7 +71,7 @@ export default function ModalBookDetails({
   const [modalVisible, setModalVisible] = useState(false);
   const [currentRating, setCurrentRating] = useState(rating);
   const [ratingCount, setRatingCount] = useState(1);
-
+  
   const bottomSheetRef = useRef<BottomSheet>(null);
   const roundedStars = Math.round(currentRating);
   const snapPoints = useMemo(() => ["62%", "85%"], []);
