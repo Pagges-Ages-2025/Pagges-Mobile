@@ -23,8 +23,6 @@ export default function TestsScreen() {
   const slideAnim = useRef(new Animated.Value(50)).current;
   const { themeName, setThemeName, theme } = useTheme();
 
-  const [modalVisible, setModalVisible] = useState(false);
-
   const [open, setOpen] = useState({
     buttons: true,
     size: true,
