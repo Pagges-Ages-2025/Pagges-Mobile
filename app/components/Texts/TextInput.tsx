@@ -15,6 +15,7 @@ interface PaggesTextInputIconNameProps {
   style?: StyleProp<ViewStyle>;
   placeholder: string;
   value: string;
+  multiline?: boolean;
   leftIconName?: IoniconsName;
   rightIconName?: IoniconsName;
   isRightIconEnabled?: boolean;
@@ -41,6 +42,7 @@ const PaggesTextInput: React.FC<PaggesTextInputIconNameProps> = ({
   onChangeText,
   onRightIconClick,
   keyboardType = "default",
+  multiline = false,
 }) => {
   const { theme } = useTheme();
   return (
@@ -76,11 +78,13 @@ const PaggesTextInput: React.FC<PaggesTextInputIconNameProps> = ({
       isSecureTextEntry={isSecureTextEntry}
       onChangeText={onChangeText}
       keyboardType={keyboardType}
+      multiline={multiline}
     />
   );
 };
 
 interface PaggesTextInputCustomIconsProps {
+  multiline?: boolean;
   style?: StyleProp<ViewStyle>;
   placeholder: string;
   value: string;
@@ -107,6 +111,7 @@ const PaggesTextInputCustomIcons: React.FC<PaggesTextInputCustomIconsProps> = ({
   isSecureTextEntry = false,
   onChangeText,
   keyboardType = "default",
+  multiline = false,
 }) => {
   const { theme } = useTheme();
   return (
@@ -124,6 +129,7 @@ const PaggesTextInputCustomIcons: React.FC<PaggesTextInputCustomIconsProps> = ({
         autoCapitalize="none"
         secureTextEntry={isSecureTextEntry}
         keyboardType={keyboardType}
+        multiline={multiline}
       />
       {rightIcon}
     </View>

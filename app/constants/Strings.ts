@@ -13,10 +13,19 @@ export default {
   confirmPasswordPlaceholder: "Confirmar senha",
   cancel: "Cancelar",
   post: "Publicar",
+  namePlaceholder: "Nome",
+  bioPlaceholder: "Biografia",
+  saving: "Salvando...",
+  save: "Salvar",
+  errorTitle: "Erro",
+  tokenNotFound: "Token de autenticação não encontrado.",
+  warningTitle: "Aviso",
+  noChangesDetected: "Nenhuma alteração detectada.",
+  unexpectedError: "Erro inesperado.",
   placeholderReview:"Algo a falar sobre seu livro ?",
   genreTitle: "Escolha seus favoritos",
-  save: "Salvar",
-   review:"Resenha",
+  review:"Resenha",
   spoilerWarningPlain: "Contém spoiler",
+
 
 };
