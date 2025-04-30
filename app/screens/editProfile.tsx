@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView, View, StyleSheet, Text } from "react-native";
+import {
+  ScrollView,
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { useTheme } from "../context/ThemeContext";
 import CustomButton from "@/app/components/Buttons/CustomButton";
 import ProfileHeader from "@/app/components/Profile/ProfileHeader";
@@ -73,7 +79,11 @@ export default function EditProfileScreen() {
       if (bio && bio !== profileBiography) updateData.biography = bio;
 
       if (!updateData.name && !updateData.biography) {
-        showErrorModal(Strings.warningTitle, Strings.noChangesDetected, "warning");
+        showErrorModal(
+          Strings.warningTitle,
+          Strings.noChangesDetected,
+          "warning"
+        );
         return;
       }
 
@@ -98,13 +108,9 @@ export default function EditProfileScreen() {
 
   return (
     <>
-      <Ionicons
-        name="arrow-undo-circle"
-        size={42}
-        style={styles.backButton}
-        onPress={() => router.back()}
-      />
-
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Ionicons name="arrow-undo-circle" size={42} />
+      </TouchableOpacity>
       <ScrollView
         style={[styles.container, { backgroundColor: theme.Background }]}
         contentContainerStyle={{ flexGrow: 1 }}
@@ -181,9 +187,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: "15%",
     width: "90%",
+    gap: 5,
   },
   charCounter: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     marginRight: 20,
     marginBottom: 60,
     fontSize: 12,
