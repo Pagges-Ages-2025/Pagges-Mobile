@@ -28,6 +28,8 @@ type Book = {
     size: 'small' | 'medium' | 'large';
   };
 
+  type BookCategory = 'READ' | 'READING' | 'TO_BE_READ';
+
   interface LibraryProps{
     isVisible: boolean;
     onClose: () => void;
@@ -53,31 +55,75 @@ const Library: React.FC<LibraryProps> = ({
   const handlePress = () => {
     console.log('Livro clicado!');
   };
+  
+  // useEffect(() => {
+  //   const fetchBooks = async () => {
+  //     const response = await new Promise<{
+  //       read: Book[];
+  //       reading: Book[];
+  //       toRead: Book[];
+  //     }>((resolve) => {
+  //       setTimeout(() => {
+  //         resolve({
+  //           read: mockReadBooks,
+  //           reading: mockReadingBooks,
+  //           toRead: mockToReadBooks,
+  //         });
+  //       }, 1000);
+  //     });
+  
+  //     setReadBooks(response.read);
+  //     setReadingBooks(response.reading);
+  //     setToReadBooks(response.toRead);
+  //   };
+  
+  //   fetchBooks();
+  // }, []);
+
+  const fetchBooksByArray = async (category: BookCategory) => {
+    try {
+      const response = await fetch(`http://localhost:3000/personal-library/getBooksArray/${category}`, {
+        method: 'GET',
+        headers: {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ1OTc4NzIzLCJleHAiOjE3NDYwNjUxMjN9.UkgchzHvkPIDINeOCrCiB_U7406aUPQZKF0WqQDvDLA"
+        },
+      });
+
+
+      if (!response.ok) {
+        console.error(`Erro ao obter dados para categoria ${category}:`, response.status);
+        return;
+      }
+
+      const data = await response.json();
+      console.log(`Resposta das listas ${category}:`, data);
+
+      const mappedBooks = data.map((item: any) => ({
+        id: item.book.book_id,
+        title: item.book.title,
+        author: item.book.authors,
+        photoPath: item.book.cover,
+        size: 'small' as const,
+      }));
+      
+      if (category === 'READ') {
+        setReadBooks(mappedBooks);
+      } else if (category === 'READING') {
+        setReadingBooks(mappedBooks);
+      } else if (category === 'TO_BE_READ') {
+        setToReadBooks(mappedBooks);
+      }
+    }
+    catch (error) {
+      console.error(`Erro ao buscar livros da categoria ${category}:`, error);
+    }
+  }
 
   useEffect(() => {
-    const fetchBooks = async () => {
-      const response = await new Promise<{
-        read: Book[];
-        reading: Book[];
-        toRead: Book[];
-      }>((resolve) => {
-        setTimeout(() => {
-          resolve({
-            read: mockReadBooks,
-            reading: mockReadingBooks,
-            toRead: mockToReadBooks,
-          });
-        }, 1000);
-      });
-  
-      setReadBooks(response.read);
-      setReadingBooks(response.reading);
-      setToReadBooks(response.toRead);
-    };
-  
-    fetchBooks();
+    fetchBooksByArray('READ');
+    fetchBooksByArray('READING');
+    fetchBooksByArray('TO_BE_READ');
   }, []);
-  
 
   return (
     <Modal
@@ -172,16 +218,21 @@ const Library: React.FC<LibraryProps> = ({
             style={{ flex: 1 }}
             nestedScrollEnabled
             >
-            {readingBooks.map((book) => (
-                <CustomBook
-                key={book.id}
-                size={book.size}
-                title={book.title}
-                photoPath={book.photoPath}
-                onPress={handlePress}
-                bookId={book.id}
-                />
-            ))}
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+                {toReadBooks.map((book) => (
+                  <View style={{paddingHorizontal: 12, paddingVertical: 15}}> 
+                      <CustomBook
+                      key={book.id}
+                      size={book.size}
+                      title={book.title}
+                      photoPath={book.photoPath}
+                      onPress={handlePress}
+                      bookId={book.id}
+                      toPersonalLibrary={true}
+                      />
+                    </View>
+                ))}
+              </View>
             </ScrollView>
         )}
 
@@ -191,16 +242,21 @@ const Library: React.FC<LibraryProps> = ({
             style={{ flex: 1 }}
             nestedScrollEnabled
             >
-            {toReadBooks.map((book) => (
-                <CustomBook
-                key={book.id}
-                size={book.size}
-                title={book.title}
-                photoPath={book.photoPath}
-                onPress={handlePress}
-                bookId={book.id}
-                />
-            ))}
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+                {readingBooks.map((book) => (
+                  <View style={{paddingHorizontal: 12, paddingVertical: 15}}> 
+                      <CustomBook
+                      key={book.id}
+                      size={book.size}
+                      title={book.title}
+                      photoPath={book.photoPath}
+                      onPress={handlePress}
+                      bookId={book.id}
+                      toPersonalLibrary={true}
+                      />
+                  </View>
+                ))}
+              </View>
             </ScrollView>
         )}
       </View>
