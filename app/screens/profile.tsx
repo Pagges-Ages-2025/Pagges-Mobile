@@ -39,9 +39,21 @@ export default function ProfileScreen() {
 
   console.log("Current data state:", data);
 
-  const handleEditProfile = () => {
-    router.push("/screens/editProfile"); 
+  const handleEditProfile = async () => {
+    const token = await getToken();
+  
+    if (token && data) {
+      router.push({
+        pathname: "/screens/editProfile",
+        params: {
+          userToken: token,
+          profileName: data.name,
+          profileBiography: data.biography ?? "",
+        },
+      });
+    }
   };
+  
 
   const handleBioChange = async (newBio: string) => {
     const token = await getToken();

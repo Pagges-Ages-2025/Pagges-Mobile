@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 interface ProfileHeaderProps {
   marginStart: number;
-  profileImageUrl: string;
+  profileImageUrl?: string;
   name: string;
   isAuthor: boolean;
   bEdit?: boolean;
@@ -51,10 +51,19 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           source={DefaultProfileHeaderImage}
           style={styles.backgroundImage}
         >
-          <Image
-            source={{ uri: profileImageUrl }}
-            style={[styles.profileImage, { marginStart: marginStart }]}
-          />
+            {bEditPicture ? (
+            <View
+              style={[
+                styles.profileImage,
+                { marginStart: marginStart, backgroundColor: "gray" },
+              ]}
+            />
+          ) : (
+            <Image
+              source={{ uri: profileImageUrl }}
+              style={[styles.profileImage, { marginStart: marginStart }]}
+            />
+          )}
 
           {bEdit && (
             <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
@@ -127,7 +136,7 @@ const styles = StyleSheet.create({
   cameraIcon: {
     position: "absolute",
     top: "90%",
-    left: "12%",
+    left: "11.5%",
   },
   username: {
     fontSize: 18,
