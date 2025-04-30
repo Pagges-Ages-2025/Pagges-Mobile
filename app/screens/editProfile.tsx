@@ -154,25 +154,25 @@ export default function EditProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  formContainer: {
-    flex: 1,
-    width: "90%",
-    alignSelf: "center",
-    paddingVertical: "15%",
-    gap: 20,
-  },
   TextInputContainer: {
-    marginVertical: 10,
     height: 70,
     marginBottom: 60,
+    marginVertical: 10,
   },
   backButton: {
     left: 20,
     position: "absolute",
     top: 50,
     zIndex: 10,
+  },
+  container: {
+    flex: 1,
+  },
+  formContainer: {
+    alignSelf: "center",
+    flex: 1,
+    gap: 20,
+    paddingVertical: "15%",
+    width: "90%",
   },
 });
