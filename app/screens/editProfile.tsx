@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView, View, StyleSheet } from "react-native";
+import { ScrollView, View, StyleSheet, Text } from "react-native";
 import { useTheme } from "../context/ThemeContext";
 import CustomButton from "@/app/components/Buttons/CustomButton";
 import ProfileHeader from "@/app/components/Profile/ProfileHeader";
@@ -21,6 +21,7 @@ export default function EditProfileScreen() {
 
   const [name, setName] = useState<string>(profileName?.toString() || "");
   const [bio, setBio] = useState<string>(profileBiography?.toString() || "");
+  const [bioCharCount, setBioCharCount] = useState<number>(bio.length);
   const [changesMade, setChangesMade] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -46,7 +47,12 @@ export default function EditProfileScreen() {
 
   const handleInputChange = (text: string, type: "name" | "bio") => {
     if (type === "name") setName(text);
-    else setBio(text);
+    else {
+      if (text.length <= 200) {
+        setBio(text);
+        setBioCharCount(text.length);
+      }
+    }
 
     const nameChanged = type === "name" && text !== profileName;
     const bioChanged = type === "bio" && text !== profileBiography;
@@ -116,7 +122,7 @@ export default function EditProfileScreen() {
 
           <View style={styles.formContainer}>
             <PaggesTextInput
-              style={styles.TextInputContainer}
+              style={[styles.TextInputContainer, { height: 60 }]}
               placeholder={Strings.namePlaceholder}
               value={name}
               onChangeText={(text) => handleInputChange(text, "name")}
@@ -124,12 +130,16 @@ export default function EditProfileScreen() {
             />
 
             <PaggesTextInput
-              style={styles.TextInputContainer}
+              style={[styles.TextInputContainer, { height: 200 }]}
               placeholder={Strings.bioPlaceholder}
               value={bio}
               onChangeText={(text) => handleInputChange(text, "bio")}
               leftIconName="document-text-outline"
+              multiline={true}
             />
+            <Text style={[styles.charCounter, { color: theme.primaryText }]}>
+              {bioCharCount}/200
+            </Text>
 
             <CustomButton
               title={loading ? Strings.saving : Strings.save}
@@ -155,8 +165,6 @@ export default function EditProfileScreen() {
 
 const styles = StyleSheet.create({
   TextInputContainer: {
-    height: 70,
-    marginBottom: 60,
     marginVertical: 10,
   },
   backButton: {
@@ -171,8 +179,13 @@ const styles = StyleSheet.create({
   formContainer: {
     alignSelf: "center",
     flex: 1,
-    gap: 20,
     paddingVertical: "15%",
     width: "90%",
+  },
+  charCounter: {
+    alignSelf: 'flex-end',
+    marginRight: 20,
+    marginBottom: 60,
+    fontSize: 12,
   },
 });
