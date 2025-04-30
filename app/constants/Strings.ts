@@ -16,7 +16,7 @@ export default {
   placeholderReview:"Algo a falar sobre seu livro ?",
   genreTitle: "Escolha seus favoritos",
   save: "Salvar",
-   review:"Resenha",
+  review:"Resenha",
   spoilerWarningPlain: "Contém spoiler",
-
+  selectBook: "Selecionar um livro"
 };
