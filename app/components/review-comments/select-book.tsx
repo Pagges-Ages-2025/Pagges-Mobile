@@ -10,24 +10,23 @@ import BookSearch, { Book } from '../SearchBar/SearchBar';
 import SearchAPI from '@/app/services/googleAPIService';
 import ModalBookDetails from '@/app/screens/book';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-
 const SelectBook = forwardRef((props, ref) => {
 
   const { theme, themeName } = useTheme();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [buttonVisible, setButtonVisible] = useState(true);
+  const { height: SCREEN_HEIGHT } = Dimensions.get('window');
   const snapPoints = useMemo(() => [SCREEN_HEIGHT * 0.6], []);
   const [loading, setLoading] = useState(false);
   const { searchBooks } = SearchAPI();
   const [books, setBooks] = useState<Book[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
   const handleOpen = useCallback(() => {
+    setIsBottomSheetOpen(true)
     bottomSheetRef.current?.expand();
-    bottomSheetRef.current?.close();
-    
     setButtonVisible(false); 
   }, []);
 
@@ -38,7 +37,6 @@ const SelectBook = forwardRef((props, ref) => {
   const handleSelectBook = (book: Book) => {
     console.log("Livro selecionado:", book);
     
-    // Garantir que a URL da capa tenha 'zoom=6'
     let updatedCapa = book.capa;
     if (updatedCapa && updatedCapa.includes('zoom=1')) {
       updatedCapa = updatedCapa.replace('zoom=1', 'zoom=6');
@@ -67,14 +65,16 @@ const SelectBook = forwardRef((props, ref) => {
 
   return (
     <>
+    
       <GestureHandlerRootView style={[styles.container, { backgroundColor: theme.Background }]}>
         <BottomSheet
           ref={bottomSheetRef}
           snapPoints={snapPoints}
           enablePanDownToClose={true}
-          
+          index={-1} 
           backgroundStyle={styles.bottomSheet}
           onClose={handleCloseBottomSheet}
+          
           backdropComponent={(props) => (
             <BottomSheetBackdrop
               {...props}
@@ -86,6 +86,8 @@ const SelectBook = forwardRef((props, ref) => {
         >
           <BottomSheetScrollView>
             <View style={styles.search}>
+            {isBottomSheetOpen && (
+
               <BookSearch
                 SearchSize="md"
                 iconPosition="left"
@@ -95,6 +97,7 @@ const SelectBook = forwardRef((props, ref) => {
                 onSelectBook={handleSelectBook} 
                 onSearch={handleSearch}
               />
+            )}
             </View>
             {selectedBook && (
               <ModalBookDetails
@@ -102,7 +105,7 @@ const SelectBook = forwardRef((props, ref) => {
                 onClose={handleCloseModal}
                 titulo={selectedBook.titulo}
                 author={selectedBook.autores?.join(", ") || "Autor desconhecido"}
-                capa={selectedBook.capa}  // Capa com 'zoom=6'
+                capa={selectedBook.capa}  
                 paginas={selectedBook.paginas || 0}
                 sinopse={selectedBook.sinopse || "Sinopse não disponível"}
                 rating={4.0} 
