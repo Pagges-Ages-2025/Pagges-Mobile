@@ -22,4 +22,10 @@ export default {
   warningTitle: "Aviso",
   noChangesDetected: "Nenhuma alteração detectada.",
   unexpectedError: "Erro inesperado.",
+  placeholderReview:"Algo a falar sobre seu livro ?",
+  genreTitle: "Escolha seus favoritos",
+  review:"Resenha",
+  spoilerWarningPlain: "Contém spoiler",
+
+
 };

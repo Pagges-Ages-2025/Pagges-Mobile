@@ -13,7 +13,10 @@ import { Ionicons } from "@expo/vector-icons";
 import CustomButton from "../components/Buttons/CustomButton";
 import NunitoText from "../components/Texts/NunitoText";
 import { PaggesTextInput } from "../components/Texts/TextInput";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Strings from "../constants/Strings";
+import axios from "axios";
+import AtuhApi from "../services/auth";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -29,6 +32,8 @@ export default function RegisterScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [userType, setUserType] = useState("reader");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     Animated.parallel([
@@ -44,6 +49,34 @@ export default function RegisterScreen() {
       }),
     ]).start();
   }, []);
+
+  useEffect(() => {
+    const nameValid = fullName.length > 5;
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const passwordValid = password.length > 0 && password == confirmPassword;
+    setIsFormValid(nameValid && emailValid && passwordValid);
+  }, [fullName, email, password, confirmPassword]);
+
+  const handleSubmit = async () => {
+    try {
+      const response = await AtuhApi().registerUser({
+        email,
+        password,
+        name: fullName,
+        username,
+        isAuthor: userType === "author",
+      });
+
+      await AsyncStorage.setItem("userToken", response.accessToken);
+      await AsyncStorage.setItem("userEmail", email);
+
+      router.replace("/screens/favoriteGenre");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data.message);
+      }
+    }
+  };
 
   const navigateTo = (screen: "login" | "register") => {
     Animated.parallel([
@@ -204,7 +237,22 @@ export default function RegisterScreen() {
               </TouchableOpacity>
 
               <View style={{ marginTop: 30 }}>
-                <CustomButton title={"Cadastrar"} onPress={() => {}} />
+                {error != "" && (
+                  <NunitoText
+                    style={{
+                      color: "red",
+                      marginBottom: 8,
+                      textAlign: "center",
+                    }}
+                  >
+                    {error}
+                  </NunitoText>
+                )}
+                <CustomButton
+                  title={"Cadastrar"}
+                  onPress={handleSubmit}
+                  isDisabled={!isFormValid}
+                />
               </View>
 
               <TouchableOpacity
@@ -227,152 +275,152 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  content: {
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 30,
-  },
-  welcomeText: {
-    fontSize: 18,
-    color: "#333",
-  },
-  title: {
-    fontSize: 48,
-    fontWeight: "bold",
-    color: "#9C0F5F",
-    marginBottom: 30,
-  },
-  form: {
-    width: "100%",
-  },
-  inputsContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#A9A8A9",
-    borderRadius: 30,
-    marginBottom: 16,
-    paddingHorizontal: 16,
-  },
-  inputIcon: {
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
-    height: "100%",
-    color: "#333",
-    fontSize: 16,
-    fontFamily: "Nunito",
-  },
-  eyeIcon: {
-    padding: 10,
-  },
-  radioContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginBottom: 30,
-    paddingHorizontal: 10,
-  },
-  radioOption: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  radioButton: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#A9A8A9",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 8,
-  },
-  radioButtonSelected: {
-    borderColor: "#9C0F5F",
-  },
-  radioButtonInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#9C0F5F",
-  },
-  radioLabel: {
-    fontSize: 14,
-    color: "#333",
-  },
-  termsContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 24,
-    paddingHorizontal: 10,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: "#A9A8A9",
-    marginRight: 10,
-    marginTop: 2,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  checkboxSelected: {
-    backgroundColor: "#9C0F5F",
-  },
-  termsText: {
-    flex: 1,
-    fontSize: 14,
-    color: "#666",
-    lineHeight: 20,
-  },
-  termsLink: {
-    color: "#9C0F5F",
-    textDecorationLine: "underline",
-  },
   button: {
+    alignItems: "center",
     backgroundColor: "#9C0F5F",
     borderRadius: 30,
     height: 56,
     justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
     marginBottom: 16,
+    width: "100%",
   },
   buttonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
   },
+  checkbox: {
+    alignItems: "center",
+    borderColor: "#A9A8A9",
+    borderRadius: 4,
+    borderWidth: 1,
+    height: 20,
+    justifyContent: "center",
+    marginRight: 10,
+    marginTop: 2,
+    width: 20,
+  },
+  checkboxSelected: {
+    backgroundColor: "#9C0F5F",
+  },
+  container: {
+    alignItems: "center",
+    backgroundColor: "white",
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
+  },
+  content: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 30,
+    width: "100%",
+  },
+  eyeIcon: {
+    padding: 10,
+  },
+  form: {
+    width: "100%",
+  },
+  input: {
+    color: "#333",
+    flex: 1,
+    fontFamily: "Nunito",
+    fontSize: 16,
+    height: "100%",
+  },
+  inputContainer: {
+    alignItems: "center",
+    borderColor: "#A9A8A9",
+    borderRadius: 30,
+    borderWidth: 1,
+    flexDirection: "row",
+    height: 50,
+    marginBottom: 16,
+    paddingHorizontal: 16,
+    width: "100%",
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
+  inputsContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
   loginLink: {
     alignSelf: "center",
     marginTop: 10,
+  },
+  loginLinkHighlight: {
+    color: "#9C0F5F",
+    fontWeight: "500",
   },
   loginLinkText: {
     color: "#666",
     fontSize: 14,
   },
-  loginLinkHighlight: {
+  radioButton: {
+    alignItems: "center",
+    borderColor: "#A9A8A9",
+    borderRadius: 10,
+    borderWidth: 1,
+    height: 20,
+    justifyContent: "center",
+    marginRight: 8,
+    width: 20,
+  },
+  radioButtonInner: {
+    backgroundColor: "#9C0F5F",
+    borderRadius: 5,
+    height: 10,
+    width: 10,
+  },
+  radioButtonSelected: {
+    borderColor: "#9C0F5F",
+  },
+  radioContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 30,
+    paddingHorizontal: 10,
+    width: "100%",
+  },
+  radioLabel: {
+    color: "#333",
+    fontSize: 14,
+  },
+  radioOption: {
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  scrollContainer: {
+    flexGrow: 1,
+  },
+  termsContainer: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    marginBottom: 24,
+    paddingHorizontal: 10,
+  },
+  termsLink: {
     color: "#9C0F5F",
-    fontWeight: "500",
+    textDecorationLine: "underline",
+  },
+  termsText: {
+    color: "#666",
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  title: {
+    color: "#9C0F5F",
+    fontSize: 48,
+    fontWeight: "bold",
+    marginBottom: 30,
+  },
+  welcomeText: {
+    color: "#333",
+    fontSize: 18,
   },
 });
