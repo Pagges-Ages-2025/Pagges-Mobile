@@ -1,6 +1,6 @@
-import { View, StyleSheet, Dimensions, Button, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { useRef, useMemo, forwardRef, useCallback, useState } from 'react';
+import { useRef, useMemo, forwardRef, useState } from 'react';
 import Strings from '@/app/constants/Strings';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import NunitoText from '../Texts/NunitoText';
@@ -9,6 +9,7 @@ import { useTheme } from '@/app/context/ThemeContext';
 import BookSearch, { Book } from '../SearchBar/SearchBar';
 import SearchAPI from '@/app/services/googleAPIService';
 import ModalBookDetails from '@/app/screens/book';
+import React from 'react';
 
 const SelectBook = forwardRef((props, ref) => {
 
@@ -24,15 +25,15 @@ const SelectBook = forwardRef((props, ref) => {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
-  const handleOpen = useCallback(() => {
+  const handleOpen = () => {
     setIsBottomSheetOpen(true)
     bottomSheetRef.current?.expand();
     setButtonVisible(false); 
-  }, []);
+  };
 
-  const handleCloseBottomSheet = useCallback(() => {
+  const handleCloseBottomSheet = () => {
     setButtonVisible(true); 
-  }, []);
+  }
 
   const handleSelectBook = (book: Book) => {
     console.log("Livro selecionado:", book);
