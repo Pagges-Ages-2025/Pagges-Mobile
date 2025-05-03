@@ -1,22 +1,22 @@
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
   Animated,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import CustomButton from "../components/Buttons/CustomButton";
 import NunitoText from "../components/Texts/NunitoText";
 import { PaggesTextInput } from "../components/Texts/TextInput";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Strings from "../constants/Strings";
-import axios from "axios";
-import AtuhApi from "../services/auth";
+import AuthAPI from "../services/auth";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -59,7 +59,7 @@ export default function RegisterScreen() {
 
   const handleSubmit = async () => {
     try {
-      const response = await AtuhApi().registerUser({
+      const response = await AuthAPI().registerUser({
         email,
         password,
         name: fullName,

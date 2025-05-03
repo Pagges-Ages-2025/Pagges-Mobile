@@ -1,23 +1,22 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { useRouter } from "expo-router";
+import LottieView from "lottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
   Animated,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import LottieView from "lottie-react-native";
 import CustomButton from "../components/Buttons/CustomButton";
 import NunitoText from "../components/Texts/NunitoText";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import { PaggesTextInput } from "../components/Texts/TextInput";
 import Strings from "../constants/Strings";
+import axiosInstance from "../services/axios-instance-singleton";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -40,18 +39,17 @@ export default function LoginScreen() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`http://localhost:3000/auth/login`, {
+      const response = await axiosInstance.post(`/auth/login`, {
         email,
         password,
       });
 
       const data = response.data;
 
-   
-      await AsyncStorage.setItem("userToken", data.accessToken); 
-      await AsyncStorage.setItem("userEmail", email); 
+      await AsyncStorage.setItem("userToken", data.accessToken);
+      await AsyncStorage.setItem("userEmail", email);
 
-      router.replace("/screens/searchPage"); 
+      router.replace("/screens/searchPage");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(
