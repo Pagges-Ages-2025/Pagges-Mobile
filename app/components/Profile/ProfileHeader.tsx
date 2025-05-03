@@ -5,18 +5,24 @@ import {
   Image,
   ImageBackground,
   TextStyle,
+  TouchableOpacity,
 } from "react-native";
 import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
 import VerifiedIcon from "../../assets/images/ic_verified.svg";
 import Strings from "@/app/constants/Strings";
 import DefaultProfileHeaderImage from "../../assets/images/default_profile_header_image.png";
+import { Ionicons } from "@expo/vector-icons";
 
 interface ProfileHeaderProps {
   marginStart: number;
-  profileImageUrl: string;
+  profileImageUrl?: string;
   name: string;
   isAuthor: boolean;
+  bEdit?: boolean;
+  bEditPicture?: boolean;
+  onPressEdit?: () => void;
+  onPressCameraIcon?: () => void;
 }
 
 const headerImageHeight = 123;
@@ -27,6 +33,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   profileImageUrl,
   name,
   isAuthor,
+  bEdit = false,
+  bEditPicture = false,
+  onPressEdit,
+  onPressCameraIcon,
 }) => {
   const { theme } = useTheme();
 
@@ -41,10 +51,34 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           source={DefaultProfileHeaderImage}
           style={styles.backgroundImage}
         >
-          <Image
-            source={{ uri: profileImageUrl }}
-            style={[styles.profileImage, { marginStart: marginStart }]}
-          />
+            {bEditPicture ? (
+            <View
+              style={[
+                styles.profileImage,
+                { marginStart: marginStart, backgroundColor: "gray" },
+              ]}
+            />
+          ) : (
+            <Image
+              source={{ uri: profileImageUrl }}
+              style={[styles.profileImage, { marginStart: marginStart }]}
+            />
+          )}
+
+          {bEdit && (
+            <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
+              <Ionicons name="create-outline" size={32} />
+            </TouchableOpacity>)}
+
+          {bEditPicture && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={onPressCameraIcon}
+              style={styles.cameraIcon}
+            >
+              <Ionicons name="camera" size={48} color={theme.white} />
+            </TouchableOpacity>
+          )}
         </ImageBackground>
       </View>
       <View style={{ marginStart: marginStart }}>
@@ -73,6 +107,7 @@ const styles = StyleSheet.create({
   backgroundImage: {
     width: "100%",
     height: headerImageHeight,
+    position: "relative",
   },
   profileImage: {
     width: profileImageSize,
@@ -85,6 +120,11 @@ const styles = StyleSheet.create({
     flex: 1,
     height: headerImageHeight * 0.75 + profileImageSize,
   },
+  editIcon: {
+    position: "absolute",
+    top: "55%",
+    right: "5%",
+  },
   genresContainer: {
     flexDirection: "row",
     marginTop: 8,
@@ -92,6 +132,11 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 28,
     fontWeight: 700,
+  },
+  cameraIcon: {
+    position: "absolute",
+    top: "90%",
+    left: "11.5%",
   },
   username: {
     fontSize: 18,
