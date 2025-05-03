@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { View, StyleSheet, SafeAreaView } from "react-native";
+import debounce from "lodash.debounce";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { SafeAreaView, StyleSheet, View } from "react-native";
 import BookSearch, { Book } from "../components/SearchBar/SearchBar";
 import { useTheme } from "../context/ThemeContext";
 import SearchAPI from "../services/googleAPIService";
@@ -10,34 +11,47 @@ const SearchPage: React.FC = () => {
   const { searchBooks } = SearchAPI();
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
-  
+
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
-  const handleSearch = async (term: string) => {
-    setLoading(true);
-    try {
-      const results = await searchBooks(term);
-      setBooks(results);
-      console.log(results);
-    } catch (error) {
-      console.error("Erro ao buscar livros:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleSearch = useCallback(
+    async (term: string) => {
+      setLoading(true);
+      try {
+        const results = await searchBooks(term);
+        setBooks(results);
+      } catch (error) {
+        console.error("Erro ao buscar livros:", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [searchBooks]
+  );
+
+  const debouncedSearch = useMemo(
+    () => debounce(handleSearch, 1000), // Debounce de 1 segundos
+    [handleSearch]
+  );
 
   const handleCloseModal = () => {
     setModalVisible(false);
   };
 
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
+
   const handleSelectBook = (book: Book) => {
     console.log("Livro selecionado:", book);
-    
+
     // Garantir que a URL da capa tenha 'zoom=6'
     let updatedCapa = book.capa;
-    if (updatedCapa && updatedCapa.includes('zoom=1')) {
-      updatedCapa = updatedCapa.replace('zoom=1', 'zoom=6');
+    if (updatedCapa && updatedCapa.includes("zoom=1")) {
+      updatedCapa = updatedCapa.replace("zoom=1", "zoom=6");
     }
 
     setSelectedBook({ ...book, capa: updatedCapa });
@@ -45,7 +59,9 @@ const SearchPage: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.Background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.Background }]}
+    >
       <View style={styles.content}>
         <BookSearch
           SearchSize="md"
@@ -53,8 +69,8 @@ const SearchPage: React.FC = () => {
           iconColor="grey"
           borderRadius="md"
           books={books}
-          onSelectBook={handleSelectBook} 
-          onSearch={handleSearch}
+          onSelectBook={handleSelectBook}
+          onSearch={debouncedSearch}
         />
       </View>
 
@@ -64,16 +80,18 @@ const SearchPage: React.FC = () => {
           onClose={handleCloseModal}
           titulo={selectedBook.titulo}
           author={selectedBook.autores?.join(", ") || "Autor desconhecido"}
-          capa={selectedBook.capa}  // Capa com 'zoom=6'
+          capa={selectedBook.capa} // Capa com 'zoom=6'
           paginas={selectedBook.paginas || 0}
           sinopse={selectedBook.sinopse || "Sinopse não disponível"}
-          rating={4.0} 
-          readersNumber={100} 
+          rating={4.0}
+          readersNumber={100}
           rankingNumber={"5"}
-          review="Sem avaliações disponíveis ainda." 
-          publicationDate={ "Ano desconhecido"} 
-          genre={ "Gênero não especificado"} 
-          onCreateReview={() => console.log("Criar resenha para:", selectedBook.titulo)}
+          review="Sem avaliações disponíveis ainda."
+          publicationDate={"Ano desconhecido"}
+          genre={"Gênero não especificado"}
+          onCreateReview={() =>
+            console.log("Criar resenha para:", selectedBook.titulo)
+          }
           onShare={() => console.log("Compartilhar:", selectedBook.titulo)}
         />
       )}
@@ -86,7 +104,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    alignSelf: 'center',
+    alignSelf: "center",
     width: "90%",
     flex: 1,
     paddingTop: 30,
