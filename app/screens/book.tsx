@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   starsContainer: {
-    zIndex: 9999,
+    zIndex: 10,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
   },
   bookContentContainer: {
     position: "absolute",
-    top: "9%",
+    top: "5%",
     left: "5%",
     right: "5%",
     paddingHorizontal: 10,
