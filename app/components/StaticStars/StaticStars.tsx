@@ -34,7 +34,7 @@ const getStyles = (theme: Theme) =>
     container: {
       alignItems: "flex-start",
       justifyContent: "center",
-      width: "100%",
+      alignSelf: "flex-start",
     },
     starsContainer: {
       flexDirection: "row",
