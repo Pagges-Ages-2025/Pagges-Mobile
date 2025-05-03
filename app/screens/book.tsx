@@ -26,21 +26,22 @@ import CustomBook from "../components/Book/CustomBook";
 import { ReviewComment } from "../components/review-comments/review-comments";
 import CustomModal from "../components/review-comments/pop-up-modal";
 import CustomButton from "../components/Buttons/CustomButton";
+import { SinopseExpandable } from "../components/Book/sinopseExpandable";
 
 interface ModalBookDetailsProps {
   visible: boolean;
   onClose: () => void;
-  rating?: number;
-  titulo?: string;
+  rating: number;
+  title: string;
+  pages?: number;
   readersNumber?: number;
-  paginas?: number;
   rankingNumber?: string;
-  sinopse?: string;
-  review?: string;
-  author?: string;
-  publicationDate?: string;
+  synopsis: string;
+  review: string;
+  authors?: string;
+  year?: string;
   genre?: string;
-  capa?: string;
+  google_image_url?: string;
   onCreateReview?: () => void;
   onShare?: () => void;
 }
@@ -48,20 +49,36 @@ interface ModalBookDetailsProps {
 export default function ModalBookDetails({
   visible,
   onClose,
-  rating = 4.5,
-  titulo = "Título do Livro",
+  rating,
+  title,
   readersNumber = 1000,
-  paginas = 300,
+  pages,
   rankingNumber = "10",
-  sinopse = "Sinopse do livro...",
-  review = "Review do livro...",
-  author = "Autor do Livro",
-  publicationDate = "2023",
-  genre = "Ficção",
-  capa = "https://placeholder.com/book",
+  synopsis,
+  review,
+  authors,
+  year,
+  genre,
+  google_image_url,
   onCreateReview,
   onShare,
 }: ModalBookDetailsProps) {
+  console.log("ModalBookDetails");
+  console.log("google_image_url", google_image_url);
+  console.log("title", title);
+  console.log("rating", rating);
+  console.log("readersNumber", readersNumber);
+  console.log("pages", pages);
+  console.log("rankingNumber", rankingNumber);
+  console.log("synopsis", synopsis);
+  console.log("review", review);
+  console.log("author", authors);
+  console.log("publicationDate", year);
+  console.log("genre", genre);
+  console.log("onCreateReview", onCreateReview);
+  console.log("onShare", onShare);
+  console.log("onClose", onClose);
+  console.log("visible", visible);
   const { theme } = useTheme();
   const [isMaximized, setIsMaximized] = useState(false);
   const [showMoreText, setShowMoreText] = useState(false);
@@ -120,7 +137,7 @@ export default function ModalBookDetails({
 
   const bookStats = [
     { value: readersNumber, label: "Leitores" },
-    { value: paginas, label: "Páginas" },
+    { value: pages, label: "Páginas" },
     { value: currentRating?.toFixed(1), label: "Avaliação" },
     { value: `#${rankingNumber}`, label: "Ranking" },
   ];
@@ -149,7 +166,7 @@ export default function ModalBookDetails({
   const BookContent = () => (
     <View style={{ flex: 1 }}>
       <ImageBackground
-        source={{ uri: capa }}
+        source={{ uri: google_image_url }}
         style={styles.backgroundImage}
       >
         <View style={styles.overlay} />
@@ -181,7 +198,7 @@ export default function ModalBookDetails({
                     fontWeight: "bold",
                   }}
                 >
-                  {titulo.length > 23 ? titulo?.substring(0, 23) + "..." : titulo}
+                  {title.length > 23 ? title?.substring(0, 23) + "..." : title}
                 </NunitoText>
               </View>
             </View>
@@ -232,10 +249,10 @@ export default function ModalBookDetails({
           )}
 
           <NunitoText style={[styles.title, { color: theme.white }]}>
-            {titulo}
+            {title}
           </NunitoText>
           <NunitoText style={[styles.subtitle, { color: theme.white }]}>
-            {author}
+            {authors}
           </NunitoText>
           <View
             style={{
@@ -245,7 +262,7 @@ export default function ModalBookDetails({
             }}
           >
             <NunitoText style={[styles.date, { color: theme.white }]}>
-              {publicationDate}
+              {year}
             </NunitoText>
             <NunitoText
               style={{ color: theme.white, paddingHorizontal: 10 }}
@@ -386,7 +403,7 @@ export default function ModalBookDetails({
                 ))}
               </View>
 
-              <View>
+              {/* <View>
                 <NunitoText
                   style={[styles.secondTitle, { color: theme.primaryText }]}
                 >
@@ -395,7 +412,7 @@ export default function ModalBookDetails({
                 <NunitoText
                   style={[styles.sinopseText, { color: theme.primaryText }]}
                 >
-                  {showMoreText ? sinopse : sinopse?.substring(0, 450) + "..."}
+                  {showMoreText ? synopsis : synopsis?.substring(0, 450) + "..."}
                 </NunitoText>
 
                 <TouchableOpacity
@@ -411,7 +428,8 @@ export default function ModalBookDetails({
                     {showMoreText ? "Mostrar menos" : "Mostrar mais"}
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </View> */}
+              <SinopseExpandable synopsis={synopsis} />
 
               <View
                 style={{ alignItems: "flex-start", justifyContent: "center" }}
@@ -432,7 +450,7 @@ export default function ModalBookDetails({
                   byAuthor={false}
                   fullNamePostAuthor={"Monica Alvarenga"}    
                   datePost={"22/08/2024"}
-                  text={review}
+                  text={"Memórias da Meia-Noite é um romance de Sidney Sheldon que mistura mistério, drama e uma boa dose de suspense. A história gira em torno de Katherine, uma mulher marcada por tragédias pessoais e uma vida cheia de reviravoltas. Ela se vê envolvida em uma trama que desafia sua compreensão de confiança, vingança e sobrevivência, enquanto tenta descobrir os segredos obscuros de seu passado e lidar com as consequências de suas escolhas.Com o estilo característico de Sheldon, a narrativa é envolvente e cheia de surpresas, mantendo o leitor na expectativa até o final. A trama é recheada de personagens complexos e dilemas emocionais, explorando temas como o perdão, a vingança e os jogos de poder. A escrita é fluída, o ritmo é rápido e as reviravoltas são sempre inesperadas. É uma história que prende o leitor até a última página, com um final impactante."}
                 />
               </View>
 

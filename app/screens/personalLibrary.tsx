@@ -12,11 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import NunitoText from '../components/Texts/NunitoText';
 import CustomBook from '../components/Book/CustomBook';
 import { useTheme } from '../context/ThemeContext';
-import {
-    mockReadBooks,
-    mockReadingBooks,
-    mockToReadBooks,
-  } from './tests/mocks/book';  
+import ModalBookDetails from './book';
 
 const { width } = Dimensions.get('window');
   
@@ -47,14 +43,8 @@ const Library: React.FC<LibraryProps> = ({
   const [readBooks, setReadBooks] = useState<Book[]>([]);
   const [readingBooks, setReadingBooks] = useState<Book[]>([]);
   const [toReadBooks, setToReadBooks] = useState<Book[]>([]);
-
-  const changeBar = (index: number) => {
-    setActualPage(index);
-  };
-
-  const handlePress = () => {
-    console.log('Livro clicado!');
-  };
+  const [selectedBook, setSelectedBook] = useState<any>(null);
+  const [modalBookVisible, setModalBookVisible] = useState(false);
   
   // useEffect(() => {
   //   const fetchBooks = async () => {
@@ -85,7 +75,7 @@ const Library: React.FC<LibraryProps> = ({
       const response = await fetch(`http://localhost:3000/personal-library/getBooksArray/${category}`, {
         method: 'GET',
         headers: {
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ1OTc4NzIzLCJleHAiOjE3NDYwNjUxMjN9.UkgchzHvkPIDINeOCrCiB_U7406aUPQZKF0WqQDvDLA"
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2MjgwMzYyLCJleHAiOjE3NDYzNjY3NjJ9.Xt1Gc9FkpCFEqC4l_GGWzYoopsbMQWDl0-MjxmBZcjo"
         },
       });
 
@@ -100,9 +90,17 @@ const Library: React.FC<LibraryProps> = ({
 
       const mappedBooks = data.map((item: any) => ({
         id: item.book.book_id,
+        isbn: item.book.isbn,
         title: item.book.title,
-        author: item.book.authors,
-        photoPath: item.book.cover,
+        genre: item.book.genre,
+        authors: item.book.authors,
+        cover: item.book.cover,
+        synopsis: item.book.synopsis,
+        year: item.book.year,
+        pages: item.book.pages,
+        google_image_url: item.book.google_image_url,
+        posts: item.book.posts,
+        ratings: item.book.ratings,
         size: 'small' as const,
       }));
       
@@ -119,6 +117,27 @@ const Library: React.FC<LibraryProps> = ({
     }
   }
 
+  const changeBar = (index: number) => {
+    setActualPage(index);
+  };
+
+  const handlePress = (book: Book) => {
+    setSelectedBook(book);
+    console.log(selectedBook)
+    setModalBookVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalBookVisible(false);
+    setSelectedBook(null);
+  };
+  
+  useEffect(() => {
+    if (selectedBook) {
+      console.log('Livro selecionado:', selectedBook);
+    }
+  }, [selectedBook]);
+  
   useEffect(() => {
     fetchBooksByArray('READ');
     fetchBooksByArray('READING');
@@ -195,16 +214,15 @@ const Library: React.FC<LibraryProps> = ({
           >
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
                 {readBooks.map((book) => (
-                    <View style={{paddingHorizontal: 12, paddingVertical: 15}}> 
+                    <View key={book.id} style={{paddingHorizontal: 12, paddingVertical: 15}}> 
                         <CustomBook
-                            key={book.id}
-                            size={book.size}
-                            title={book.title}
-                            author={book.author}
-                            photoPath={book.photoPath}
-                            onPress={handlePress}
-                            bookId={book.id}
-                            toPersonalLibrary={true}
+                          size={book.size}
+                          title={book.title}
+                          author={book.author}
+                          photoPath={book.photoPath}
+                          onPress={() => handlePress(book)}
+                          bookId={book.id}
+                          toPersonalLibrary={true}
                         />
                     </View>
                 ))}
@@ -220,15 +238,15 @@ const Library: React.FC<LibraryProps> = ({
             >
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
                 {toReadBooks.map((book) => (
-                  <View style={{paddingHorizontal: 12, paddingVertical: 15}}> 
+                  <View key={book.id} style={{paddingHorizontal: 12, paddingVertical: 15}}> 
                       <CustomBook
-                      key={book.id}
-                      size={book.size}
-                      title={book.title}
-                      photoPath={book.photoPath}
-                      onPress={handlePress}
-                      bookId={book.id}
-                      toPersonalLibrary={true}
+                        size={book.size}
+                        title={book.title}
+                        author={book.author}
+                        photoPath={book.photoPath}
+                        onPress={() => handlePress(book)}
+                        bookId={book.id}
+                        toPersonalLibrary={true}
                       />
                     </View>
                 ))}
@@ -244,15 +262,15 @@ const Library: React.FC<LibraryProps> = ({
             >
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
                 {readingBooks.map((book) => (
-                  <View style={{paddingHorizontal: 12, paddingVertical: 15}}> 
+                  <View key={book.id} style={{paddingHorizontal: 12, paddingVertical: 15}}> 
                       <CustomBook
-                      key={book.id}
-                      size={book.size}
-                      title={book.title}
-                      photoPath={book.photoPath}
-                      onPress={handlePress}
-                      bookId={book.id}
-                      toPersonalLibrary={true}
+                        size={book.size}
+                        title={book.title}
+                        author={book.author}
+                        photoPath={book.photoPath}
+                        onPress={() => handlePress(book)}
+                        bookId={book.id}
+                        toPersonalLibrary={true}
                       />
                   </View>
                 ))}
@@ -261,6 +279,21 @@ const Library: React.FC<LibraryProps> = ({
         )}
       </View>
     </View>
+    {selectedBook && (
+      <ModalBookDetails
+        visible={modalBookVisible}
+        onClose={handleCloseModal}
+        rating={selectedBook.ratings[0].rating}
+        title={selectedBook.title}
+        pages={selectedBook.pages}
+        synopsis={selectedBook.synopsis}
+        authors={selectedBook.authors}
+        google_image_url={selectedBook.google_image_url}
+        genre={selectedBook.genre}
+        year={selectedBook.year}
+        review={selectedBook.review}
+      />
+    )}
     </Modal>
   );
 };
