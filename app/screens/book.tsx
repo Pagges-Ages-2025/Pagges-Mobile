@@ -71,7 +71,6 @@ export default function ModalBookDetails({
   const [modalVisible, setModalVisible] = useState(false);
   const [currentRating, setCurrentRating] = useState(rating);
   const [ratingCount, setRatingCount] = useState(1);
-  
   const bottomSheetRef = useRef<BottomSheet>(null);
   const roundedStars = Math.round(currentRating);
   const snapPoints = useMemo(() => ["62%", "85%"], []);
@@ -271,8 +270,8 @@ export default function ModalBookDetails({
             <View style={styles.starsContainer}>
             <StaticStars
               rating={rating}
-              onPress={() => setModalVisible(true)}
-            />
+              onPress={() => {setModalVisible(true)}}
+              />
             <RatingModal
               visible={modalVisible}
               onClose={() => setModalVisible(false)}
@@ -306,12 +305,6 @@ export default function ModalBookDetails({
               </NunitoText>
             </TouchableOpacity>
 
-            <CustomModal
-              visible={modalVisible}
-              onClose={() => setModalVisible(false)}
-              content="Avalie o livro"
-              onRate={handleNewRating}
-            />
           </View>
         </View>
 
@@ -531,6 +524,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   starsContainer: {
+    zIndex: 9999,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
