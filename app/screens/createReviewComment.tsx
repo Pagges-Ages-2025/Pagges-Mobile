@@ -1,5 +1,6 @@
 import NunitoText from "@/app/components/Texts/NunitoText";
 import { StyleSheet, View } from "react-native";
+import SelectBook from "../components/review-comments/select-book";
 
 
 export default function CreateReviewCommentScreen() {  
@@ -8,6 +9,9 @@ export default function CreateReviewCommentScreen() {
         <NunitoText style={[{ color: 'black'}]}>
           Adicionar Resenha / Comentario
         </NunitoText>
+        <View style={styles.selectBook}>
+          <SelectBook />
+        </View>
       </View>
   );
 };
@@ -15,10 +19,10 @@ export default function CreateReviewCommentScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    height:"100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingRight: 5,
+    flex: 1, 
+    flexDirection: "column", 
   },
+  selectBook:{
+    flex:1
+  }
 });
