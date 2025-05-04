@@ -34,7 +34,7 @@ type Book = {
   }
 
 const Library: React.FC<LibraryProps> = ({
-  isVisible = false,
+  isVisible,
   onClose,
   pageIndex = 0,
 }) => {
