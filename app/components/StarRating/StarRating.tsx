@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import { Theme } from "@/app/constants/Theme";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { blue } from "react-native-reanimated/lib/typescript/Colors";
 
 interface StarRatingProps {
   stars: number;
@@ -28,7 +29,7 @@ const StarRating: React.FC<StarRatingProps> = ({ stars, onPressStar }) => {
           <AntDesign
             name={index < selectedStars ? "star" : "staro"}
             color={index < selectedStars ? theme.starColor : theme.secondaryText}
-            size={20}
+            size={40}
           />
         </TouchableOpacity>
       ))}
@@ -40,8 +41,9 @@ const getStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flexDirection: "row",
-      width: "30%",
+      width: "100%",
       alignItems: "center",
+      justifyContent: "center",
     },
   });
 
