@@ -93,6 +93,29 @@ export default function ModalBookDetails({
     [bottomSheetRef, MAX_SNAP_POINT_INDEX]
   );
 
+  const updateBookState = async (id: string, state: string) => {
+    try {
+      const response = await fetch(`http://localhost:3000/personal-library/addBook/${id}`, {
+        method: 'PUT',
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2MzcyNjA0LCJleHAiOjE3NDY0NTkwMDR9.uq6I3IJmVM2r9MZJ6Yze1hdt7vZyd1VitJp5QouVcr8"
+        },
+        body: JSON.stringify({
+          state: state,
+        })
+      });
+  
+      if (response.ok) {
+        console.log(`Adicionado a ${state} da biblioteca pessoal`);
+      } else {
+        console.error(`Erro ao adicionar livro com estado ${state}`);
+      }
+    } catch (error) {
+      console.error(`Erro ao adicionar livro (${state}):`, error);
+    }
+  };
+
   const handleNewRating = (newRating: number) => {
     const total = currentRating * ratingCount;
     const updatedCount = ratingCount + 1;
@@ -132,20 +155,23 @@ export default function ModalBookDetails({
   const bookActions = [
     {
       label: "Já li",
-      onPress: () => {
+      onPress: async () => {
         console.log("Ação: Já li");
-      },
+        await updateBookState(id, "READ");
+      }
     },
     {
       label: "Estou lendo",
-      onPress: () => {
+      onPress: async () => {
         console.log("Ação: Estou lendo");
+        await updateBookState(id, "READING");
       },
     },
     {
       label: "Quero ler",
-      onPress: () => {
+      onPress: async () => {
         console.log("Ação: Quero ler");
+        await updateBookState(id, "TO_BE_READ");
       },
     },
   ];
@@ -356,32 +382,7 @@ export default function ModalBookDetails({
               <View style={styles.statusBookContainer}>
                 {bookActions.map((action, index) => (
 
-                  <CustomButton width={150} height={30} key={index} title={action.label} onPress={()=>{}} />
-                  // <TouchableOpacity
-                  //   key={index}
-                  //   onPress={action.onPress}
-                  //   style={{
-                  //     borderRadius: 15,
-                  //     backgroundColor: theme.primary,
-                  //     width: "25%",
-                  //     height: 23,
-                  //     alignItems: "center",
-                  //     justifyContent: "center",
-                  //     flexDirection: "row",
-                  //     marginRight: 8,
-                  //     marginLeft: 8,
-                  //   }}
-                  // >
-                  //   <Text
-                  //     style={{
-                  //       fontSize: 12,
-                  //       fontWeight: "bold",
-                  //       color: theme.quinaryText,
-                  //     }}
-                  //   >
-                  //     {action.label}
-                  //   </Text>
-                  // </TouchableOpacity>
+                  <CustomButton width={150} height={30} key={index} title={action.label} onPress={action.onPress} />
                 ))}
               </View>
               
