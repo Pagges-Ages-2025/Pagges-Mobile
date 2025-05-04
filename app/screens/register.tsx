@@ -1,26 +1,28 @@
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TextInput, 
-  TouchableOpacity, 
-  Animated, 
+import {
+  Animated,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  GestureResponderEvent
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import CustomButton from "../components/Buttons/CustomButton";
 import NunitoText from "../components/Texts/NunitoText";
+import { PaggesTextInput } from "../components/Texts/TextInput";
+import Strings from "../constants/Strings";
+import AuthAPI from "../services/auth";
 
 export default function RegisterScreen() {
   const router = useRouter();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
-  
+
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -28,8 +30,10 @@ export default function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [userType, setUserType] = useState("reader"); 
+  const [userType, setUserType] = useState("reader");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     Animated.parallel([
@@ -45,6 +49,34 @@ export default function RegisterScreen() {
       }),
     ]).start();
   }, []);
+
+  useEffect(() => {
+    const nameValid = fullName.length > 5;
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const passwordValid = password.length > 0 && password == confirmPassword;
+    setIsFormValid(nameValid && emailValid && passwordValid);
+  }, [fullName, email, password, confirmPassword]);
+
+  const handleSubmit = async () => {
+    try {
+      const response = await AuthAPI().registerUser({
+        email,
+        password,
+        name: fullName,
+        username,
+        isAuthor: userType === "author",
+      });
+
+      await AsyncStorage.setItem("userToken", response.accessToken);
+      await AsyncStorage.setItem("userEmail", email);
+
+      router.replace("/screens/favoriteGenre");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data.message);
+      }
+    }
+  };
 
   const navigateTo = (screen: "login" | "register") => {
     Animated.parallel([
@@ -68,7 +100,10 @@ export default function RegisterScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer} scrollEnabled={false}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        scrollEnabled={false}
+      >
         <View style={styles.container}>
           <Animated.View
             style={[
@@ -81,146 +116,154 @@ export default function RegisterScreen() {
           >
             <NunitoText style={styles.welcomeText}>Bem-vindo à</NunitoText>
             <NunitoText style={styles.title}>Pagges</NunitoText>
-            
+
             <View style={styles.form}>
-            <View style={styles.inputsContainer}>
-              <View style={styles.inputContainer}>
-                <Ionicons name="person" size={20} color="#A9A8A9" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nome Completo"
-                  placeholderTextColor="#999"
+              <View style={styles.inputsContainer}>
+                <PaggesTextInput
+                  placeholder={Strings.fullNamePlaceholder}
                   value={fullName}
+                  leftIconName="person"
                   onChangeText={setFullName}
                 />
-              </View>
-              
-              <View style={styles.inputContainer}>
-                <Ionicons name="at" size={20} color="#A9A8A9" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nome de usuário"
-                  placeholderTextColor="#999"
+
+                <PaggesTextInput
+                  placeholder={Strings.usernamePlaceholder}
                   value={username}
+                  leftIconName="at"
                   onChangeText={setUsername}
-                  autoCapitalize="none"
                 />
-              </View>
-            
-              
-              <View style={styles.inputContainer}>
-                <Ionicons name="mail-outline" size={20} color="#A9A8A9" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="E-mail"
-                  placeholderTextColor="#999"
+
+                <PaggesTextInput
+                  placeholder={Strings.emailPlaceholder}
                   value={email}
+                  leftIconName="mail-outline"
                   onChangeText={setEmail}
                   keyboardType="email-address"
-                  autoCapitalize="none"
                 />
-              </View>
-              
-              <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed-outline" size={20} color="#A9A8A9" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Senha"
-                  placeholderTextColor="#999"
-                  secureTextEntry={!showPassword}
+
+                <PaggesTextInput
+                  placeholder={Strings.passwordPlaceholder}
                   value={password}
+                  leftIconName="lock-closed-outline"
+                  rightIconName={
+                    showPassword ? "eye-outline" : "eye-off-outline"
+                  }
+                  isRightIconEnabled={true}
+                  isSecureTextEntry={!showPassword}
+                  onRightIconClick={() => setShowPassword(!showPassword)}
                   onChangeText={setPassword}
                 />
-                <TouchableOpacity 
-                  style={styles.eyeIcon} 
-                  onPress={() => setShowPassword(!showPassword)}
-                >
-                  <Ionicons 
-                    name={showPassword ? "eye-outline" : "eye-off-outline"} 
-                    size={20} 
-                    color="#A9A8A9" 
-                  />
-                </TouchableOpacity>
-              </View>
-              
-              <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed-outline" size={20} color="#A9A8A9" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Confirmar senha"
-                  placeholderTextColor="#999"
-                  secureTextEntry={!showConfirmPassword}
+
+                <PaggesTextInput
+                  placeholder={Strings.confirmPasswordPlaceholder}
                   value={confirmPassword}
+                  leftIconName="lock-closed-outline"
+                  rightIconName={
+                    showConfirmPassword ? "eye-outline" : "eye-off-outline"
+                  }
+                  isRightIconEnabled={true}
+                  isSecureTextEntry={!showConfirmPassword}
+                  onRightIconClick={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
                   onChangeText={setConfirmPassword}
                 />
-                <TouchableOpacity 
-                  style={styles.eyeIcon} 
-                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  <Ionicons 
-                    name={showConfirmPassword ? "eye-outline" : "eye-off-outline"} 
-                    size={20} 
-                    color="#A9A8A9" 
-                  />
-                </TouchableOpacity>
+
+                <View style={styles.radioContainer}>
+                  <TouchableOpacity
+                    style={styles.radioOption}
+                    onPress={() => setUserType("reader")}
+                  >
+                    <View
+                      style={[
+                        styles.radioButton,
+                        userType === "reader" && styles.radioButtonSelected,
+                      ]}
+                    >
+                      {userType === "reader" && (
+                        <View style={styles.radioButtonInner} />
+                      )}
+                    </View>
+                    <NunitoText style={styles.radioLabel}>
+                      Sou leitor(a)
+                    </NunitoText>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.radioOption}
+                    onPress={() => setUserType("author")}
+                  >
+                    <View
+                      style={[
+                        styles.radioButton,
+                        userType === "author" && styles.radioButtonSelected,
+                      ]}
+                    >
+                      {userType === "author" && (
+                        <View style={styles.radioButtonInner} />
+                      )}
+                    </View>
+                    <NunitoText style={styles.radioLabel}>
+                      Sou autor(a)
+                    </NunitoText>
+                  </TouchableOpacity>
+                </View>
               </View>
 
-              <View style={styles.radioContainer}>
-                <TouchableOpacity 
-                  style={styles.radioOption} 
-                  onPress={() => setUserType("reader")}
-                >
-                  <View style={[
-                    styles.radioButton, 
-                    userType === "reader" && styles.radioButtonSelected
-                  ]}>
-                    {userType === "reader" && <View style={styles.radioButtonInner} />}
-                  </View>
-                  <NunitoText style={styles.radioLabel}>Sou leitor(a)</NunitoText>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={styles.radioOption} 
-                  onPress={() => setUserType("author")}
-                >
-                  <View style={[
-                    styles.radioButton, 
-                    userType === "author" && styles.radioButtonSelected
-                  ]}>
-                    {userType === "author" && <View style={styles.radioButtonInner} />}
-                  </View>
-                  <NunitoText style={styles.radioLabel}>Sou autor(a)</NunitoText>
-                </TouchableOpacity>
-              </View>
-              </View>
-              
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.termsContainer}
                 onPress={() => setTermsAccepted(!termsAccepted)}
               >
-                <View style={[
-                  styles.checkbox, 
-                  termsAccepted && styles.checkboxSelected
-                ]}>
-                  {termsAccepted && <Ionicons name="checkmark" size={14} color="white" />}
+                <View
+                  style={[
+                    styles.checkbox,
+                    termsAccepted && styles.checkboxSelected,
+                  ]}
+                >
+                  {termsAccepted && (
+                    <Ionicons name="checkmark" size={14} color="white" />
+                  )}
                 </View>
                 <NunitoText style={styles.termsText}>
                   Declaro que li e concordo com os{" "}
-                  <NunitoText style={styles.termsLink}>Termos de Uso</NunitoText> e a{" "}
-                  <NunitoText style={styles.termsLink}>Política de Privacidade</NunitoText>
+                  <NunitoText style={styles.termsLink}>
+                    Termos de Uso
+                  </NunitoText>{" "}
+                  e a{" "}
+                  <NunitoText style={styles.termsLink}>
+                    Política de Privacidade
+                  </NunitoText>
                 </NunitoText>
               </TouchableOpacity>
 
-              <View style={{marginTop:30}}>
-              <CustomButton title={"Cadastrar"}  onPress={() => {}} />
+              <View style={{ marginTop: 30 }}>
+                {error != "" && (
+                  <NunitoText
+                    style={{
+                      color: "red",
+                      marginBottom: 8,
+                      textAlign: "center",
+                    }}
+                  >
+                    {error}
+                  </NunitoText>
+                )}
+                <CustomButton
+                  title={"Cadastrar"}
+                  onPress={handleSubmit}
+                  isDisabled={!isFormValid}
+                />
               </View>
-              
-              <TouchableOpacity 
-                style={styles.loginLink} 
+
+              <TouchableOpacity
+                style={styles.loginLink}
                 onPress={() => navigateTo("login")}
               >
                 <NunitoText style={styles.loginLinkText}>
-                  Já possui uma conta? <NunitoText style={styles.loginLinkHighlight}>Login</NunitoText>
+                  Já possui uma conta?{" "}
+                  <NunitoText style={styles.loginLinkHighlight}>
+                    Login
+                  </NunitoText>
                 </NunitoText>
               </TouchableOpacity>
             </View>
@@ -232,152 +275,152 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  content: {
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 30,
-  },
-  welcomeText: {
-    fontSize: 18,
-    color: "#333",
-  },
-  title: {
-    fontSize: 48,
-    fontWeight: "bold",
-    color: "#9C0F5F",
-    marginBottom: 30,
-  },
-  form: {
-    width: "100%",
-  },
-  inputsContainer:{
-    display:"flex",
-    flexDirection:"column",
-    gap: 10,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#A9A8A9",
-    borderRadius: 30,
-    marginBottom: 16,
-    paddingHorizontal: 16,
-  },
-  inputIcon: {
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
-    height: "100%",
-    color: "#333",
-    fontSize: 16,
-    fontFamily:"Nunito"
-  },
-  eyeIcon: {
-    padding: 10,
-  },
-  radioContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginBottom: 30,
-    paddingHorizontal: 10,
-  },
-  radioOption: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  radioButton: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#A9A8A9",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 8,
-  },
-  radioButtonSelected: {
-    borderColor: "#9C0F5F",
-  },
-  radioButtonInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#9C0F5F",
-  },
-  radioLabel: {
-    fontSize: 14,
-    color: "#333",
-  },
-  termsContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 24,
-    paddingHorizontal: 10,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: "#A9A8A9",
-    marginRight: 10,
-    marginTop: 2,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  checkboxSelected: {
-    backgroundColor: "#9C0F5F",
-  },
-  termsText: {
-    flex: 1,
-    fontSize: 14,
-    color: "#666",
-    lineHeight: 20,
-  },
-  termsLink: {
-    color: "#9C0F5F",
-    textDecorationLine: "underline",
-  },
   button: {
+    alignItems: "center",
     backgroundColor: "#9C0F5F",
     borderRadius: 30,
     height: 56,
     justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
     marginBottom: 16,
+    width: "100%",
   },
   buttonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
   },
+  checkbox: {
+    alignItems: "center",
+    borderColor: "#A9A8A9",
+    borderRadius: 4,
+    borderWidth: 1,
+    height: 20,
+    justifyContent: "center",
+    marginRight: 10,
+    marginTop: 2,
+    width: 20,
+  },
+  checkboxSelected: {
+    backgroundColor: "#9C0F5F",
+  },
+  container: {
+    alignItems: "center",
+    backgroundColor: "white",
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
+  },
+  content: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 30,
+    width: "100%",
+  },
+  eyeIcon: {
+    padding: 10,
+  },
+  form: {
+    width: "100%",
+  },
+  input: {
+    color: "#333",
+    flex: 1,
+    fontFamily: "Nunito",
+    fontSize: 16,
+    height: "100%",
+  },
+  inputContainer: {
+    alignItems: "center",
+    borderColor: "#A9A8A9",
+    borderRadius: 30,
+    borderWidth: 1,
+    flexDirection: "row",
+    height: 50,
+    marginBottom: 16,
+    paddingHorizontal: 16,
+    width: "100%",
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
+  inputsContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
   loginLink: {
     alignSelf: "center",
     marginTop: 10,
+  },
+  loginLinkHighlight: {
+    color: "#9C0F5F",
+    fontWeight: "500",
   },
   loginLinkText: {
     color: "#666",
     fontSize: 14,
   },
-  loginLinkHighlight: {
+  radioButton: {
+    alignItems: "center",
+    borderColor: "#A9A8A9",
+    borderRadius: 10,
+    borderWidth: 1,
+    height: 20,
+    justifyContent: "center",
+    marginRight: 8,
+    width: 20,
+  },
+  radioButtonInner: {
+    backgroundColor: "#9C0F5F",
+    borderRadius: 5,
+    height: 10,
+    width: 10,
+  },
+  radioButtonSelected: {
+    borderColor: "#9C0F5F",
+  },
+  radioContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 30,
+    paddingHorizontal: 10,
+    width: "100%",
+  },
+  radioLabel: {
+    color: "#333",
+    fontSize: 14,
+  },
+  radioOption: {
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  scrollContainer: {
+    flexGrow: 1,
+  },
+  termsContainer: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    marginBottom: 24,
+    paddingHorizontal: 10,
+  },
+  termsLink: {
     color: "#9C0F5F",
-    fontWeight: "500",
+    textDecorationLine: "underline",
+  },
+  termsText: {
+    color: "#666",
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  title: {
+    color: "#9C0F5F",
+    fontSize: 48,
+    fontWeight: "bold",
+    marginBottom: 30,
+  },
+  welcomeText: {
+    color: "#333",
+    fontSize: 18,
   },
 });

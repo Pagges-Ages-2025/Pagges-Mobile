@@ -1,17 +1,12 @@
-import axios from "axios";
 import { User } from "../models/User";
+import axiosInstance from "./axios-instance-singleton";
 // Se não funcionar mudar de localhost para o ip da máquina
-const baseUrl = `http://localhost:3000/profile`;
+const profileControllerUrl = "profile";
 
 export default function UserAPI() {
-  const getAuthToken = () => {
-    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImVtYWlsIjoiYWxpY2VCQGV4YW1wbGUuY29tIiwiaWQiOjQsImlhdCI6MTc0NDA2MTYxNCwiZXhwIjoxNzQ0MTQ4MDE0fQ.mHCBZAZmX7ZK05XlA4TzvrxjHiCdeR4hQABxp9dW-O0"; // Exemplo com localStorage
-  };
-
-  const getProfile = async (email: string): Promise<User> => {
-    const token = getAuthToken();
+  const getProfile = async (token: string): Promise<User> => {
     try {
-      const response = await axios.get(`${baseUrl}/${email}`, {
+      const response = await axiosInstance.get(`${profileControllerUrl}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -23,7 +18,70 @@ export default function UserAPI() {
     }
   };
 
+  const getProfileImage = async (token: string): Promise<string> => {
+    try {
+      const response = await axiosInstance.get(`/profile-image`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error("Erro ao buscar imagem de perfil:", error);
+      throw error;
+    }
+  };
+
+  const updateBio = async (token: string, bio: string): Promise<User> => {
+    try {
+      const response = await axiosInstance.put(
+        `${profileControllerUrl}/biography`,
+        { biography: bio },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      console.error("Erro ao atualizar bio:", error);
+      throw error;
+    }
+  };
+
+  const updateProfile = async (
+    token: string,
+    name?: string,
+    biography?: string,
+    genreIds?: number[]
+  ): Promise<User> => {
+    try {
+      const payload: any = {};
+      if (name) payload.name = name;
+      if (biography) payload.biography = biography;
+      if (genreIds) payload.genreIds = genreIds;
+
+      const response = await axiosInstance.put(
+        `${profileControllerUrl}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data.data;
+    } catch (error) {
+      console.error("Erro ao atualizar perfil:", error);
+      throw error;
+    }
+  };
+
   return {
     getProfile,
+    updateBio,
+    updateProfile,
   };
 }

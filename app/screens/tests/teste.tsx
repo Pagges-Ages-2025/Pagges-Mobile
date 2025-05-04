@@ -16,6 +16,7 @@ import SearchBarSection from "./sections/searchbarSection";
 import BooksSection from "./sections/booksSection";
 import CarouselSection from "./sections/carouselSection";
 import ColorsSection from "./sections/colorsSection";
+import ErrorsModalsSection from "./sections/ErrorsModalsSection";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -79,10 +80,8 @@ export default function TestsScreen() {
           <SearchBarSection />
           <BooksSection />
           <CarouselSection />
+          <ErrorsModalsSection />
         </View>
-
-        {/* importar aqui o novo componente para poder testar */}
-      
       </ScrollView>
     </SafeAreaView>
   );
