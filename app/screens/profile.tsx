@@ -10,6 +10,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Biography from "../components/Biography/Biography";
 import Achievement from "../components/Achievements/Achievement";
 import { useRouter } from "expo-router";
+import { base64Uri } from "../utils/imageUtils";
 
 const getToken = async () => {
   const userToken = await AsyncStorage.getItem("userToken");
@@ -76,7 +77,11 @@ export default function ProfileScreen() {
       <View style={[styles.content, { backgroundColor: theme.Background }]}>
         <ProfileHeader
           marginStart={30}
-          profileImageUrl="https://upload.wikimedia.org/wikipedia/pt/6/62/Kermit_the_Frog.jpg"
+          profileImageUrl={
+            data?.profileImage
+              ? base64Uri(data.profileImage)
+              : undefined
+          }
           name={data?.name || "Seu Perfil"}
           isAuthor={data?.isAuthor || false}
           bEdit={true}
