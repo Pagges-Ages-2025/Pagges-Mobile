@@ -7,12 +7,14 @@ import {
   Dimensions,
   ScrollView,
   Modal,
+  BackHandler,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import NunitoText from '../components/Texts/NunitoText';
 import CustomBook from '../components/Book/CustomBook';
 import { useTheme } from '../context/ThemeContext';
 import ModalBookDetails from './book';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
   
@@ -26,11 +28,10 @@ type Book = {
 
   type BookCategory = 'READ' | 'READING' | 'TO_BE_READ';
 
-  interface LibraryProps{
-    isVisible: boolean;
-    onClose: () => void;
-    pageIndex: Number;
-
+  interface LibraryProps {
+    isVisible?: boolean;
+    onClose?: () => void;
+    pageIndex?: number;
   }
 
 const Library: React.FC<LibraryProps> = ({
@@ -39,16 +40,41 @@ const Library: React.FC<LibraryProps> = ({
   pageIndex = 0,
 }) => {
   const { theme } = useTheme();
-  const [actualPage, setActualPage] = useState(pageIndex);
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const initialPageIndex = params.pageIndex ? Number(params.pageIndex) : pageIndex;
+  
+  const [actualPage, setActualPage] = useState(initialPageIndex);
   const [readBooks, setReadBooks] = useState<Book[]>([]);
   const [readingBooks, setReadingBooks] = useState<Book[]>([]);
   const [toReadBooks, setToReadBooks] = useState<Book[]>([]);
   const [selectedBook, setSelectedBook] = useState<any>(null);
   const [modalBookVisible, setModalBookVisible] = useState(false);
+  const [isModalMode] = useState(isVisible !== undefined);
+  
+  // Handle back button press for standalone screen mode
+  useEffect(() => {
+    if (!isModalMode) {
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+        router.back();
+        return true;
+      });
+      
+      return () => backHandler.remove();
+    }
+  }, [isModalMode, router]);
+
+  const handleClose = () => {
+    if (isModalMode && onClose) {
+      onClose();
+    } else {
+      router.back();
+    }
+  };
 
   const fetchBooksByArray = async (category: BookCategory) => {
     try {
-      const response = await fetch(`http://localhost:3000/personal-library/getBooksArray/${category}`, {
+      const response = await fetch(`http://192.168.15.15:3000/personal-library/getBooksArray/${category}`, {
         method: 'GET',
         headers: {
           "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2Mzc2MzQwLCJleHAiOjE3NDY0NjI3NDB9.qHYM2FNTzv-2jYFZS3Vd3h9VzynXAe8ItFog0yLrlrs"
@@ -99,7 +125,6 @@ const Library: React.FC<LibraryProps> = ({
 
   const handlePress = (book: Book) => {
     setSelectedBook(book);
-    console.log(selectedBook)
     setModalBookVisible(true);
   };
 
@@ -120,17 +145,11 @@ const Library: React.FC<LibraryProps> = ({
     fetchBooksByArray('TO_BE_READ');
   }, []);
 
-  return (
-    <Modal
-     animationType='slide'
-     visible={isVisible}
-     onRequestClose={onClose}
-     presentationStyle='fullScreen'
-    >
+  const content = (
     <View style={[styles.container, {backgroundColor: theme.personalLibraryBackground}]}>
       {/* header */}
       <View style={styles.headerPage}>
-        <TouchableOpacity onPress={() => console.log('Back button pressed')} style={[styles.circleButton]}>
+        <TouchableOpacity onPress={handleClose} style={[styles.circleButton]}>
           <Ionicons
             name="return-up-back-outline"
             size={30}
@@ -255,23 +274,54 @@ const Library: React.FC<LibraryProps> = ({
         )}
       </View>
     </View>
-    {selectedBook && (
-      <ModalBookDetails
-        visible={modalBookVisible}
-        onClose={handleCloseModal}
-        rating={selectedBook.ratings[0].rating}
-        title={selectedBook.title}
-        pages={selectedBook.pages}
-        synopsis={selectedBook.synopsis}
-        authors={selectedBook.authors}
-        google_image_url={selectedBook.google_image_url}
-        genre={selectedBook.genre}
-        year={selectedBook.year}
-        review={selectedBook.review}
-        id={selectedBook.id}
-      />
-    )}
+  );
+
+  // Return either as a modal or a direct component
+  return isModalMode ? (
+    <Modal
+     animationType='slide'
+     visible={isVisible}
+     onRequestClose={handleClose}
+     presentationStyle='fullScreen'
+    >
+      {content}
+      {selectedBook && (
+        <ModalBookDetails
+          visible={modalBookVisible}
+          onClose={handleCloseModal}
+          rating={selectedBook.ratings?.[0]?.rating ?? 0}
+          title={selectedBook.title}
+          pages={selectedBook.pages}
+          synopsis={selectedBook.synopsis}
+          authors={selectedBook.authors}
+          google_image_url={selectedBook.google_image_url}
+          genre={selectedBook.genre}
+          year={selectedBook.year}
+          review={selectedBook.review}
+          id={selectedBook.id}
+        />
+      )}
     </Modal>
+  ) : (
+    <>
+      {content}
+      {selectedBook && (
+        <ModalBookDetails
+          visible={modalBookVisible}
+          onClose={handleCloseModal}
+          rating={selectedBook.ratings?.[0]?.rating ?? 0}
+          title={selectedBook.title}
+          pages={selectedBook.pages}
+          synopsis={selectedBook.synopsis}
+          authors={selectedBook.authors}
+          google_image_url={selectedBook.google_image_url}
+          genre={selectedBook.genre}
+          year={selectedBook.year}
+          review={selectedBook.review}
+          id={selectedBook.id}
+        />
+      )}
+    </>
   );
 };
 

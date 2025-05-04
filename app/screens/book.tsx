@@ -95,7 +95,7 @@ export default function ModalBookDetails({
 
   const updateBookState = async (id: string, state: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/personal-library/addBook/${id}`, {
+      const response = await fetch(`http://192.168.15.15:3000/personal-library/addBook/${id}`, {
         method: 'PUT',
         headers: {
           "Content-Type": "application/json",
