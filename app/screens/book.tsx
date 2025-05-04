@@ -8,7 +8,6 @@ import {
   ImageBackground,
   TouchableOpacity,
   Modal,
-  GestureResponderEvent,
 } from "react-native";
 import {
   GestureHandlerRootView,
@@ -63,22 +62,6 @@ export default function ModalBookDetails({
   onCreateReview,
   onShare,
 }: ModalBookDetailsProps) {
-  console.log("ModalBookDetails");
-  console.log("google_image_url", google_image_url);
-  console.log("title", title);
-  console.log("rating", rating);
-  console.log("readersNumber", readersNumber);
-  console.log("pages", pages);
-  console.log("rankingNumber", rankingNumber);
-  console.log("synopsis", synopsis);
-  console.log("review", review);
-  console.log("author", authors);
-  console.log("publicationDate", year);
-  console.log("genre", genre);
-  console.log("onCreateReview", onCreateReview);
-  console.log("onShare", onShare);
-  console.log("onClose", onClose);
-  console.log("visible", visible);
   const { theme } = useTheme();
   const [isMaximized, setIsMaximized] = useState(false);
   const [showMoreText, setShowMoreText] = useState(false);
@@ -402,33 +385,7 @@ export default function ModalBookDetails({
                   // </TouchableOpacity>
                 ))}
               </View>
-
-              {/* <View>
-                <NunitoText
-                  style={[styles.secondTitle, { color: theme.primaryText }]}
-                >
-                  Sinopse
-                </NunitoText>
-                <NunitoText
-                  style={[styles.sinopseText, { color: theme.primaryText }]}
-                >
-                  {showMoreText ? synopsis : synopsis?.substring(0, 450) + "..."}
-                </NunitoText>
-
-                <TouchableOpacity
-                  onPress={() => setShowMoreText(!showMoreText)}
-                  style={styles.moreAndLessButton}
-                >
-                  <Text
-                    style={[
-                      styles.showMoreAndLess,
-                      { color: theme.primary },
-                    ]}
-                  >
-                    {showMoreText ? "Mostrar menos" : "Mostrar mais"}
-                  </Text>
-                </TouchableOpacity>
-              </View> */}
+              
               <SinopseExpandable synopsis={synopsis} />
 
               <View

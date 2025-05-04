@@ -45,37 +45,13 @@ const Library: React.FC<LibraryProps> = ({
   const [toReadBooks, setToReadBooks] = useState<Book[]>([]);
   const [selectedBook, setSelectedBook] = useState<any>(null);
   const [modalBookVisible, setModalBookVisible] = useState(false);
-  
-  // useEffect(() => {
-  //   const fetchBooks = async () => {
-  //     const response = await new Promise<{
-  //       read: Book[];
-  //       reading: Book[];
-  //       toRead: Book[];
-  //     }>((resolve) => {
-  //       setTimeout(() => {
-  //         resolve({
-  //           read: mockReadBooks,
-  //           reading: mockReadingBooks,
-  //           toRead: mockToReadBooks,
-  //         });
-  //       }, 1000);
-  //     });
-  
-  //     setReadBooks(response.read);
-  //     setReadingBooks(response.reading);
-  //     setToReadBooks(response.toRead);
-  //   };
-  
-  //   fetchBooks();
-  // }, []);
 
   const fetchBooksByArray = async (category: BookCategory) => {
     try {
       const response = await fetch(`http://localhost:3000/personal-library/getBooksArray/${category}`, {
         method: 'GET',
         headers: {
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2MjgwMzYyLCJleHAiOjE3NDYzNjY3NjJ9.Xt1Gc9FkpCFEqC4l_GGWzYoopsbMQWDl0-MjxmBZcjo"
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2MzY3MDE1LCJleHAiOjE3NDY0NTM0MTV9.xzUHUdFkWsBnS0O5W-2n3nUZsGiBK5Kd-kNdmCyn7jc"
         },
       });
 
