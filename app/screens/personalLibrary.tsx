@@ -34,7 +34,7 @@ type Book = {
   }
 
 const Library: React.FC<LibraryProps> = ({
-  isVisible,
+  isVisible = false,
   onClose,
   pageIndex = 0,
 }) => {
@@ -51,7 +51,7 @@ const Library: React.FC<LibraryProps> = ({
       const response = await fetch(`http://localhost:3000/personal-library/getBooksArray/${category}`, {
         method: 'GET',
         headers: {
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2MzY3MDE1LCJleHAiOjE3NDY0NTM0MTV9.xzUHUdFkWsBnS0O5W-2n3nUZsGiBK5Kd-kNdmCyn7jc"
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2Mzc2MzQwLCJleHAiOjE3NDY0NjI3NDB9.qHYM2FNTzv-2jYFZS3Vd3h9VzynXAe8ItFog0yLrlrs"
         },
       });
 

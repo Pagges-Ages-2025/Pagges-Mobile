@@ -18,12 +18,12 @@ export default function ScreensLayout() {
   const handleLongPress = ({ nativeEvent }: any) => {
     // if (nativeEvent.state === 4) {
     //   if (pathname !== "screens/tests/teste") {
-    //     router.push("screens/tests/teste" as any);
+    //     router.push("screens/profile" as any);
     //   } else {
     //     router.back();
     //   }
     // }
-    router.push("/screens/personalLibrary");
+    router.push("screens/profile" as any);
   };
 
   return (

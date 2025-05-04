@@ -22,6 +22,40 @@ export default function ProfileScreen() {
   const { theme } = useTheme();
   const router = useRouter();
 
+  const [stats, setStats] = useState<{ readBooks: number; readKms: number }>({
+    readBooks: 0,
+    readKms: 0,
+  });  
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = await getToken();
+        const res = await fetch(`http://localhost:3000/personal-library/getUserStatistics`, {
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+            // "Authorization": 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2Mzc2MzQwLCJleHAiOjE3NDY0NjI3NDB9.qHYM2FNTzv-2jYFZS3Vd3h9VzynXAe8ItFog0yLrlrs'
+          },
+        });
+  
+        const data = await res.json();
+
+        setStats({
+          readBooks: data.readBooks,
+          readKms: data.readKms,
+        });
+
+      } catch (error) {
+        console.error("Erro ao buscar estatísticas do usuário:", error);
+      }
+    };
+  
+    fetchStats();
+  }, []);
+  
+
   useEffect(() => {
     const fetchProfile = async () => {
       const token = await getToken();
@@ -37,8 +71,6 @@ export default function ProfileScreen() {
     };
     fetchProfile();
   }, []);
-
-  console.log("Current data state:", data);
 
   const handleEditProfile = async () => {
     const token = await getToken();
@@ -89,8 +121,9 @@ export default function ProfileScreen() {
         />
         <View style={styles.statsContainer}>
           <UserStats
-            kmLidos={data?.readKm || 0}
-            livros={data?.readBooks || 0}
+            // kmLidos={data?.readKm || 0}
+            kmLidos={stats.readKms}
+            livros={stats.readBooks}
             ranking={data?.ranking || 0}
             amigos={data?.friendsNumber || 0}
           />
