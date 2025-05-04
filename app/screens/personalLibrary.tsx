@@ -268,6 +268,7 @@ const Library: React.FC<LibraryProps> = ({
         genre={selectedBook.genre}
         year={selectedBook.year}
         review={selectedBook.review}
+        id={selectedBook.id}
       />
     )}
     </Modal>

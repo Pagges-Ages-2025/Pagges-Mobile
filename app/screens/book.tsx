@@ -39,6 +39,7 @@ interface ModalBookDetailsProps {
   review: string;
   authors?: string;
   year?: string;
+  id: string;
   genre?: string;
   google_image_url?: string;
   onCreateReview?: () => void;
@@ -57,6 +58,7 @@ export default function ModalBookDetails({
   review,
   authors,
   year,
+  id,
   genre,
   google_image_url,
   onCreateReview,
