@@ -18,6 +18,20 @@ export default function UserAPI() {
     }
   };
 
+  const getProfileImage = async (token: string): Promise<string> => {
+    try {
+      const response = await axiosInstance.get(`/profile-image`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error("Erro ao buscar imagem de perfil:", error);
+      throw error;
+    }
+  };
+
   const updateBio = async (token: string, bio: string): Promise<User> => {
     try {
       const response = await axiosInstance.put(

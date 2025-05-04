@@ -9,6 +9,7 @@ export class User {
   friendsNumber: number;
   isAuthor: boolean;
   email: string;
+  profileImage?: string;
 
   constructor() {
     this.id = 0;

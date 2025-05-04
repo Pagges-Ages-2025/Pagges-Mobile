@@ -13,7 +13,7 @@ import VerifiedIcon from "../../assets/images/ic_verified.svg";
 import Strings from "@/app/constants/Strings";
 import DefaultProfileHeaderImage from "../../assets/images/default_profile_header_image.png";
 import { Ionicons } from "@expo/vector-icons";
-
+import profileUser from "../../assets/images/profile-user.png";
 interface ProfileHeaderProps {
   marginStart: number;
   profileImageUrl?: string;
@@ -51,7 +51,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           source={DefaultProfileHeaderImage}
           style={styles.backgroundImage}
         >
-            {bEditPicture ? (
+          {bEditPicture ? (
             <View
               style={[
                 styles.profileImage,
@@ -60,7 +60,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             />
           ) : (
             <Image
-              source={{ uri: profileImageUrl }}
+              source={profileImageUrl ? { uri: profileImageUrl } : profileUser}
               style={[styles.profileImage, { marginStart: marginStart }]}
             />
           )}
@@ -68,7 +68,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           {bEdit && (
             <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
               <Ionicons name="create-outline" size={32} />
-            </TouchableOpacity>)}
+            </TouchableOpacity>
+          )}
 
           {bEditPicture && (
             <TouchableOpacity
