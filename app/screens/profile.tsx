@@ -154,19 +154,19 @@ export default function ProfileScreen() {
 
             <TouchableOpacity 
               style={[styles.libraryTab, { backgroundColor: theme.Background }]} 
-              onPress={() => navigateToLibrary(2)}
+              onPress={() => navigateToLibrary(1)}
             >
               <NunitoText style={[styles.libraryTabText, { color: theme.primaryText }]}>
-                Lendo
+                Quero Ler
               </NunitoText>
             </TouchableOpacity>
 
             <TouchableOpacity 
               style={[styles.libraryTab, { backgroundColor: theme.Background }]} 
-              onPress={() => navigateToLibrary(1)}
+              onPress={() => navigateToLibrary(2)}
             >
               <NunitoText style={[styles.libraryTabText, { color: theme.primaryText }]}>
-                A ler
+                Lendo
               </NunitoText>
             </TouchableOpacity>
           </View>

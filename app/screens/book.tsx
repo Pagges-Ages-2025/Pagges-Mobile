@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-raw-text */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -8,6 +8,8 @@ import {
   ImageBackground,
   TouchableOpacity,
   Modal,
+  ToastAndroid,
+  Alert,
 } from "react-native";
 import {
   GestureHandlerRootView,
@@ -29,6 +31,8 @@ import { SinopseExpandable } from "../components/Book/sinopseExpandable";
 import { router } from "expo-router";
 import StaticStars from "../components/StaticStars/StaticStars";
 import RatingModal from "../components/RatingModal/RatingModal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 
 interface ModalBookDetailsProps {
   visible: boolean;
@@ -95,11 +99,29 @@ export default function ModalBookDetails({
 
   const updateBookState = async (id: string, state: string) => {
     try {
-      const response = await fetch(`http://192.168.15.15:3000/personal-library/addBook/${id}`, {
+      // For testing, use this hardcoded token that works in personalLibrary.tsx
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2Mzc2MzQwLCJleHAiOjE3NDY0NjI3NDB9.qHYM2FNTzv-2jYFZS3Vd3h9VzynXAe8ItFog0yLrlrs";
+      
+      // Convert id to number as the backend expects a numeric book_id
+      const numericId = parseInt(id, 10);
+      
+      if (isNaN(numericId)) {
+        console.error(`Invalid book ID: ${id}`);
+        if (Platform.OS === 'android') {
+          ToastAndroid.show("ID do livro inválido", ToastAndroid.SHORT);
+        } else {
+          Alert.alert("Erro", "ID do livro inválido");
+        }
+        return;
+      }
+
+      console.log(`Adding book ${numericId} to ${state} library with token`, token);
+      
+      const response = await fetch(`http://192.168.15.15:3000/personal-library/addBook/${numericId}`, {
         method: 'PUT',
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2MzcyNjA0LCJleHAiOjE3NDY0NTkwMDR9.uq6I3IJmVM2r9MZJ6Yze1hdt7vZyd1VitJp5QouVcr8"
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
           state: state,
@@ -108,11 +130,27 @@ export default function ModalBookDetails({
   
       if (response.ok) {
         console.log(`Adicionado a ${state} da biblioteca pessoal`);
+        if (Platform.OS === 'android') {
+          ToastAndroid.show(`Livro adicionado com sucesso à sua biblioteca`, ToastAndroid.SHORT);
+        } else {
+          Alert.alert("Sucesso", `Livro adicionado com sucesso à sua biblioteca`);
+        }
       } else {
-        console.error(`Erro ao adicionar livro com estado ${state}`);
+        const errorText = await response.text();
+        console.error(`Erro ao adicionar livro com estado ${state}:`, errorText);
+        if (Platform.OS === 'android') {
+          ToastAndroid.show("Erro ao adicionar livro à biblioteca", ToastAndroid.SHORT);
+        } else {
+          Alert.alert("Erro", "Não foi possível adicionar o livro à biblioteca");
+        }
       }
     } catch (error) {
       console.error(`Erro ao adicionar livro (${state}):`, error);
+      if (Platform.OS === 'android') {
+        ToastAndroid.show("Erro ao adicionar livro à biblioteca", ToastAndroid.SHORT);
+      } else {
+        Alert.alert("Erro", "Não foi possível adicionar o livro à biblioteca");
+      }
     }
   };
 
@@ -181,6 +219,7 @@ export default function ModalBookDetails({
       <ImageBackground
         source={{ uri: google_image_url }}
         style={styles.backgroundImage}
+        onError={() => console.error("Error loading book cover image:", google_image_url)}
       >
         <View style={styles.overlay} />
 
