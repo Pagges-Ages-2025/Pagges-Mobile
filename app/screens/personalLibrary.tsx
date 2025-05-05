@@ -15,6 +15,7 @@ import CustomBook from '../components/Book/CustomBook';
 import { useTheme } from '../context/ThemeContext';
 import ModalBookDetails from './book';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
   
@@ -72,12 +73,18 @@ const Library: React.FC<LibraryProps> = ({
     }
   };
 
+  const getToken = async () => {
+    const userToken = await AsyncStorage.getItem("userToken");
+    return userToken;
+  };
+
   const fetchBooksByArray = async (category: BookCategory) => {
+    const token = await getToken();
     try {
       const response = await fetch(`http://localhost:3000/personal-library/getBooksArray/${category}`, {
         method: 'GET',
         headers: {
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2Mzc2MzQwLCJleHAiOjE3NDY0NjI3NDB9.qHYM2FNTzv-2jYFZS3Vd3h9VzynXAe8ItFog0yLrlrs"
+          "Authorization": `Bearer ${token}`
         },
       });
 
@@ -210,19 +217,31 @@ const Library: React.FC<LibraryProps> = ({
             nestedScrollEnabled
           >
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-                {readBooks.map((book) => (
-                    <View key={book.id} style={{paddingHorizontal: 12, paddingVertical: 15}}> 
-                        <CustomBook
-                          size={book.size}
-                          title={book.title}
-                          author={book.author}
-                          photoPath={book.photoPath}
-                          onPress={() => handlePress(book)}
-                          bookId={book.id}
-                          toPersonalLibrary={true}
-                        />
-                    </View>
-                ))}
+
+              {readBooks.length > 0 ? readBooks.map((book) => (
+                <View key={book.id} style={{ paddingHorizontal: 12, paddingVertical: 15 }}>
+                  <CustomBook
+                    size={book.size}
+                    title={book.title}
+                    author={book.author}
+                    photoPath={book.photoPath}
+                    onPress={() => handlePress(book)}
+                    bookId={book.id}
+                    toPersonalLibrary={true}
+                  />
+                </View>
+              )) : (
+                <View style={styles.centered}>
+                  <View style={{ paddingBottom: 10, height: 500, alignItems: 'center', justifyContent: 'center' }}>
+                    <NunitoText style={{ fontSize: 20, fontWeight: "bold", color: theme.quinaryText }}>
+                      Nenhum livro adicionado...
+                    </NunitoText>
+                    <NunitoText style={{ fontSize: 18, color: theme.quinaryText }}>
+                      Adicione um livro à sua biblioteca para ver aqui!
+                    </NunitoText>
+                  </View>
+                </View>
+              )}
             </View>
           </ScrollView>
         )}
@@ -232,47 +251,71 @@ const Library: React.FC<LibraryProps> = ({
             contentContainerStyle={styles.scrollContent}
             style={{ flex: 1 }}
             nestedScrollEnabled
-            >
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-                {toReadBooks.map((book) => (
-                  <View key={book.id} style={{paddingHorizontal: 12, paddingVertical: 15}}> 
-                      <CustomBook
-                        size={book.size}
-                        title={book.title}
-                        author={book.author}
-                        photoPath={book.photoPath}
-                        onPress={() => handlePress(book)}
-                        bookId={book.id}
-                        toPersonalLibrary={true}
-                      />
+          >
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+              {toReadBooks.length > 0 ? toReadBooks.map((book) => (
+                <View key={book.id} style={{ paddingHorizontal: 12, paddingVertical: 15 }}>
+                  <CustomBook
+                    size={book.size}
+                    title={book.title}
+                    author={book.author}
+                    photoPath={book.photoPath}
+                    onPress={() => handlePress(book)}
+                    bookId={book.id}
+                    toPersonalLibrary={true}
+                  />
+                </View>
+              )) :
+                (
+                  <View style={styles.centered}>
+                    <View style={{ paddingBottom: 10, height: 500, alignItems: 'center', justifyContent: 'center' }}>
+                      <NunitoText style={{ fontSize: 20, fontWeight: "bold", color: theme.quinaryText }}>
+                        Nenhum livro adicionado...
+                      </NunitoText>
+                      <NunitoText style={{ fontSize: 18, color: theme.quinaryText }}>
+                        Adicione um livro à sua biblioteca para ver aqui!
+                      </NunitoText>
                     </View>
-                ))}
-              </View>
-            </ScrollView>
+                  </View>
+                )}
+            </View>
+          </ScrollView>
         )}
 
         {actualPage === 2 && (
-            <ScrollView
+          <ScrollView
             contentContainerStyle={styles.scrollContent}
             style={{ flex: 1 }}
             nestedScrollEnabled
-            >
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-                {readingBooks.map((book) => (
-                  <View key={book.id} style={{paddingHorizontal: 12, paddingVertical: 15}}> 
-                      <CustomBook
-                        size={book.size}
-                        title={book.title}
-                        author={book.author}
-                        photoPath={book.photoPath}
-                        onPress={() => handlePress(book)}
-                        bookId={book.id}
-                        toPersonalLibrary={true}
-                      />
+          >
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+              {readingBooks.length > 0 ? readingBooks.map((book) => (
+                <View key={book.id} style={{ paddingHorizontal: 12, paddingVertical: 15 }}>
+                  <CustomBook
+                    size={book.size}
+                    title={book.title}
+                    author={book.author}
+                    photoPath={book.photoPath}
+                    onPress={() => handlePress(book)}
+                    bookId={book.id}
+                    toPersonalLibrary={true}
+                  />
+                </View>
+              )) :
+                (
+                  <View style={styles.centered}>
+                    <View style={{ paddingBottom: 10, height: 500, alignItems: 'center', justifyContent: 'center' }}>
+                      <NunitoText style={{ fontSize: 20, fontWeight: "bold", color: theme.quinaryText }}>
+                        Nenhum livro adicionado...
+                      </NunitoText>
+                      <NunitoText style={{ fontSize: 18, color: theme.quinaryText }}>
+                        Adicione um livro à sua biblioteca para ver aqui!
+                      </NunitoText>
+                    </View>
                   </View>
-                ))}
-              </View>
-            </ScrollView>
+                )}
+            </View>
+          </ScrollView>
         )}
       </View>
     </View>

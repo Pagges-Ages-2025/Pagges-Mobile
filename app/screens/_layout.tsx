@@ -7,7 +7,6 @@ import {
 import React from "react";
 import { StatusBar, View } from "react-native";
 import NavBar from "../components/Nav/NavBar";
-
 import { Redirect } from "expo-router";
 
 
@@ -43,7 +42,8 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
     "/screens/register", 
     "/screens/splash",
     "/screens/welcome",
-    "/screens/book"
+    "/screens/book",
+    "/screens/favoriteGenre"
   ];
 
   const { themeName } = useTheme();
@@ -71,6 +71,8 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
             <Stack.Screen name="welcome" />
             <Stack.Screen name="login" />
             <Stack.Screen name="register" />
+            <Stack.Screen name="favoriteGenre"/>
+            <Stack.Screen name="home" />
             <Stack.Screen name="searchPage" />
             <Stack.Screen name="tests/teste" />
             <Stack.Screen name="book"/>

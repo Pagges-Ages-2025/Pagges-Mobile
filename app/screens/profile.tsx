@@ -2,7 +2,6 @@ import ProfileHeader from "@/app/components/Profile/ProfileHeader";
 import { User } from "@/app/models/User";
 import { useEffect, useState } from "react";
 import UserAPI from "@/app/services/profileService";
-import { useLocalSearchParams } from "expo-router";
 import { ScrollView, View, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import UserStats from "../components/UserStats/UserStats";
 import { useTheme } from "../context/ThemeContext";
@@ -37,7 +36,6 @@ export default function ProfileScreen() {
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
-            // "Authorization": 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2Mzc2MzQwLCJleHAiOjE3NDY0NjI3NDB9.qHYM2FNTzv-2jYFZS3Vd3h9VzynXAe8ItFog0yLrlrs'
           },
         });
   

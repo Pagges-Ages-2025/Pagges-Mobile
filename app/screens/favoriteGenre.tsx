@@ -11,7 +11,7 @@ import NunitoText from "../components/Texts/NunitoText";
 import Strings from "../constants/Strings";
 import SelectionButton from "../components/Buttons/SelectionButton";
 import CustomButton from "../components/Buttons/CustomButton";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 const FavoriteGenre: React.FC = () => {
   const { theme, themeName } = useTheme();
@@ -106,9 +106,7 @@ const FavoriteGenre: React.FC = () => {
           title={Strings.save}
           size="small"
           fontWeight="bold"
-          onPress={function (event: GestureResponderEvent): void {
-            throw new Error("Function not implemented.");
-          }}
+          onPress={() => router.replace("/screens/home")}
         />
       </View>
     </SafeAreaView>

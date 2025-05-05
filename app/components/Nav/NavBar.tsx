@@ -42,7 +42,7 @@ export default function NavBar() {
   };
 
   const navigationItems = [
-    { name: "Home", icon: "home-outline", route: "/screens/searchPage" },
+    { name: "Home", icon: "home-outline", route: "/screens/home" },
     {
       name: themeName === "dark" ? "Light" : "Dark",
       icon: themeName === "dark" ? "sunny" : "moon",
