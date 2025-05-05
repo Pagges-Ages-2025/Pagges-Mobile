@@ -74,7 +74,7 @@ const Library: React.FC<LibraryProps> = ({
 
   const fetchBooksByArray = async (category: BookCategory) => {
     try {
-      const response = await fetch(`http://192.168.15.15:3000/personal-library/getBooksArray/${category}`, {
+      const response = await fetch(`http://localhost:3000/personal-library/getBooksArray/${category}`, {
         method: 'GET',
         headers: {
           "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2Mzc2MzQwLCJleHAiOjE3NDY0NjI3NDB9.qHYM2FNTzv-2jYFZS3Vd3h9VzynXAe8ItFog0yLrlrs"

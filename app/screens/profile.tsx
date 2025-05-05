@@ -32,7 +32,7 @@ export default function ProfileScreen() {
     const fetchStats = async () => {
       try {
         const token = await getToken();
-        const res = await fetch(`http://192.168.15.15:3000/personal-library/getUserStatistics`, {
+        const res = await fetch(`http://localhost:3000/personal-library/getUserStatistics`, {
           method: 'GET',
           headers: {
             "Content-Type": "application/json",
