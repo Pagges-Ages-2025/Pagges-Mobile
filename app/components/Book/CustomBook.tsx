@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   TouchableOpacity,
   StyleSheet,
@@ -34,6 +34,26 @@ const CustomBook: React.FC<CustomBookProps> = ({
   author,
 }) => {
   const { theme } = useTheme();
+  const [imageError, setImageError] = useState(false);
+  const [optimizedPhotoPath, setOptimizedPhotoPath] = useState(photoPath);
+
+  // Otimiza a URL da imagem ao montar o componente
+  useEffect(() => {
+    if (photoPath && typeof photoPath === "string") {
+      // Melhora a qualidade da imagem do Google Books
+      const optimizedUrl = photoPath.includes("zoom=1")
+        ? photoPath.replace("zoom=1", "zoom=6")
+        : photoPath;
+
+      setOptimizedPhotoPath(optimizedUrl);
+    }
+  }, [photoPath]);
+
+  // Se a imagem falhar ao carregar, usamos uma imagem placeholder
+  const handleImageError = () => {
+    console.log("Error loading book cover:", optimizedPhotoPath);
+    setImageError(true);
+  };
 
   const sizeStyles = {
     small: {
@@ -55,6 +75,11 @@ const CustomBook: React.FC<CustomBookProps> = ({
 
   const titleStyle = size === "search" ? styles.searchTitle : styles.baseText;
 
+  // Imagem de fallback para quando a capa não carregar
+  const bookCoverSource = imageError
+    ? require("../../assets/images/book-cover.png")
+    : { uri: optimizedPhotoPath };
+
   return (
     <View style={{ alignItems: "center" }}>
       <TouchableOpacity
@@ -70,8 +95,10 @@ const CustomBook: React.FC<CustomBookProps> = ({
         activeOpacity={0.8}
       >
         <Image
-          source={{ uri: photoPath }}
+          source={bookCoverSource}
           style={size === "search" ? styles.searchBookPhoto : styles.bookPhoto}
+          onError={handleImageError}
+          defaultSource={require("../../assets/images/book-cover.png")}
         />
 
         {/* if it is not a personal library, add the text inside */}
@@ -85,14 +112,12 @@ const CustomBook: React.FC<CustomBookProps> = ({
         <>
           {title && (
             <Text style={[styles.bookTitle, { color: theme.secondaryText }]}>
-              {/* {title} */}
-              {title.substring(0, 12)}
+              {title.length > 14 ? `${title.substring(0, 14)}...` : title}
             </Text>
           )}
           {author && (
             <Text style={[styles.bookAuthor, { color: theme.secondaryText }]}>
-              {/* {author} */}
-              {author.substring(0, 15)}
+              {author.length > 18 ? `${author.substring(0, 18)}...` : author}
             </Text>
           )}
         </>

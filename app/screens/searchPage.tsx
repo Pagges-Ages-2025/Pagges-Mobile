@@ -21,9 +21,15 @@ const SearchPage: React.FC = () => {
       try {
         const results = await searchBooks(term);
         console.log("Search results:", results);
-        setBooks(results);
+
+        // Garantir que os resultados estão no formato esperado pelo componente SearchBar
+        // Se os resultados já forem retornados no formato esperado, esta etapa pode não ser necessária
+        const formattedResults = Array.isArray(results) ? results : [];
+
+        setBooks(formattedResults);
       } catch (error) {
         console.error("Erro ao buscar livros:", error);
+        setBooks([]);
       } finally {
         setLoading(false);
       }

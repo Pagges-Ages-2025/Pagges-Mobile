@@ -97,6 +97,7 @@ const Library: React.FC<LibraryProps> = ({
         genre: item.book.genre,
         authors: item.book.authors,
         cover: item.book.cover,
+        photoPath: item.book.google_image_url || item.book.cover, // Usando google_image_url ou cover como fallback
         synopsis: item.book.synopsis,
         year: item.book.year,
         pages: item.book.pages,
@@ -104,6 +105,7 @@ const Library: React.FC<LibraryProps> = ({
         posts: item.book.posts,
         ratings: item.book.ratings,
         size: 'small' as const,
+        author: item.book.authors, // Adicionando o autor para exibição
       }));
       
       if (category === 'READ') {
