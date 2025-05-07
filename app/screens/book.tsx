@@ -27,6 +27,8 @@ import { ReviewComment } from "../components/review-comments/review-comments";
 import CustomModal from "../components/review-comments/pop-up-modal";
 import CustomButton from "../components/Buttons/CustomButton";
 import { router } from "expo-router";
+import StaticStars from "../components/StaticStars/StaticStars";
+import RatingModal from "../components/RatingModal/RatingModal";
 
 interface ModalBookDetailsProps {
   visible: boolean;
@@ -69,7 +71,6 @@ export default function ModalBookDetails({
   const [modalVisible, setModalVisible] = useState(false);
   const [currentRating, setCurrentRating] = useState(rating);
   const [ratingCount, setRatingCount] = useState(1);
-
   const bottomSheetRef = useRef<BottomSheet>(null);
   const roundedStars = Math.round(currentRating);
   const snapPoints = useMemo(() => ["62%", "85%"], []);
@@ -267,16 +268,17 @@ export default function ModalBookDetails({
             }}
           >
             <View style={styles.starsContainer}>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <AntDesign
-                  key={index}
-                  name={index < roundedStars ? "star" : "staro"}
-                  size={20}
-                  color={
-                    index < roundedStars ? theme.starColor : theme.white
-                  }
-                />
-              ))}
+            <StaticStars
+              rating={rating}
+              onPress={() => {setModalVisible(true)}}
+              />
+            <RatingModal
+              visible={modalVisible}
+              onClose={() => setModalVisible(false)}
+              onRate={() => {setModalVisible(false);
+              }}
+              book={titulo}
+            />
             </View>
 
             <TouchableOpacity
@@ -303,12 +305,6 @@ export default function ModalBookDetails({
               </NunitoText>
             </TouchableOpacity>
 
-            <CustomModal
-              visible={modalVisible}
-              onClose={() => setModalVisible(false)}
-              content="Avalie o livro"
-              onRate={handleNewRating}
-            />
           </View>
         </View>
 
@@ -528,6 +524,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   starsContainer: {
+    zIndex: 10,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
@@ -535,7 +532,7 @@ const styles = StyleSheet.create({
   },
   bookContentContainer: {
     position: "absolute",
-    top: "9%",
+    top: "5%",
     left: "5%",
     right: "5%",
     paddingHorizontal: 10,
