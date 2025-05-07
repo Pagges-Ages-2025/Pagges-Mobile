@@ -31,21 +31,25 @@ export default function CreateReviewCommentScreen() {
   const backgroundColor = theme.Background;
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <CancelPostButtons
-        onPost={handlePublish}
-        cancelScreen="searchPage" // ou "book", dependendo do fluxo desejado
-      />
+      <View style={styles.header}>
+        <CancelPostButtons
+          onPost={handlePublish}
+          cancelScreen="searchPage" // ou "book", dependendo do fluxo desejado
+        />
+      </View>
 
       <ReviewTextField value={reviewText} onChangeText={setReviewText} />
 
       <SelectBook />
 
-      <CheckBoxOptions
-        isReviewChecked={isReviewChecked}
-        isSpoilerChecked={isSpoilerChecked}
-        onReviewChange={setIsReviewChecked}
-        onSpoilerChange={setIsSpoilerChecked}
-      />
+      <View style={styles.options}>
+        <CheckBoxOptions
+          isReviewChecked={isReviewChecked}
+          isSpoilerChecked={isSpoilerChecked}
+          onReviewChange={setIsReviewChecked}
+          onSpoilerChange={setIsSpoilerChecked}
+        />
+      </View>
     </View>
   );
 }
@@ -56,4 +60,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
   },
+  header:{
+   paddingTop: 30,
+   paddingBottom: 20
+  },
+  options:{
+    paddingTop: 5,
+    paddingBottom: 15
+  }
 });
