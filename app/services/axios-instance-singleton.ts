@@ -1,6 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosInstance } from "axios";
 
-// .env file
 const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 if (!EXPO_PUBLIC_API_URL) {
@@ -9,13 +9,28 @@ if (!EXPO_PUBLIC_API_URL) {
 
 export const API_URL: string = EXPO_PUBLIC_API_URL;
 
-// Create a singleton Axios instance
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: API_URL,
-  timeout: 10000, // 10 seconds timeout request
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 });
+
+axiosInstance.interceptors.request.use(
+  async (config) => {
+    const isAuthRoute = config.url?.startsWith("/auth");
+
+    if (!isAuthRoute) {
+      const token = await AsyncStorage.getItem("userToken");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default axiosInstance;
