@@ -1,22 +1,21 @@
+import { useTheme } from "@/app/context/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  StyleSheet,
-  ScrollView,
   Animated,
+  ScrollView,
+  StyleSheet,
   TouchableOpacity,
-  GestureResponderEvent,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme } from "@/app/context/ThemeContext";
-import ButtonSection from "./sections/buttonsSection";
 import AnimationSection from "./sections/animationsSection";
-import SearchBarSection from "./sections/searchbarSection";
 import BooksSection from "./sections/booksSection";
+import ButtonSection from "./sections/buttonsSection";
 import CarouselSection from "./sections/carouselSection";
 import ColorsSection from "./sections/colorsSection";
 import ErrorsModalsSection from "./sections/ErrorsModalsSection";
+import SearchBarSection from "./sections/searchbarSection";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
