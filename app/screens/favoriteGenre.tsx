@@ -1,17 +1,13 @@
 import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-  GestureResponderEvent,
-} from "react-native";
-import { useTheme } from "../context/ThemeContext";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { router, useLocalSearchParams } from "expo-router";
+import CustomButton from "../components/Buttons/CustomButton";
+import SelectionButton from "../components/Buttons/SelectionButton";
 import NunitoText from "../components/Texts/NunitoText";
 import Strings from "../constants/Strings";
-import SelectionButton from "../components/Buttons/SelectionButton";
-import CustomButton from "../components/Buttons/CustomButton";
-import { router, useLocalSearchParams } from "expo-router";
+import { useTheme } from "../context/ThemeContext";
 
 const FavoriteGenre: React.FC = () => {
   const { theme, themeName } = useTheme();
