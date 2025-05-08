@@ -54,22 +54,7 @@ const SearchPage: React.FC = () => {
   }, [debouncedSearch]);
 
   const handleSelectBook = (book: Book) => {
-    console.log("Livro selecionado original:", book);
-
-    // Garantir que a URL da capa tenha 'zoom=6' para melhor qualidade
-    let bookCoverUrl = book.capa;
-    if (bookCoverUrl && bookCoverUrl.includes("zoom=1")) {
-      bookCoverUrl = bookCoverUrl.replace("zoom=1", "zoom=6");
-    }
-
-    // Criar uma cópia do livro com a capa atualizada
-    const updatedBook = {
-      ...book,
-      capa: bookCoverUrl,
-    };
-
-    console.log("Livro processado para modal:", updatedBook);
-    setSelectedBook(updatedBook);
+    setSelectedBook(book);
     setModalVisible(true);
   };
 
