@@ -20,9 +20,16 @@ const SearchPage: React.FC = () => {
       setLoading(true);
       try {
         const results = await searchBooks(term);
-        setBooks(results);
+        console.log("Search results:", results);
+
+        // Garantir que os resultados estão no formato esperado pelo componente SearchBar
+        // Se os resultados já forem retornados no formato esperado, esta etapa pode não ser necessária
+        const formattedResults = Array.isArray(results) ? results : [];
+
+        setBooks(formattedResults);
       } catch (error) {
         console.error("Erro ao buscar livros:", error);
+        setBooks([]);
       } finally {
         setLoading(false);
       }
@@ -31,12 +38,13 @@ const SearchPage: React.FC = () => {
   );
 
   const debouncedSearch = useMemo(
-    () => debounce(handleSearch, 1000), // Debounce de 1 segundos
+    () => debounce(handleSearch, 1000), // Debounce de 1 segundo
     [handleSearch]
   );
 
   const handleCloseModal = () => {
     setModalVisible(false);
+    setSelectedBook(null);
   };
 
   useEffect(() => {
@@ -46,15 +54,22 @@ const SearchPage: React.FC = () => {
   }, [debouncedSearch]);
 
   const handleSelectBook = (book: Book) => {
-    console.log("Livro selecionado:", book);
+    console.log("Livro selecionado original:", book);
 
-    // Garantir que a URL da capa tenha 'zoom=6'
-    let updatedCapa = book.capa;
-    if (updatedCapa && updatedCapa.includes("zoom=1")) {
-      updatedCapa = updatedCapa.replace("zoom=1", "zoom=6");
+    // Garantir que a URL da capa tenha 'zoom=6' para melhor qualidade
+    let bookCoverUrl = book.capa;
+    if (bookCoverUrl && bookCoverUrl.includes("zoom=1")) {
+      bookCoverUrl = bookCoverUrl.replace("zoom=1", "zoom=6");
     }
 
-    setSelectedBook({ ...book, capa: updatedCapa });
+    // Criar uma cópia do livro com a capa atualizada
+    const updatedBook = {
+      ...book,
+      capa: bookCoverUrl,
+    };
+
+    console.log("Livro processado para modal:", updatedBook);
+    setSelectedBook(updatedBook);
     setModalVisible(true);
   };
 
@@ -78,17 +93,16 @@ const SearchPage: React.FC = () => {
         <ModalBookDetails
           visible={modalVisible}
           onClose={handleCloseModal}
-          titulo={selectedBook.titulo}
-          author={selectedBook.autores?.join(", ") || "Autor desconhecido"}
-          capa={selectedBook.capa} // Capa com 'zoom=6'
-          paginas={selectedBook.paginas || 0}
-          sinopse={selectedBook.sinopse || "Sinopse não disponível"}
           rating={4.0}
-          readersNumber={100}
-          rankingNumber={"5"}
+          title={selectedBook.titulo}
+          pages={selectedBook.paginas || 0}
+          synopsis={selectedBook.sinopse || "Sinopse não disponível"}
           review="Sem avaliações disponíveis ainda."
-          publicationDate={"Ano desconhecido"}
-          genre={"Gênero não especificado"}
+          authors={selectedBook.autores?.join(", ") || "Autor desconhecido"}
+          year={selectedBook.anoDePublicacao?.substring(0, 4) || "Desconhecido"}
+          id={selectedBook.id?.toString() || "0"}
+          genre={selectedBook.generos?.[0] || "Gênero não especificado"}
+          google_image_url={selectedBook.capa || ""}
           onCreateReview={() =>
             console.log("Criar resenha para:", selectedBook.titulo)
           }

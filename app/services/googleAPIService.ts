@@ -15,18 +15,21 @@ export default function SearchAPI() {
   };
 
   const searchBooks = async (searchTerm: string) => {
-    const token = await getAuthToken();
     try {
+      const token = await getAuthToken();
       const encodedTerm = encodeURIComponent(searchTerm);
-      const response = await axiosInstance.get(`google-integration/search`, {
-        params: {
-          term: encodedTerm,
-        },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        validateStatus: (status) => status < 500,
-      });
+      // Corrigindo a URL para usar o formato que o backend espera
+      const response = await axiosInstance.get(
+        `google-integration/search/${encodedTerm}`,
+        {
+          headers: token
+            ? {
+                Authorization: `Bearer ${token}`,
+              }
+            : {},
+          validateStatus: (status) => status < 500,
+        }
+      );
       return response.data;
     } catch (error: any) {
       if (error.code === "ECONNREFUSED" || error.code === "ERR_NETWORK") {
@@ -43,15 +46,21 @@ export default function SearchAPI() {
   };
 
   const searchByGenre = async (genero: string) => {
-    const token = await getAuthToken();
     try {
-      const response = await axiosInstance.get(`google-integration/genre`, {
-        params: { genre: genero },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        validateStatus: (status) => status < 500,
-      });
+      const token = await getAuthToken();
+      const encodedGenre = encodeURIComponent(genero);
+      // Corrigindo a URL para usar o formato que o backend espera
+      const response = await axiosInstance.get(
+        `google-integration/genre/${encodedGenre}`,
+        {
+          headers: token
+            ? {
+                Authorization: `Bearer ${token}`,
+              }
+            : {},
+          validateStatus: (status) => status < 500,
+        }
+      );
       return response.data;
     } catch (error: any) {
       if (error.code === "ECONNREFUSED" || error.code === "ERR_NETWORK") {

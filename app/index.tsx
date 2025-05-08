@@ -15,7 +15,7 @@ export default function Index() {
       if (userToken) {
         router.replace("/screens/splash");
       } else {
-        router.replace("/screens/splash"); 
+        router.replace("/screens/personalLibrary");
       }
     };
 

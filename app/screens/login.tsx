@@ -49,7 +49,7 @@ export default function LoginScreen() {
       await AsyncStorage.setItem("userToken", data.accessToken);
       await AsyncStorage.setItem("userEmail", email);
 
-      router.replace("/screens/searchPage");
+      router.replace("/screens/home");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(

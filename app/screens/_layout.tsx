@@ -7,6 +7,8 @@ import {
 import React from "react";
 import { StatusBar, View } from "react-native";
 import NavBar from "../components/Nav/NavBar";
+import { Redirect } from "expo-router";
+
 
 export default function ScreensLayout() {
   const router = useRouter();
@@ -15,11 +17,12 @@ export default function ScreensLayout() {
   const handleLongPress = ({ nativeEvent }: any) => {
     if (nativeEvent.state === 4) {
       if (pathname !== "screens/tests/teste") {
-        router.push("screens/tests/teste" as any);
+        router.push("screens/profile" as any);
       } else {
         router.back();
       }
     }
+    // router.push("screens/profile" as any);
   };
 
   return (
@@ -39,7 +42,8 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
     "/screens/register", 
     "/screens/splash",
     "/screens/welcome",
-    "/screens/book"
+    "/screens/book",
+    "/screens/favoriteGenre"
   ];
 
   const { themeName } = useTheme();
@@ -67,9 +71,12 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
             <Stack.Screen name="welcome" />
             <Stack.Screen name="login" />
             <Stack.Screen name="register" />
+            <Stack.Screen name="favoriteGenre"/>
+            <Stack.Screen name="home" />
             <Stack.Screen name="searchPage" />
             <Stack.Screen name="tests/teste" />
             <Stack.Screen name="book"/>
+            <Stack.Screen name="personalLibrary" />
             <Stack.Screen name="profile" />
             <Stack.Screen name="createreReviewComment" />
           </Stack>
