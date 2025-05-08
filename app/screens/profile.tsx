@@ -35,30 +35,24 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const token = await getToken();
-      if (token) {
-        UserAPI()
-          .getUserStatistics(token)
-          .then((response: { readBooks: number; readKms: number }) => {
-            setStats(response);
-          })
-          .catch((error: any) => {});
-      }
+      UserAPI()
+        .getUserStatistics()
+        .then((response: { readBooks: number; readKms: number }) => {
+          setStats(response);
+        })
+        .catch((error: any) => {});
     };
     fetchStats();
   }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = await getToken();
-      if (token) {
-        UserAPI()
-          .getProfile(token)
-          .then((response: User) => {
-            setData(response);
-          })
-          .catch((error: any) => {});
-      }
+      UserAPI()
+        .getProfile()
+        .then((response: User) => {
+          setData(response);
+        })
+        .catch((error: any) => {});
     };
     fetchProfile();
   }, []);
@@ -86,17 +80,14 @@ export default function ProfileScreen() {
   };
 
   const handleBioChange = async (newBio: string) => {
-    const token = await getToken();
-    if (token) {
-      UserAPI()
-        .updateBio(token, newBio)
-        .then((response: User) => {
-          console.log("Bio atualizada com sucesso:", response); // TODO: notificar usuário com mensagem na tela
-        })
-        .catch((error) => {
-          console.error("Erro ao atualizar bio:", error);
-        });
-    }
+    UserAPI()
+      .updateBio(newBio)
+      .then((response: User) => {
+        console.log("Bio atualizada com sucesso:", response); // TODO: notificar usuário com mensagem na tela
+      })
+      .catch((error) => {
+        console.error("Erro ao atualizar bio:", error);
+      });
   };
 
   return (
