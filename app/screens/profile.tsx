@@ -2,7 +2,13 @@ import ProfileHeader from "@/app/components/Profile/ProfileHeader";
 import { User } from "@/app/models/User";
 import { useEffect, useState } from "react";
 import UserAPI from "@/app/services/profileService";
-import { ScrollView, View, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
+import {
+  ScrollView,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import UserStats from "../components/UserStats/UserStats";
 import { useTheme } from "../context/ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -25,35 +31,22 @@ export default function ProfileScreen() {
   const [stats, setStats] = useState<{ readBooks: number; readKms: number }>({
     readBooks: 0,
     readKms: 0,
-  });  
+  });
 
   useEffect(() => {
     const fetchStats = async () => {
-      try {
-        const token = await getToken();
-        const res = await fetch(`http://localhost:3000/personal-library/getUserStatistics`, {
-          method: 'GET',
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
-        });
-  
-        const data = await res.json();
-
-        setStats({
-          readBooks: data.readBooks,
-          readKms: data.readKms,
-        });
-
-      } catch (error) {
-        console.error("Erro ao buscar estatísticas do usuário:", error);
+      const token = await getToken();
+      if (token) {
+        UserAPI()
+          .getUserStatistics(token)
+          .then((response: { readBooks: number; readKms: number }) => {
+            setStats(response);
+          })
+          .catch((error: any) => {});
       }
     };
-  
     fetchStats();
   }, []);
-  
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -64,8 +57,7 @@ export default function ProfileScreen() {
           .then((response: User) => {
             setData(response);
           })
-          .catch((error: any) => {
-          });
+          .catch((error: any) => {});
       }
     };
     fetchProfile();
@@ -73,7 +65,7 @@ export default function ProfileScreen() {
 
   const handleEditProfile = async () => {
     const token = await getToken();
-  
+
     if (token && data) {
       router.push({
         pathname: "/screens/editProfile",
@@ -85,11 +77,11 @@ export default function ProfileScreen() {
       });
     }
   };
-  
+
   const navigateToLibrary = (tabIndex: number) => {
     router.push({
       pathname: "/screens/personalLibrary",
-      params: { pageIndex: tabIndex }
+      params: { pageIndex: tabIndex },
     });
   };
 
@@ -98,8 +90,8 @@ export default function ProfileScreen() {
     if (token) {
       UserAPI()
         .updateBio(token, newBio)
-      .then((response: User) => {
-        console.log("Bio atualizada com sucesso:", response); // TODO: notificar usuário com mensagem na tela
+        .then((response: User) => {
+          console.log("Bio atualizada com sucesso:", response); // TODO: notificar usuário com mensagem na tela
         })
         .catch((error) => {
           console.error("Erro ao atualizar bio:", error);
@@ -115,9 +107,7 @@ export default function ProfileScreen() {
         <ProfileHeader
           marginStart={30}
           profileImageUrl={
-            data?.profileImage
-              ? base64Uri(data.profileImage)
-              : undefined
+            data?.profileImage ? base64Uri(data.profileImage) : undefined
           }
           name={data?.name || "Seu Perfil"}
           isAuthor={data?.isAuthor || false}
@@ -134,42 +124,53 @@ export default function ProfileScreen() {
           />
         </View>
         <View style={styles.biographyContainer}>
-          <Biography biographyText={data?.biography || ""} onBioChange={handleBioChange}/>
+          <Biography
+            biographyText={data?.biography || ""}
+            onBioChange={handleBioChange}
+          />
         </View>
 
         {/* Biblioteca pessoal buttons - Now placed above achievements */}
         <View style={styles.libraryButtonsContainer}>
-          <NunitoText style={styles.libraryTitle}>Biblioteca Pessoal</NunitoText>
+          <NunitoText style={styles.libraryTitle}>
+            Biblioteca Pessoal
+          </NunitoText>
           <View style={styles.libraryTabsContainer}>
-            <TouchableOpacity 
-              style={[styles.libraryTab, { backgroundColor: theme.Background }]} 
+            <TouchableOpacity
+              style={[styles.libraryTab, { backgroundColor: theme.Background }]}
               onPress={() => navigateToLibrary(0)}
             >
-              <NunitoText style={[styles.libraryTabText, { color: theme.primaryText }]}>
+              <NunitoText
+                style={[styles.libraryTabText, { color: theme.primaryText }]}
+              >
                 Lidos
               </NunitoText>
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={[styles.libraryTab, { backgroundColor: theme.Background }]} 
+            <TouchableOpacity
+              style={[styles.libraryTab, { backgroundColor: theme.Background }]}
               onPress={() => navigateToLibrary(1)}
             >
-              <NunitoText style={[styles.libraryTabText, { color: theme.primaryText }]}>
+              <NunitoText
+                style={[styles.libraryTabText, { color: theme.primaryText }]}
+              >
                 Quero Ler
               </NunitoText>
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={[styles.libraryTab, { backgroundColor: theme.Background }]} 
+            <TouchableOpacity
+              style={[styles.libraryTab, { backgroundColor: theme.Background }]}
               onPress={() => navigateToLibrary(2)}
             >
-              <NunitoText style={[styles.libraryTabText, { color: theme.primaryText }]}>
+              <NunitoText
+                style={[styles.libraryTabText, { color: theme.primaryText }]}
+              >
                 Lendo
               </NunitoText>
             </TouchableOpacity>
           </View>
         </View>
-        
+
         <View style={styles.achievementContainer}>
           <Achievement />
         </View>
@@ -178,7 +179,7 @@ export default function ProfileScreen() {
   );
 }
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {

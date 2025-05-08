@@ -32,6 +32,28 @@ export default function UserAPI() {
     }
   };
 
+  const getUserStatistics = async (
+    token: string
+  ): Promise<{
+    readBooks: number;
+    readKms: number;
+  }> => {
+    try {
+      const response = await axiosInstance.get(
+        `/personal-library/getUserStatistics`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar estatísticas do usuário:", error);
+      throw error;
+    }
+  };
+
   const updateBio = async (token: string, bio: string): Promise<User> => {
     try {
       const response = await axiosInstance.put(
@@ -81,6 +103,8 @@ export default function UserAPI() {
 
   return {
     getProfile,
+    getProfileImage,
+    getUserStatistics,
     updateBio,
     updateProfile,
   };
