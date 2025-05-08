@@ -16,18 +16,9 @@ import { useTheme } from '../context/ThemeContext';
 import ModalBookDetails from './book';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { Book, BookCategory } from '../models/PersonalLibrary';
+import personalLibraryService from '../services/personalLibraryService';
 const { width } = Dimensions.get('window');
-  
-type Book = {
-    id: number;
-    title: string;
-    author: string;
-    photoPath: string;
-    size: 'small' | 'medium' | 'large';
-  };
-
-  type BookCategory = 'READ' | 'READING' | 'TO_BE_READ';
 
   interface LibraryProps {
     isVisible?: boolean;
@@ -73,48 +64,9 @@ const Library: React.FC<LibraryProps> = ({
     }
   };
 
-  const getToken = async () => {
-    const userToken = await AsyncStorage.getItem("userToken");
-    return userToken;
-  };
-
   const fetchBooksByArray = async (category: BookCategory) => {
-    const token = await getToken();
-    try {
-      const response = await fetch(`http://localhost:3000/personal-library/getBooksArray/${category}`, {
-        method: 'GET',
-        headers: {
-          "Authorization": `Bearer ${token}`
-        },
-      });
-
-
-      if (!response.ok) {
-        console.error(`Erro ao obter dados para categoria ${category}:`, response.status);
-        return;
-      }
-
-      const data = await response.json();
-      console.log(`Resposta das listas ${category}:`, data);
-
-      const mappedBooks = data.map((item: any) => ({
-        id: item.book.book_id,
-        isbn: item.book.isbn,
-        title: item.book.title,
-        genre: item.book.genre,
-        authors: item.book.authors,
-        cover: item.book.cover,
-        photoPath: item.book.google_image_url || item.book.cover, // Usando google_image_url ou cover como fallback
-        synopsis: item.book.synopsis,
-        year: item.book.year,
-        pages: item.book.pages,
-        google_image_url: item.book.google_image_url,
-        posts: item.book.posts,
-        ratings: item.book.ratings,
-        size: 'small' as const,
-        author: item.book.authors, // Adicionando o autor para exibição
-      }));
-      
+    try {     
+      const mappedBooks = await personalLibraryService().fetchBooksByArray(category);
       if (category === 'READ') {
         setReadBooks(mappedBooks);
       } else if (category === 'READING') {
