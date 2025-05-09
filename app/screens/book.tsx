@@ -1,38 +1,35 @@
 /* eslint-disable react-native/no-raw-text */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  ImageBackground,
-  TouchableOpacity,
-  Modal,
-  ToastAndroid,
-  Alert,
-} from "react-native";
-import {
-  GestureHandlerRootView,
-} from "react-native-gesture-handler";
-import { useTheme } from "../context/ThemeContext";
-import NunitoText from "../components/Texts/NunitoText";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import BottomSheet, {
   BottomSheetHandle,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-import CustomCarousel from "../components/Carousel/CustomCarousel";
-import CustomBook from "../components/Book/CustomBook";
-import { ReviewComment } from "../components/review-comments/review-comments";
-import CustomModal from "../components/review-comments/pop-up-modal";
-import CustomButton from "../components/Buttons/CustomButton";
-import { SinopseExpandable } from "../components/Book/sinopseExpandable";
-import { router } from "expo-router";
-import StaticStars from "../components/StaticStars/StaticStars";
-import RatingModal from "../components/RatingModal/RatingModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Platform } from "react-native";
+import { router } from "expo-router";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import {
+  Alert,
+  ImageBackground,
+  Modal,
+  Platform,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import CustomBook from "../components/Book/CustomBook";
+import { SinopseExpandable } from "../components/Book/sinopseExpandable";
+import CustomButton from "../components/Buttons/CustomButton";
+import CustomCarousel from "../components/Carousel/CustomCarousel";
+import RatingModal from "../components/RatingModal/RatingModal";
+import { ReviewComment } from "../components/review-comments/review-comments";
+import StaticStars from "../components/StaticStars/StaticStars";
+import NunitoText from "../components/Texts/NunitoText";
+import { useTheme } from "../context/ThemeContext";
 
 interface ModalBookDetailsProps {
   visible: boolean;
@@ -100,41 +97,64 @@ export default function ModalBookDetails({
   const updateBookState = async (id: string, state: string) => {
     try {
       // For testing, use this hardcoded token that works in personalLibrary.tsx
-      const token = await AsyncStorage.getItem("userToken") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2Mzc2MzQwLCJleHAiOjE3NDY0NjI3NDB9.qHYM2FNTzv-2jYFZS3Vd3h9VzynXAe8ItFog0yLrlrs";
-      
+      const token =
+        (await AsyncStorage.getItem("userToken")) ||
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2Mzc2MzQwLCJleHAiOjE3NDY0NjI3NDB9.qHYM2FNTzv-2jYFZS3Vd3h9VzynXAe8ItFog0yLrlrs";
+
       console.log(`Adding book ${id} to ${state} library`);
-      
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/personal-library/addBook/${id}`, {
-        method: 'PUT',
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          state: state,
-        })
-      });
-  
+
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/personal-library/addBook/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            state: state,
+          }),
+        }
+      );
+
       if (response.ok) {
         console.log(`Adicionado a ${state} da biblioteca pessoal`);
-        if (Platform.OS === 'android') {
-          ToastAndroid.show(`Livro adicionado com sucesso à sua biblioteca`, ToastAndroid.SHORT);
+        if (Platform.OS === "android") {
+          ToastAndroid.show(
+            `Livro adicionado com sucesso à sua biblioteca`,
+            ToastAndroid.SHORT
+          );
         } else {
-          Alert.alert("Sucesso", `Livro adicionado com sucesso à sua biblioteca`);
+          Alert.alert(
+            "Sucesso",
+            `Livro adicionado com sucesso à sua biblioteca`
+          );
         }
       } else {
         const errorText = await response.text();
-        console.error(`Erro ao adicionar livro com estado ${state}:`, errorText);
-        if (Platform.OS === 'android') {
-          ToastAndroid.show("Erro ao adicionar livro à biblioteca", ToastAndroid.SHORT);
+        console.error(
+          `Erro ao adicionar livro com estado ${state}:`,
+          errorText
+        );
+        if (Platform.OS === "android") {
+          ToastAndroid.show(
+            "Erro ao adicionar livro à biblioteca",
+            ToastAndroid.SHORT
+          );
         } else {
-          Alert.alert("Erro", "Não foi possível adicionar o livro à biblioteca");
+          Alert.alert(
+            "Erro",
+            "Não foi possível adicionar o livro à biblioteca"
+          );
         }
       }
     } catch (error) {
       console.error(`Erro ao adicionar livro (${state}):`, error);
-      if (Platform.OS === 'android') {
-        ToastAndroid.show("Erro ao adicionar livro à biblioteca", ToastAndroid.SHORT);
+      if (Platform.OS === "android") {
+        ToastAndroid.show(
+          "Erro ao adicionar livro à biblioteca",
+          ToastAndroid.SHORT
+        );
       } else {
         Alert.alert("Erro", "Não foi possível adicionar o livro à biblioteca");
       }
@@ -183,7 +203,7 @@ export default function ModalBookDetails({
       onPress: async () => {
         console.log("Ação: Já li");
         await updateBookState(id, "READ");
-      }
+      },
     },
     {
       label: "Estou lendo",
@@ -202,32 +222,25 @@ export default function ModalBookDetails({
   ];
 
   const BookContent = () => {
-    // Fallback para a imagem de capa
     const [coverImageError, setCoverImageError] = useState(false);
-    
-    // Melhora a qualidade da imagem do Google Books
+
     const processGoogleImageUrl = (url: string | undefined) => {
       if (!url) return undefined;
-      
+
       try {
         // Ajusta parametros de URL para melhor qualidade e compatibilidade
         let processedUrl = url;
-        
+
         // Remove parametros que podem causar problemas
-        if (url.includes('&edge=curl')) {
-          processedUrl = processedUrl.replace('&edge=curl', '');
+        if (url.includes("&edge=curl")) {
+          processedUrl = processedUrl.replace("&edge=curl", "");
         }
-        
-        // Aumenta o tamanho/zoom da imagem
-        if (processedUrl.includes('zoom=')) {
-          processedUrl = processedUrl.replace(/zoom=\d+/, 'zoom=3');
-        }
-        
+
         // Garante que a URL usa HTTPS
-        if (processedUrl.startsWith('http:')) {
-          processedUrl = processedUrl.replace('http:', 'https:');
+        if (processedUrl.startsWith("http:")) {
+          processedUrl = processedUrl.replace("http:", "https:");
         }
-        
+
         console.log("URL de imagem processada:", processedUrl);
         return processedUrl;
       } catch (error) {
@@ -235,14 +248,13 @@ export default function ModalBookDetails({
         return url;
       }
     };
-    
+
     const optimizedImageUrl = processGoogleImageUrl(google_image_url);
-    const coverImage = !coverImageError && optimizedImageUrl 
-      ? { uri: optimizedImageUrl } 
-      : require('../assets/images/book-cover.png');
-    
-    console.log("Tentando carregar imagem de capa:", optimizedImageUrl);
-    
+    const coverImage =
+      !coverImageError && optimizedImageUrl
+        ? { uri: optimizedImageUrl }
+        : require("../assets/images/book-cover.png");
+
     return (
       <View style={{ flex: 1 }}>
         <ImageBackground
@@ -282,7 +294,9 @@ export default function ModalBookDetails({
                       fontWeight: "bold",
                     }}
                   >
-                    {title.length > 23 ? title?.substring(0, 23) + "..." : title}
+                    {title.length > 23
+                      ? title?.substring(0, 23) + "..."
+                      : title}
                   </NunitoText>
                 </View>
               </View>
@@ -348,9 +362,7 @@ export default function ModalBookDetails({
               <NunitoText style={[styles.date, { color: theme.white }]}>
                 {year}
               </NunitoText>
-              <NunitoText
-                style={{ color: theme.white, paddingHorizontal: 10 }}
-              >
+              <NunitoText style={{ color: theme.white, paddingHorizontal: 10 }}>
                 {" "}
                 -{" "}
               </NunitoText>
@@ -367,17 +379,20 @@ export default function ModalBookDetails({
               }}
             >
               <View style={styles.starsContainer}>
-              <StaticStars
-                rating={rating}
-                onPress={() => {setModalVisible(true)}}
+                <StaticStars
+                  rating={rating}
+                  onPress={() => {
+                    setModalVisible(true);
+                  }}
                 />
-              <RatingModal
-                visible={modalVisible}
-                onClose={() => setModalVisible(false)}
-                onRate={() => {setModalVisible(false);
-                }}
-                book={title}
-              />
+                <RatingModal
+                  visible={modalVisible}
+                  onClose={() => setModalVisible(false)}
+                  onRate={() => {
+                    setModalVisible(false);
+                  }}
+                  book={title}
+                />
               </View>
 
               <TouchableOpacity
@@ -390,7 +405,7 @@ export default function ModalBookDetails({
                   alignItems: "center",
                   justifyContent: "center",
                   flexDirection: "row",
-                  marginRight: 10
+                  marginRight: 10,
                 }}
               >
                 <NunitoText
@@ -403,13 +418,12 @@ export default function ModalBookDetails({
                   Criar Resenha
                 </NunitoText>
               </TouchableOpacity>
-
             </View>
           </View>
 
           <GestureHandlerRootView style={styles.container}>
             <BottomSheet
-              backgroundStyle={{backgroundColor: theme.Background}}
+              backgroundStyle={{ backgroundColor: theme.Background }}
               ref={bottomSheetRef}
               snapPoints={snapPoints}
               index={0}
@@ -452,17 +466,27 @@ export default function ModalBookDetails({
 
                 <View style={styles.statusBookContainer}>
                   {bookActions.map((action, index) => (
-
-                    <CustomButton width={150} height={30} key={index} title={action.label} onPress={action.onPress} />
+                    <CustomButton
+                      width={150}
+                      height={30}
+                      key={index}
+                      title={action.label}
+                      onPress={action.onPress}
+                    />
                   ))}
                 </View>
-                
+
                 <SinopseExpandable synopsis={synopsis} />
 
                 <View
                   style={{ alignItems: "flex-start", justifyContent: "center" }}
                 >
-                  <NunitoText style={[styles.secondTitle, { paddingBottom: 25, color: theme.primaryText }]}>
+                  <NunitoText
+                    style={[
+                      styles.secondTitle,
+                      { paddingBottom: 25, color: theme.primaryText },
+                    ]}
+                  >
                     Principais Resenhas e Comentários
                   </NunitoText>
 
@@ -470,19 +494,26 @@ export default function ModalBookDetails({
                     comment={true}
                     byAuthor={true}
                     datePost={"30/01/2025"}
-                    text={"Amei o livro, muito bom mesmo! Recomendo muito. A história é envolvente e os personagens são bem desenvolvidos."} 
-                    fullNamePostAuthor={"Monica Alvarenga"}                />
+                    text={
+                      "Amei o livro, muito bom mesmo! Recomendo muito. A história é envolvente e os personagens são bem desenvolvidos."
+                    }
+                    fullNamePostAuthor={"Monica Alvarenga"}
+                  />
 
                   <ReviewComment
                     comment={false}
                     byAuthor={false}
-                    fullNamePostAuthor={"Monica Alvarenga"}    
+                    fullNamePostAuthor={"Monica Alvarenga"}
                     datePost={"22/08/2024"}
-                    text={"Memórias da Meia-Noite é um romance de Sidney Sheldon que mistura mistério, drama e uma boa dose de suspense. A história gira em torno de Katherine, uma mulher marcada por tragédias pessoais e uma vida cheia de reviravoltas. Ela se vê envolvida em uma trama que desafia sua compreensão de confiança, vingança e sobrevivência, enquanto tenta descobrir os segredos obscuros de seu passado e lidar com as consequências de suas escolhas.Com o estilo característico de Sheldon, a narrativa é envolvente e cheia de surpresas, mantendo o leitor na expectativa até o final. A trama é recheada de personagens complexos e dilemas emocionais, explorando temas como o perdão, a vingança e os jogos de poder. A escrita é fluída, o ritmo é rápido e as reviravoltas são sempre inesperadas. É uma história que prende o leitor até a última página, com um final impactante."}
+                    text={
+                      "Memórias da Meia-Noite é um romance de Sidney Sheldon que mistura mistério, drama e uma boa dose de suspense. A história gira em torno de Katherine, uma mulher marcada por tragédias pessoais e uma vida cheia de reviravoltas. Ela se vê envolvida em uma trama que desafia sua compreensão de confiança, vingança e sobrevivência, enquanto tenta descobrir os segredos obscuros de seu passado e lidar com as consequências de suas escolhas.Com o estilo característico de Sheldon, a narrativa é envolvente e cheia de surpresas, mantendo o leitor na expectativa até o final. A trama é recheada de personagens complexos e dilemas emocionais, explorando temas como o perdão, a vingança e os jogos de poder. A escrita é fluída, o ritmo é rápido e as reviravoltas são sempre inesperadas. É uma história que prende o leitor até a última página, com um final impactante."
+                    }
                   />
                 </View>
 
-                <View style={{ alignItems: "center", justifyContent: "center" }}>
+                <View
+                  style={{ alignItems: "center", justifyContent: "center" }}
+                >
                   <TouchableOpacity
                     onPress={undefined}
                     style={{
@@ -494,28 +525,52 @@ export default function ModalBookDetails({
                       borderRadius: 30,
                     }}
                   >
-                    <Text style={{ color: theme.quinaryText }}>Acessar mais</Text>
+                    <Text style={{ color: theme.quinaryText }}>
+                      Acessar mais
+                    </Text>
                   </TouchableOpacity>
                 </View>
 
                 <View style={{ marginBottom: 30 }}></View>
 
-                <NunitoText style={[styles.secondTitle, { paddingBottom: 15, color: theme.primaryText }]}>
+                <NunitoText
+                  style={[
+                    styles.secondTitle,
+                    { paddingBottom: 15, color: theme.primaryText },
+                  ]}
+                >
                   Livros do mesmo autor
                 </NunitoText>
                 <CustomCarousel
                   isHorizontal
-                  data={[<CustomBook key={1} bookId={0} photoPath={require('../assets/images/book-cover.png')} />]}
+                  data={[
+                    <CustomBook
+                      key={1}
+                      bookId={0}
+                      photoPath={require("../assets/images/book-cover.png")}
+                    />,
+                  ]}
                 />
 
                 <View style={{ marginBottom: 15 }}></View>
 
-                <NunitoText style={[styles.secondTitle, { paddingBottom: 15, color: theme.primaryText }]}>
+                <NunitoText
+                  style={[
+                    styles.secondTitle,
+                    { paddingBottom: 15, color: theme.primaryText },
+                  ]}
+                >
                   Livros semelhantes
                 </NunitoText>
                 <CustomCarousel
                   isHorizontal
-                  data={[<CustomBook key={1} bookId={0} photoPath={require('../assets/images/book-cover.png')} />]}
+                  data={[
+                    <CustomBook
+                      key={1}
+                      bookId={0}
+                      photoPath={require("../assets/images/book-cover.png")}
+                    />,
+                  ]}
                 />
 
                 <View style={{ marginBottom: 500 }}></View>
@@ -641,7 +696,7 @@ const styles = StyleSheet.create({
   },
   statusBookContainer: {
     gap: 10,
-    transform:"scale(0.8)",
+    transform: "scale(0.8)",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

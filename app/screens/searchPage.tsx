@@ -21,7 +21,6 @@ const SearchPage: React.FC = () => {
       setLoading(true);
       try {
         const results = await searchBooks(term);
-        console.log("Search results:", results);
 
         // Garantir que os resultados estão no formato esperado pelo componente SearchBar
         // Se os resultados já forem retornados no formato esperado, esta etapa pode não ser necessária
@@ -39,7 +38,7 @@ const SearchPage: React.FC = () => {
   );
 
   const debouncedSearch = useMemo(
-    () => debounce(handleSearch, 1000), // Debounce de 1 segundo
+    () => debounce(handleSearch, 800), // Debounce de 1 segundo
     [handleSearch]
   );
 
