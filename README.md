@@ -89,6 +89,65 @@ Note: ESLint will automatically run when you save files if you have the ESLint e
 
 Now Prettier will automatically format your code when you save files (Ctrl + S) if you have the Prettier extension installed in VSCode.
 
+## 📱 Running the Expo App on an Android Emulator (Android Studio)
+
+This project can be tested using an Android emulator via Android Studio. Follow the steps below to install and configure everything properly:
+
+---
+
+### ⚙️ 1. Install Android Studio
+
+1. Go to: https://developer.android.com/studio
+2. Download and install Android Studio.
+3. During installation, **make sure "Android Virtual Device" is selected**.
+
+---
+
+### 📦 2. Set Up the Environment
+
+After installation:
+
+1. Open Android Studio.
+2. Go to **More Actions > Virtual Device Manager**.
+3. Click **Create Device**.
+4. Choose a lightweight device such as `Pixel 3` and click **Next**.
+5. Select a system image:
+   - **API 30: Android 11 (Google APIs x86_64)**.
+   - Download if needed, then click **Next**.
+
+---
+
+### 🧠 3. Optimize Performance (optional, but recommended)
+
+On the **"Verify Configuration"** screen, click **"Show Advanced Settings"** and set:
+
+- **CPU cores:** `2`
+- **RAM:** `1024 MB (1 GB)`
+- **VM Heap:** `256 MB`
+- **Internal Storage:** `2 GB`
+- **Graphics Acceleration:** `Automatic`
+
+Click **Finish** when done.
+
+---
+
+### ▶️ 4. Start the Emulator
+
+1. In the Virtual Device Manager, click the ▶️ button to launch the emulator.
+2. Wait until the Android home screen is fully loaded.
+
+---
+
+### 🚀 5. Run the Expo Project on the Emulator
+
+In your terminal, from the project root, run:
+
+```bash
+npx expo start
+```
+Once the Expo CLI opens, press: `a`
+
+
 # Branch Naming Convention
 
 ## Format
