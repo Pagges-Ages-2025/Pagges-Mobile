@@ -16,7 +16,7 @@ import CustomButton from "../components/Buttons/CustomButton";
 import NunitoText from "../components/Texts/NunitoText";
 import { PaggesTextInput } from "../components/Texts/TextInput";
 import Strings from "../constants/Strings";
-import axiosInstance from "../services/axios-instance-singleton";
+import AuthAPI from "../services/auth";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -29,7 +29,7 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = async () => {
+  const handleSubmitLoginButton = async () => {
     if (!email || !password) {
       setError("Por favor, preencha todos os campos");
       return;
@@ -39,14 +39,12 @@ export default function LoginScreen() {
     setIsLoading(true);
 
     try {
-      const response = await axiosInstance.post(`/auth/login`, {
+      const responseData = await AuthAPI().executeLoginUserRequest({
         email,
         password,
       });
 
-      const data = response.data;
-
-      await AsyncStorage.setItem("userToken", data.accessToken);
+      await AsyncStorage.setItem("userToken", responseData.accessToken);
       await AsyncStorage.setItem("userEmail", email);
 
       router.replace("/screens/home");
@@ -163,7 +161,7 @@ export default function LoginScreen() {
 
             <CustomButton
               title={isLoading ? "Entrando..." : "Entrar"}
-              onPress={handleLogin}
+              onPress={handleSubmitLoginButton}
               isDisabled={isLoading}
             />
 
