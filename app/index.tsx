@@ -29,11 +29,9 @@ export default function Index() {
         try {
           const { exp } = jwtDecode<JwtPayload>(token);
           const now = Date.now() / 1000;
-          console.log("Token exp:", exp);
 
           if (exp > now) {
             // token still valid
-            console.log("Token is valid");
             router.replace("/screens/home");
             return;
           } else {
