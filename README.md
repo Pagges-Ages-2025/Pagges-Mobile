@@ -89,7 +89,7 @@ Note: ESLint will automatically run when you save files if you have the ESLint e
 
 Now Prettier will automatically format your code when you save files (Ctrl + S) if you have the Prettier extension installed in VSCode.
 
-## Running the Expo App on an Android Emulator (Android Studio)
+# Running the Expo App on an Android Emulator (Android Studio)
 
 This project can be tested using an Android emulator via Android Studio. Follow the steps below to install and configure everything properly:
 
@@ -146,7 +146,6 @@ In your terminal, from the project root, run:
 npx expo start
 ```
 Once the Expo CLI opens, press: `a`
-
 
 # Branch Naming Convention
 
