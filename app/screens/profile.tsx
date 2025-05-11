@@ -18,6 +18,7 @@ import { useRouter } from "expo-router";
 import { base64Uri } from "../utils/imageUtils";
 import NunitoText from "../components/Texts/NunitoText";
 import CustomButton from "../components/Buttons/CustomButton";
+import axios from "axios";
 
 const getToken = async () => {
   const userToken = await AsyncStorage.getItem("userToken");
@@ -26,6 +27,7 @@ const getToken = async () => {
 
 export default function ProfileScreen() {
   const [data, setData] = useState<User>();
+  const [userGenres, setUserGenres] = useState<string[]>();
   const { theme } = useTheme();
   const router = useRouter();
 
@@ -57,6 +59,30 @@ export default function ProfileScreen() {
     };
     fetchProfile();
   }, []);
+  
+  useEffect(() => {
+    const fetchUserGenres = async () => {
+      try {
+        const token = await getToken();
+        if (!token) return;
+  
+        const api = axios.create({
+          baseURL: 'http://localhost:3000',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        const response = await api.get('/user-genres/user');
+        setUserGenres(response.data.data);
+      } catch (error) {
+        console.error("Erro ao buscar os gêneros do usuário:", error);
+      }
+    };
+  
+    fetchUserGenres();
+  }, []);
+  
 
   const handleEditProfile = async () => {
     const token = await getToken();
@@ -104,9 +130,11 @@ export default function ProfileScreen() {
           }
           name={data?.name || "Seu Perfil"}
           isAuthor={data?.isAuthor || false}
+          genres={userGenres ?? []}
           bEdit={true}
           onPressEdit={handleEditProfile}
         />
+
         <View style={styles.statsContainer}>
           <UserStats
             // kmLidos={data?.readKm || 0}
