@@ -4,13 +4,9 @@ import axiosInstance from "./axios-instance-singleton";
 const profileControllerUrl = "profile";
 
 export default function UserAPI() {
-  const getProfile = async (token: string): Promise<User> => {
+  const getProfile = async (): Promise<User> => {
     try {
-      const response = await axiosInstance.get(`${profileControllerUrl}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axiosInstance.get(`${profileControllerUrl}`);
       return response.data.data;
     } catch (error) {
       console.error("Erro ao buscar perfil:", error);
@@ -18,13 +14,9 @@ export default function UserAPI() {
     }
   };
 
-  const getProfileImage = async (token: string): Promise<string> => {
+  const getProfileImage = async (): Promise<string> => {
     try {
-      const response = await axiosInstance.get(`/profile-image`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axiosInstance.get(`/profile-image`);
       return response.data.data;
     } catch (error) {
       console.error("Erro ao buscar imagem de perfil:", error);
@@ -32,16 +24,27 @@ export default function UserAPI() {
     }
   };
 
-  const updateBio = async (token: string, bio: string): Promise<User> => {
+  const getUserStatistics = async (
+  ): Promise<{
+    readBooks: number;
+    readKms: number;
+  }> => {
+    try {
+      const response = await axiosInstance.get(
+        `/personal-library/getUserStatistics`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar estatísticas do usuário:", error);
+      throw error;
+    }
+  };
+
+  const updateBio = async (bio: string): Promise<User> => {
     try {
       const response = await axiosInstance.put(
         `${profileControllerUrl}/biography`,
         { biography: bio },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
       );
       return response.data.data;
     } catch (error) {
@@ -51,7 +54,6 @@ export default function UserAPI() {
   };
 
   const updateProfile = async (
-    token: string,
     name?: string,
     biography?: string,
     genreIds?: number[]
@@ -64,12 +66,7 @@ export default function UserAPI() {
 
       const response = await axiosInstance.put(
         `${profileControllerUrl}`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        payload
       );
 
       return response.data.data;
@@ -81,6 +78,8 @@ export default function UserAPI() {
 
   return {
     getProfile,
+    getProfileImage,
+    getUserStatistics,
     updateBio,
     updateProfile,
   };

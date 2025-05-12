@@ -5,7 +5,6 @@ import {
   TextInput,
   FlatList,
   Text,
-  TouchableOpacity,
   StyleSheet,
   Platform,
   TouchableWithoutFeedback,
@@ -15,12 +14,12 @@ import { useTheme } from "../../context/ThemeContext";
 import CustomBook from "../Book/CustomBook";
 
 export interface Book {
-  id: number;          // Identificador único do livro
-  titulo: string;      // Título do livro
-  autores: string[];   // Lista de autores
-  capa: string;        // URL da capa do livro
-  paginas: number;     // Número de páginas
-  sinopse?: string;    // Sinopse do livro (opcional, pois nem todos os livros possuem)
+  id: number;
+  titulo: string;
+  autores: string[];
+  capa: string;
+  paginas: number;
+  sinopse?: string;
 }
 
 type SearchIconPosition = "right" | "left";
@@ -136,7 +135,6 @@ export default function BookSearch({
             {showSuggestions && query.length > 0 && (
               <View style={styles.suggestionsContainer}>
                 <FlatList
-                  style={{ maxHeight: 200, backgroundColor: theme.postCardBackground}}
                   data={books}
                   nestedScrollEnabled={true}
                   keyboardShouldPersistTaps="handled"
@@ -165,14 +163,15 @@ export default function BookSearch({
 }
 
 const styles = StyleSheet.create({
-  outerContainer: {
-    flex: 1,
-    width: "100%",
-  },
   container: {
     width: "100%",
     zIndex: 1,
   },
+  outerContainer: {
+    flex: 1,
+    paddingBottom: 75,
+    width: "100%",
+  }, 
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -185,30 +184,15 @@ const styles = StyleSheet.create({
     paddingRight: 40,
   },
   searchIconContainer: {
+    height: "100%",
+    justifyContent: "center",
     position: "absolute",
     right: 16,
-    height: "100%",
     width: 25,
-    justifyContent: "center",
   },
   suggestionsContainer: {
     borderRadius: 8,
-    marginTop: 8,
-    maxHeight: 200,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-      web: {
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-      },
-    }),
+    margin: 8,
   },
   suggestionItem: {
     padding: 12,

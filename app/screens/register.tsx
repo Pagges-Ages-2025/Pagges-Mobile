@@ -59,7 +59,7 @@ export default function RegisterScreen() {
 
   const handleSubmit = async () => {
     try {
-      const response = await AuthAPI().registerUser({
+      const responseData = await AuthAPI().executeRegisterUserRequest({
         email,
         password,
         name: fullName,
@@ -67,7 +67,7 @@ export default function RegisterScreen() {
         isAuthor: userType === "author",
       });
 
-      await AsyncStorage.setItem("userToken", response.accessToken);
+      await AsyncStorage.setItem("userToken", responseData.accessToken);
       await AsyncStorage.setItem("userEmail", email);
 
       router.replace("/screens/favoriteGenre");

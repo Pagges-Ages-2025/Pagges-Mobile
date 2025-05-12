@@ -1,8 +1,11 @@
-import RegisterAPI from "../models/Register";
+import { LoginRequestData, LoginResponseDto } from "../models/login.model";
+import RegisterRequestData, { RegisterResponseDto } from "../models/Register";
 import axiosInstance from "./axios-instance-singleton";
 
 export default function AuthAPI() {
-  const registerUser = async (user: RegisterAPI) => {
+  const executeRegisterUserRequest = async (
+    user: RegisterRequestData
+  ): Promise<RegisterResponseDto> => {
     const response = await axiosInstance.post("/auth/register", {
       email: user.email,
       password: user.password,
@@ -10,10 +13,23 @@ export default function AuthAPI() {
       username: user.username,
       isAuthor: user.isAuthor,
     });
-    return response.data;
+    const responseData: RegisterResponseDto = response.data;
+    return responseData;
+  };
+
+  const executeLoginUserRequest = async (
+    loginRequestData: LoginRequestData
+  ): Promise<LoginResponseDto> => {
+    const response = await axiosInstance.post(`/auth/login`, {
+      email: loginRequestData.email,
+      password: loginRequestData.password,
+    });
+    const responseData: LoginResponseDto = response.data;
+    return responseData;
   };
 
   return {
-    registerUser,
+    executeRegisterUserRequest: executeRegisterUserRequest,
+    executeLoginUserRequest: executeLoginUserRequest,
   };
 }

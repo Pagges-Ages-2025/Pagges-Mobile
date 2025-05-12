@@ -1,32 +1,15 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import axiosInstance from "./axios-instance-singleton";
 
 export default function SearchAPI() {
-  const getAuthToken = async () => {
-    try {
-      const token = await AsyncStorage.getItem("userToken");
-      if (token === null) {
-        throw new Error("Token not found");
-      }
-      return token;
-    } catch (error) {
-      console.error("Error getting auth token:", error);
-    }
-  };
-
   const searchBooks = async (searchTerm: string) => {
-    const token = await getAuthToken();
     try {
       const encodedTerm = encodeURIComponent(searchTerm);
-      const response = await axiosInstance.get(`google-integration/search`, {
-        params: {
-          term: encodedTerm,
-        },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        validateStatus: (status) => status < 500,
-      });
+      const response = await axiosInstance.get(
+        `google-integration/search/${encodedTerm}`,
+        {
+          validateStatus: (status) => status < 500,
+        }
+      );
       return response.data;
     } catch (error: any) {
       if (error.code === "ECONNREFUSED" || error.code === "ERR_NETWORK") {
@@ -43,15 +26,15 @@ export default function SearchAPI() {
   };
 
   const searchByGenre = async (genero: string) => {
-    const token = await getAuthToken();
     try {
-      const response = await axiosInstance.get(`google-integration/genre`, {
-        params: { genre: genero },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        validateStatus: (status) => status < 500,
-      });
+      const encodedGenre = encodeURIComponent(genero);
+      // Corrigindo a URL para usar o formato que o backend espera
+      const response = await axiosInstance.get(
+        `google-integration/genre/${encodedGenre}`,
+        {
+          validateStatus: (status) => status < 500,
+        }
+      );
       return response.data;
     } catch (error: any) {
       if (error.code === "ECONNREFUSED" || error.code === "ERR_NETWORK") {
