@@ -15,7 +15,11 @@ export default function Index() {
   const fontsLoaded = useLoadFonts();
 
   useEffect(() => {
-    if (!fontsLoaded) return;
+    console.log('teste novo repo')
+    if (fontsLoaded) {
+      const timeout = setTimeout(() => {
+        router.replace("/screens/splash");
+      }, 50);
 
     (async () => {
       router.replace("/screens/splash");
