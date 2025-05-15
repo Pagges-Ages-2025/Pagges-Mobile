@@ -225,7 +225,7 @@ const Library: React.FC<LibraryProps> = ({
                         Nenhum livro adicionado...
                       </NunitoText>
                       <NunitoText style={{ fontSize: 18, color: theme.quinaryText }}>
-                        Adicione um livro à sua biblioteca para ver aqui!
+                        AKNSDJAKNSDAKJSNDKJASNDAKSJDN
                       </NunitoText>
                     </View>
                   </View>

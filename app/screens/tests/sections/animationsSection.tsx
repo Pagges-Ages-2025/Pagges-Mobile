@@ -5,6 +5,7 @@ import LottieView from "lottie-react-native";
 
 const AnimationSection = () => {
   const [open, setOpen] = useState({
+    sadasdasdasdasdasd
     animations: false,
     loading: true,
     login: true,
