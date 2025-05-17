@@ -88,7 +88,6 @@ export default function EditProfileScreen() {
       }
 
       await UserAPI().updateProfile(
-        userToken,
         updateData.name,
         updateData.biography
       );

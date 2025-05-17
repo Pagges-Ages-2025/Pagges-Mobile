@@ -20,6 +20,8 @@ export interface Book {
   autores: string[];
   capa: string;
   paginas: number;
+  anoDePublicacao: string;
+  generos: string[];
   sinopse?: string;
 }
 
