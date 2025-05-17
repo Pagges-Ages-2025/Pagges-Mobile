@@ -17,6 +17,7 @@ import Achievement from "../components/Achievements/Achievement";
 import { useRouter } from "expo-router";
 import { base64Uri } from "../utils/imageUtils";
 import NunitoText from "../components/Texts/NunitoText";
+import CustomButton from "../components/Buttons/CustomButton";
 
 const getToken = async () => {
   const userToken = await AsyncStorage.getItem("userToken");
@@ -40,7 +41,7 @@ export default function ProfileScreen() {
         .then((response: { readBooks: number; readKms: number }) => {
           setStats(response);
         })
-        .catch((error: any) => {});
+        .catch((error: any) => { });
     };
     fetchStats();
   }, []);
@@ -52,7 +53,7 @@ export default function ProfileScreen() {
         .then((response: User) => {
           setData(response);
         })
-        .catch((error: any) => {});
+        .catch((error: any) => { });
     };
     fetchProfile();
   }, []);
@@ -93,6 +94,7 @@ export default function ProfileScreen() {
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: theme.Background }]}
+      showsVerticalScrollIndicator={false}
     >
       <View style={[styles.content, { backgroundColor: theme.Background }]}>
         <ProfileHeader
@@ -123,42 +125,38 @@ export default function ProfileScreen() {
 
         {/* Biblioteca pessoal buttons - Now placed above achievements */}
         <View style={styles.libraryButtonsContainer}>
-          <NunitoText style={styles.libraryTitle}>
+          <NunitoText style={[styles.libraryTitle, { color: theme.primaryText }]}>
             Biblioteca Pessoal
           </NunitoText>
+
           <View style={styles.libraryTabsContainer}>
-            <TouchableOpacity
-              style={[styles.libraryTab, { backgroundColor: theme.Background }]}
+
+            <CustomButton
+              title={"Quero Ler"}
               onPress={() => navigateToLibrary(0)}
-            >
-              <NunitoText
-                style={[styles.libraryTabText, { color: theme.primaryText }]}
-              >
-                Lidos
-              </NunitoText>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.libraryTab, { backgroundColor: theme.Background }]}
+              fullWidth={false}
+              size="small"
+              type="outlined"
+              height={30}
+            />
+            <CustomButton
+              title={"Lendo"}
               onPress={() => navigateToLibrary(1)}
-            >
-              <NunitoText
-                style={[styles.libraryTabText, { color: theme.primaryText }]}
-              >
-                Quero Ler
-              </NunitoText>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.libraryTab, { backgroundColor: theme.Background }]}
+              fullWidth={false}
+              size="small"
+              type="outlined"
+              height={30}
+            />
+            <CustomButton
+              title={"Lidos"}
               onPress={() => navigateToLibrary(2)}
-            >
-              <NunitoText
-                style={[styles.libraryTabText, { color: theme.primaryText }]}
-              >
-                Lendo
-              </NunitoText>
-            </TouchableOpacity>
+              fullWidth={false}
+              type="outlined"
+              size="small"
+              height={30}
+            />
+
+
           </View>
         </View>
 
@@ -169,8 +167,6 @@ export default function ProfileScreen() {
     </ScrollView>
   );
 }
-
-const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {
@@ -203,9 +199,8 @@ const styles = StyleSheet.create({
   },
   libraryTabsContainer: {
     flexDirection: "row",
-    backgroundColor: "#F4F4F4",
     borderRadius: 20,
-    padding: 3,
+    justifyContent: "space-around",
   },
   libraryTab: {
     flex: 1,

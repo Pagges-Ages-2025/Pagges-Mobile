@@ -16,6 +16,11 @@ import CarouselSection from "./sections/carouselSection";
 import ColorsSection from "./sections/colorsSection";
 import ErrorsModalsSection from "./sections/ErrorsModalsSection";
 import SearchBarSection from "./sections/searchbarSection";
+import AchievementsSection from "./sections/achievementsSection";
+import AdditionalButtonsSection from "./sections/additionalButtonsSection";
+import PostCardSection from "./sections/postCardSection";
+import CheckboxSection from "./sections/checkboxSection";
+import GenreLabelSection from "./sections/genreLabelSection";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -80,6 +85,11 @@ export default function TestsScreen() {
           <BooksSection />
           <CarouselSection />
           <ErrorsModalsSection />
+          <AchievementsSection />
+          <AdditionalButtonsSection />
+          <PostCardSection />
+          <CheckboxSection />
+          <GenreLabelSection />
         </View>
       </ScrollView>
     </SafeAreaView>
