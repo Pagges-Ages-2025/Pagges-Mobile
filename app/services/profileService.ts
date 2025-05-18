@@ -1,5 +1,7 @@
 import { User } from "../models/User";
 import axiosInstance from "./axios-instance-singleton";
+import * as ImagePicker from "expo-image-picker";
+
 // Se não funcionar mudar de localhost para o ip da máquina
 const profileControllerUrl = "profile";
 
@@ -24,8 +26,7 @@ export default function UserAPI() {
     }
   };
 
-  const getUserStatistics = async (
-  ): Promise<{
+  const getUserStatistics = async (): Promise<{
     readBooks: number;
     readKms: number;
   }> => {
@@ -44,7 +45,7 @@ export default function UserAPI() {
     try {
       const response = await axiosInstance.put(
         `${profileControllerUrl}/biography`,
-        { biography: bio },
+        { biography: bio }
       );
       return response.data.data;
     } catch (error) {
@@ -56,17 +57,32 @@ export default function UserAPI() {
   const updateProfile = async (
     name?: string,
     biography?: string,
-    genreIds?: number[]
+    genreIds?: number[],
+    image?: ImagePicker.ImagePickerAsset
   ): Promise<User> => {
     try {
-      const payload: any = {};
-      if (name) payload.name = name;
-      if (biography) payload.biography = biography;
-      if (genreIds) payload.genreIds = genreIds;
+      const formData = new FormData();
+
+      if (name) formData.append("name", name);
+      if (biography) formData.append("biography", biography);
+      if (genreIds) formData.append("genreIds", genreIds.join(","));
+      if (image) {
+        formData.append("file", {
+          uri: image.uri,
+          name: image.fileName || "upload.jpg",
+          type: image.mimeType,
+        } as any);
+        console.log(formData);
+      }
 
       const response = await axiosInstance.put(
         `${profileControllerUrl}`,
-        payload
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
       return response.data.data;

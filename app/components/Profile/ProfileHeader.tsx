@@ -21,6 +21,7 @@ interface ProfileHeaderProps {
   isAuthor: boolean;
   bEdit?: boolean;
   bEditPicture?: boolean;
+  isEditMode: boolean;
   onPressEdit?: () => void;
   onPressCameraIcon?: () => void;
 }
@@ -35,6 +36,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   isAuthor,
   bEdit = false,
   bEditPicture = false,
+  isEditMode = false,
   onPressEdit,
   onPressCameraIcon,
 }) => {
@@ -71,13 +73,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             </TouchableOpacity>
           )}
 
-          {bEditPicture && (
+          {isEditMode && (
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={onPressCameraIcon}
               style={styles.cameraIcon}
             >
-              <Ionicons name="camera" size={48} color={theme.white} />
+              {bEditPicture && (
+                <Ionicons name="camera" size={48} color={theme.white} />
+              )}
             </TouchableOpacity>
           )}
         </ImageBackground>
@@ -136,6 +140,8 @@ const styles = StyleSheet.create({
   },
   cameraIcon: {
     position: "absolute",
+    height: 48,
+    width: 48,
     top: "90%",
     left: "11.5%",
   },
