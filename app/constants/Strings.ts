@@ -26,5 +26,6 @@ export default {
   genreTitle: "Escolha seus favoritos",
   review:"Resenha",
   spoilerWarningPlain: "Contém spoiler",
-  selectBook: "Selecionar um livro"
+  selectBook: "Selecionar um livro",
+  noBooks: "Nenhum livro encontrado"
 };

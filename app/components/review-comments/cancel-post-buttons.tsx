@@ -9,11 +9,13 @@ import Strings from "@/app/constants/Strings";
 interface CancelPostProps {
   onPost: () => void;
   cancelScreen: "searchPage" | "book";
+  isLoading?: boolean;
 }
 
 export default function CancelPost({
   onPost,
-  cancelScreen
+  cancelScreen,
+  isLoading,
 }: CancelPostProps) {
   const { theme, themeName } = useTheme();
   const router = useRouter();
@@ -23,26 +25,32 @@ export default function CancelPost({
       router.push(`/screens/${screen}`);
     }
   }, []);
-    
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigateTo(cancelScreen)} activeOpacity={0.7}>
-        <NunitoText style={{
-          color:
-          themeName === "dark"
-          ? theme.primaryText
-          : theme.secondaryText,
-          fontSize: 16 
-        }}>{Strings.cancel}</NunitoText>
+      <TouchableOpacity
+        onPress={() => navigateTo(cancelScreen)}
+        activeOpacity={0.7}
+      >
+        <NunitoText
+          style={{
+            color:
+              themeName === "dark" ? theme.primaryText : theme.secondaryText,
+            fontSize: 16,
+          }}
+        >
+          {Strings.cancel}
+        </NunitoText>
       </TouchableOpacity>
-          
-      <CustomButton 
+
+      <CustomButton
         onPress={onPost}
-        size='small' 
+        size="small"
         width={90}
         height={35}
-        title={Strings.post} 
-        type="secondary"  
+        title={Strings.post}
+        type="secondary"
+        isDisabled={isLoading}
       />
     </View>
   );
@@ -50,10 +58,10 @@ export default function CancelPost({
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'transparent',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "transparent",
     height: 40,
   },
 });

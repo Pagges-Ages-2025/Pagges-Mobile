@@ -5,25 +5,44 @@ import SelectBook from "../components/review-comments/select-book";
 import CheckBoxOptions from "../components/checkbox/CheckBoxOptions";
 import { useState } from "react";
 import { useTheme } from "../context/ThemeContext";
+import PostService from "../services/postService";
+import { Book } from "../components/SearchBar/SearchBar";
 
 export default function CreateReviewCommentScreen() {
   const [reviewText, setReviewText] = useState("");
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isReviewChecked, setIsReviewChecked] = useState(true);
   const [isSpoilerChecked, setIsSpoilerChecked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { createPost } = PostService();
 
-  const handlePublish = () => {
-    if (!reviewText.trim()) return;
+  const handlePublish = async () => {
+    if (!reviewText.trim() || !selectedBook) return;
     setIsLoading(true);
 
-    // Simula publicação (2s)
-    setTimeout(() => {
-      setIsLoading(false);
-      // Aqui você pode exibir uma Toast, Alert ou navegação
+    console.log(selectedBook.id);
+    try {
+      const newPost = {
+        book_id: selectedBook.id,
+        is_spoiler: isSpoilerChecked,
+        text: reviewText,
+        is_review: isReviewChecked,
+        title: "", // mesmo que vazio
+        parent_id: null, // ou um número válido, se estiver respondendo a outro post
+      };
+
+      await createPost(newPost);
+
+      // Limpa os campos após sucesso
       setReviewText("");
       setIsReviewChecked(false);
       setIsSpoilerChecked(false);
-    }, 2000);
+      // setSelectedBook(null); // se usar
+    } catch (error) {
+      console.error("Erro ao criar post:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const { theme } = useTheme();
@@ -34,13 +53,14 @@ export default function CreateReviewCommentScreen() {
       <View style={styles.header}>
         <CancelPostButtons
           onPost={handlePublish}
-          cancelScreen="searchPage" // ou "book", dependendo do fluxo desejado
+          cancelScreen="searchPage"
+          isLoading={isLoading}
         />
       </View>
 
       <ReviewTextField value={reviewText} onChangeText={setReviewText} />
 
-      <SelectBook />
+      <SelectBook onSelectBook={(book) => setSelectedBook(book)} />
 
       <View style={styles.options}>
         <CheckBoxOptions
@@ -60,12 +80,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
   },
-  header:{
-   paddingTop: 30,
-   paddingBottom: 20
+  header: {
+    paddingTop: 30,
+    paddingBottom: 20,
   },
-  options:{
+  options: {
     paddingTop: 5,
-    paddingBottom: 15
-  }
+    paddingBottom: 15,
+  },
 });

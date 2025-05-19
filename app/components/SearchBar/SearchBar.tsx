@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import {
   View,
   TextInput,
@@ -8,10 +8,11 @@ import {
   StyleSheet,
   Platform,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
 } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import CustomBook from "../Book/CustomBook";
+import Strings from "@/app/constants/Strings";
 
 export interface Book {
   id: number;
@@ -39,6 +40,7 @@ interface BookSearchProps {
   onSelectBook: (book: Book) => void;
   placeholder?: string;
   onSearch?: (term: string) => void;
+  isBottomSheet?: boolean;
 }
 
 export default function BookSearch({
@@ -52,10 +54,12 @@ export default function BookSearch({
   onSelectBook,
   placeholder = "Buscar Livro...",
   onSearch,
+  isBottomSheet = false,
 }: BookSearchProps) {
   const [query, setQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { theme } = useTheme();
+  const inputRef = useRef<TextInput>(null);
 
   const dynamicStyles = {
     height: SearchSize === "lg" ? 50 : SearchSize === "md" ? 40 : 35,
@@ -67,8 +71,8 @@ export default function BookSearch({
       iconColor === "primary"
         ? theme.primary
         : iconColor === "secondary"
-        ? theme.secondary
-        : "#666",
+          ? theme.secondary
+          : "#666",
     iconPositionStyle: iconPosition === "left" ? { left: 18 } : { right: 18 },
     inputPaddingStyle:
       iconPosition === "left"
@@ -101,6 +105,15 @@ export default function BookSearch({
     Keyboard.dismiss();
   };
 
+  useEffect(() => {
+    if (isBottomSheet) {
+      const timeout = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300);
+      return () => clearTimeout(timeout);
+    }
+  }, []);
+
   return (
     <TouchableWithoutFeedback onPress={handlePressOutside}>
       <View style={styles.outerContainer}>
@@ -118,7 +131,15 @@ export default function BookSearch({
               ]}
             >
               <TextInput
-                style={[styles.input, dynamicStyles.inputPaddingStyle, {backgroundColor: theme.Background, color: theme.primaryText}]}
+                ref={inputRef}
+                style={[
+                  styles.input,
+                  dynamicStyles.inputPaddingStyle,
+                  {
+                    backgroundColor: theme.Background,
+                    color: theme.primaryText,
+                  },
+                ]}
                 value={query}
                 onChangeText={handleSearch}
                 placeholder={placeholder}
@@ -126,13 +147,19 @@ export default function BookSearch({
                 onFocus={() => setShowSuggestions(true)}
               />
               <View
-                style={[styles.searchIconContainer, dynamicStyles.iconPositionStyle]}
+                style={[
+                  styles.searchIconContainer,
+                  dynamicStyles.iconPositionStyle,
+                ]}
               >
-                <Ionicons name="search" size={20} color={dynamicStyles.iconColor} />
+                <Ionicons
+                  name="search"
+                  size={20}
+                  color={dynamicStyles.iconColor}
+                />
               </View>
             </View>
-
-            {showSuggestions && query.length > 0 && (
+            {showSuggestions && query.length > 0 && !isBottomSheet && (
               <View style={styles.suggestionsContainer}>
                 <FlatList
                   data={books}
@@ -149,7 +176,11 @@ export default function BookSearch({
                   )}
                   ListEmptyComponent={() => (
                     <View style={styles.emptyContainer}>
-                      <Text style={[styles.emptyText, {color: theme.primaryText}]}>Nenhum livro encontrado</Text>
+                      <Text
+                        style={[styles.emptyText, { color: theme.primaryText }]}
+                      >
+                        {Strings.noBooks}
+                      </Text>
                     </View>
                   )}
                 />
@@ -171,7 +202,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingBottom: 75,
     width: "100%",
-  }, 
+  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
