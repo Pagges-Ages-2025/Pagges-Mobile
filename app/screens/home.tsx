@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { use, useCallback, useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import StaticSearchBar from "../components/SearchBar/StaticSearchBar";
@@ -9,6 +9,7 @@ import CustomBook from "../components/Book/CustomBook";
 
 import { router } from "expo-router";
 import ModalBookDetails from "./book";
+import SearchAPI from "../services/googleAPIService";
 
 export interface Book {
   id: number;
@@ -57,9 +58,11 @@ const initialBooks: Book[] = [
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
-  const [ trendingBooks, setTrendingBookds ] = useState<Book[]>(initialBooks);
+  const { getTrendingBooks } = SearchAPI();
+  const [ trendingBooks, setTrendingBookds ] = useState<Book[]>();
   const [ selectedTrendingBook, setSelectedTrendingBook ] = useState<Book | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
 
   const handleCloseModal = () => {
@@ -71,6 +74,24 @@ const Home: React.FC = () => {
     setSelectedTrendingBook(book);
     setModalVisible(true);
   };
+
+  const fetchTrendingBooks = useCallback(async () => {
+    setLoading(true);
+    try {
+      const results = await getTrendingBooks();
+      const formattedResults = Array.isArray(results) ? results : [];
+      setTrendingBookds(formattedResults);
+    } catch (error) {
+      console.error("Erro ao buscar livros em alta:", error);
+      setTrendingBookds([]);
+    }   finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+  fetchTrendingBooks();
+  }, [fetchTrendingBooks]);
 
   return (
     <SafeAreaView
@@ -88,7 +109,7 @@ const Home: React.FC = () => {
                 </NunitoText>
                 <CustomCarousel
                   isHorizontal
-                  data={trendingBooks.map((book) => (
+                  data={trendingBooks ? trendingBooks.map((book) => (
                      <CustomBook
                         key={book.id}
                         bookId={book.id}
@@ -97,7 +118,7 @@ const Home: React.FC = () => {
                         author={book.autores.join(", ")}
                         onPress={() => handleSelectTrendingBook(book)}
                       />
-                  ))}
+                  )) : []}
                 />
       </View>
           {selectedTrendingBook && (
