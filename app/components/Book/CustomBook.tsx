@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
+import BookCover from "../../assets/images/book-cover.png"
 
 type BookSize = "small" | "medium" | "large" | "search";
 
@@ -77,8 +78,8 @@ const CustomBook: React.FC<CustomBookProps> = ({
 
   // Imagem de fallback para quando a capa não carregar
   const bookCoverSource = imageError
-    ? require("../../assets/images/book-cover.png")
-    : { uri: optimizedPhotoPath };
+    ? BookCover
+    : { uri: optimizedPhotoPath.toString() };
 
   return (
     <View style={{ alignItems: "center" }}>
