@@ -1,5 +1,6 @@
 import ProfileHeader from "@/app/components/Profile/ProfileHeader";
 import { User } from "@/app/models/User";
+import { Post } from "@/app/models/Post";
 import { useEffect, useState } from "react";
 import UserAPI from "@/app/services/profileService";
 import {
@@ -17,6 +18,8 @@ import Achievement from "../components/Achievements/Achievement";
 import { useRouter } from "expo-router";
 import { base64Uri } from "../utils/imageUtils";
 import NunitoText from "../components/Texts/NunitoText";
+import React from "react";
+import PostCard from "../components/Cards/PostCard";
 
 const getToken = async () => {
   const userToken = await AsyncStorage.getItem("userToken");
@@ -32,6 +35,20 @@ export default function ProfileScreen() {
     readBooks: 0,
     readKms: 0,
   });
+
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      UserAPI()
+        .fetchUserPosts()
+        .then((response: Post[]) => {
+          setPosts(response);
+        })
+        .catch((error: any) => {});
+    };
+    fetchPosts();
+  }, []);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -165,6 +182,21 @@ export default function ProfileScreen() {
         <View style={styles.achievementContainer}>
           <Achievement />
         </View>
+          
+        <View style={styles.postsContainer}>
+          {posts.map((post) => (
+            <PostCard
+              title={post.title}
+              subtitle={post.text}
+              username={post.username}
+              bookcover={post.googleImageUrl}
+              likes={post.likedBy}
+              bSpoiler={post.isSpoiler || false} 
+              repost={0}
+              comments={0}
+            />
+          ))}
+        </View>
       </View>
     </ScrollView>
   );
@@ -217,5 +249,10 @@ const styles = StyleSheet.create({
   libraryTabText: {
     fontSize: 14,
     fontWeight: "500",
+  },  
+  postsContainer: {
+    marginHorizontal: 30,
+    marginTop: 20,
+    marginBottom: 20,
   },
 });

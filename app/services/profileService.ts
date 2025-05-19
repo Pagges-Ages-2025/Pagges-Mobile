@@ -112,6 +112,7 @@ export default function UserAPI() {
     getProfile,
     getProfileImage,
     getUserStatistics,
+    fetchUserPosts,
     updateBio,
     updateProfile,
   };
