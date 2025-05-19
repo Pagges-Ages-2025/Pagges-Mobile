@@ -21,7 +21,7 @@ interface ProfileHeaderProps {
   isAuthor: boolean;
   bEdit?: boolean;
   bEditPicture?: boolean;
-  genres: string[]
+  genres?: string[]
   onPressEdit?: () => void;
   onPressCameraIcon?: () => void;
 }
@@ -86,32 +86,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <Ionicons name="camera" size={48} color={theme.white} />
             </TouchableOpacity>
           )}
-            
-          {/* <View style={{ paddingLeft: 10, flexDirection: "row", paddingRight: 10 }}>
-            {genres.map((genre) => (
-              // <View style={{ paddingLeft: 10 }}>
-                <View
-                  style={{
-                    backgroundColor: "pink",
-                    borderRadius: 30,
-                    height: 25,
-                    width: 75,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    top: "30%",
-                    pointerEvents: "none",
-                  }}
-                >
-                  <NunitoText style={{ color: "black", fontSize: 14 }}>
-                    {genre}
-                  </NunitoText>
-                </View>
-              // </View>
-            ))}
-          </View> */}
 
+        {!bEditPicture && (
           <View style={{ paddingLeft: 10, flexDirection: "row", flexWrap: "wrap", paddingRight: 6 }}>
-            {genres.map((genre, index) => {
+            {genres?.map((genre, index) => {
               const firstWord = genre.split(' ')[0];
               const backgroundColor = colorsBackground[index % colorsBackground.length]
               const colorsTitle = colorsLabel[index % colorsLabel.length]
@@ -138,6 +116,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               );
             })}
           </View>
+        )}
 
 
           </View>
@@ -184,7 +163,7 @@ const styles = StyleSheet.create({
   },
   editIcon: {
     position: "absolute",
-    top: "55%",
+    top: "42%",
     right: "5%",
   },
   genresContainer: {
@@ -197,7 +176,7 @@ const styles = StyleSheet.create({
   },
   cameraIcon: {
     position: "absolute",
-    top: "90%",
+    top: "62%",
     left: "11.5%",
   },
   username: {

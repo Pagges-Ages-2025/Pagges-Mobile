@@ -2,6 +2,7 @@ import ProfileHeader from "@/app/components/Profile/ProfileHeader";
 import { User } from "@/app/models/User";
 import { useEffect, useState } from "react";
 import UserAPI from "@/app/services/profileService";
+import axiosInstance from "../services/axios-instance-singleton";
 import {
   ScrollView,
   View,
@@ -63,17 +64,7 @@ export default function ProfileScreen() {
   useEffect(() => {
     const fetchUserGenres = async () => {
       try {
-        const token = await getToken();
-        if (!token) return;
-  
-        const api = axios.create({
-          baseURL: 'http://localhost:3000',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-  
-        const response = await api.get('/user-genres/user');
+        const response = await axiosInstance.get('/user-genres/user');
         setUserGenres(response.data.data);
       } catch (error) {
         console.error("Erro ao buscar os gêneros do usuário:", error);
