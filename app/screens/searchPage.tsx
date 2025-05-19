@@ -5,9 +5,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import BookSearch, { Book } from "../components/SearchBar/SearchBar";
 import { useTheme } from "../context/ThemeContext";
 import SearchAPI from "../services/googleAPIService";
-import ModalBookDetails from "./bookDetails";
+import ModalBookDetails from "./book";
+import HomeCarouselSection from "../components/Home-Carousel/HomeCarousel";
+import { ScrollView } from "react-native-gesture-handler";
 
-import { SearchHistoryList } from "../components/SearchBar/SearchHistoryList";
+interface CarouselProps {
+  data: React.ReactNode[];
+  isHorizontal?: true;
+  onIndexChange?: (index: number) => void;
+}
+
+const mockCards = [
+  { id: "1", title: "Desafio Diário", challengeId: "a1" },
+  { id: "2", title: "Desafio Diário", challengeId: "a2" },
+  { id: "3", title: "Desafio Diário", challengeId: "a3" },
+];
+
 
 const SearchPage: React.FC = () => {
   const { theme } = useTheme();
@@ -100,26 +113,32 @@ const SearchPage: React.FC = () => {
         )}
       </View>
 
-      {selectedBook && (
-        <ModalBookDetails
-          visible={modalVisible}
-          onClose={handleCloseModal}
-          rating={4.0}
-          title={selectedBook.titulo}
-          pages={selectedBook.paginas || 0}
-          synopsis={selectedBook.sinopse || "Sinopse não disponível"}
-          review="Sem avaliações disponíveis ainda."
-          authors={selectedBook.autores?.join(", ") || "Autor desconhecido"}
-          year={selectedBook.anoDePublicacao?.substring(0, 4) || "Desconhecido"}
-          id={selectedBook.id?.toString() || "0"}
-          genre={selectedBook.generos?.[0] || "Gênero não especificado"}
-          google_image_url={selectedBook.capa || ""}
-          onCreateReview={() =>
-            console.log("Criar resenha para:", selectedBook.titulo)
-          }
-          onShare={() => console.log("Compartilhar:", selectedBook.titulo)}
-        />
-      )}
+        {selectedBook && (
+          <ModalBookDetails
+            visible={modalVisible}
+            onClose={handleCloseModal}
+            titulo={selectedBook.titulo}
+            author={selectedBook.autores?.join(", ") || "Autor desconhecido"}
+            capa={selectedBook.capa} // Capa com 'zoom=6'
+            paginas={selectedBook.paginas || 0}
+            sinopse={selectedBook.sinopse || "Sinopse não disponível"}
+            rating={4.0}
+            readersNumber={100}
+            rankingNumber={"5"}
+            review="Sem avaliações disponíveis ainda."
+            publicationDate={"Ano desconhecido"}
+            genre={"Gênero não especificado"}
+            onCreateReview={() =>
+              console.log("Criar resenha para:", selectedBook.titulo)
+            }
+            onShare={() => console.log("Compartilhar:", selectedBook.titulo)}
+          />
+        )}
+
+      <View style={styles.carouselContainer}>
+        <HomeCarouselSection cards={mockCards} />
+      </View>
+    </ScrollView>
     </SafeAreaView>
   );
 };
@@ -131,9 +150,12 @@ const styles = StyleSheet.create({
   content: {
     alignSelf: "center",
     width: "90%",
-    flex: 1,
     paddingTop: 30,
   },
+  carouselContainer: {
+    paddingTop: 20,
+  }
+  
 });
 
 export default SearchPage;
