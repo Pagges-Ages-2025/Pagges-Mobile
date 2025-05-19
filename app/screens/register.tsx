@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import CustomButton from "../components/Buttons/CustomButton";
 import NunitoText from "../components/Texts/NunitoText";
-import { PaggesTextInput } from "../components/Texts/TextInput";
+import { PaggesTextInput } from "../components/Inputs/TextInput";
 import Strings from "../constants/Strings";
 import AuthAPI from "../services/auth";
 

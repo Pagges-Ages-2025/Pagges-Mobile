@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/app/context/ThemeContext';
 import BookSearch, { Book } from '../SearchBar/SearchBar';
 import SearchAPI from '@/app/services/googleAPIService';
-import ModalBookDetails from '@/app/screens/book';
+import ModalBookDetails from '@/app/screens/bookDetails';
 import React from 'react';
 import CustomBook from '../Book/CustomBook';
 
