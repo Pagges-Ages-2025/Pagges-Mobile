@@ -1,4 +1,5 @@
 import { User } from "../models/User";
+import { Post } from "../models/Post";
 import axiosInstance from "./axios-instance-singleton";
 // Se não funcionar mudar de localhost para o ip da máquina
 const profileControllerUrl = "profile";
@@ -23,6 +24,37 @@ export default function UserAPI() {
       throw error;
     }
   };
+
+  const fetchUserPosts = async (): Promise<Post[]> => {
+    try {
+      const response = await axiosInstance.get(
+        `/posts/user-recent-reviews`
+      );
+      
+      const mappedPosts = response.data.map(
+        (item: any) => 
+          new Post({
+            bookId: item.book.book_id,
+            userId: item.user.user_id,
+            isSpoiler: item.is_spoiler,
+            title: item.title,
+            text: item.text,
+            isReview: item.is_review,
+            parentId: item.parent_id,
+            createdAt: item.created_at,
+            googleImageUrl: item.livro.google_image_url,
+            bookTitle: item.livro.title,
+            username: item.user.username,
+            likedBy: item._count.liked_by
+          })
+      )
+
+      return mappedPosts;
+    } catch (error) {
+      console.error("Erro ao buscar posts do usuário:", error);
+      throw error;
+    }
+  }
 
   const getUserStatistics = async (
   ): Promise<{
