@@ -30,7 +30,6 @@ const FavoriteGenre: React.FC = () => {
   useEffect(() => {
     const fetchGenres = async () => {
       const genresData = await retriveAllGenres();
-      console.log("to aqui: ", genresData);
       setGenres(genresData.data); 
     };
     fetchGenres();
