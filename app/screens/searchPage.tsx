@@ -1,6 +1,6 @@
 import debounce from "lodash.debounce";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BookSearch, { Book } from "../components/SearchBar/SearchBar";
 import { useTheme } from "../context/ThemeContext";
@@ -85,7 +85,11 @@ const SearchPage: React.FC = () => {
           onSearch={debouncedSearch}
         />
 
-        {searchHistory.length > 0 ? (
+        {loading ? (
+          <View style={{ marginTop: 16, alignItems: "center" }}>
+            <ActivityIndicator size="small" color={theme.postCardBackground} />
+          </View>
+        ) : searchHistory.length > 0 ? (
           <SearchHistoryList
             history={searchHistory}
             onDeleteItem={handleDeleteHistoryItem}
