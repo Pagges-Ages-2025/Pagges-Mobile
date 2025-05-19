@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -9,50 +9,11 @@ import NunitoText from "../components/Texts/NunitoText";
 import Strings from "../constants/Strings";
 import { useTheme } from "../context/ThemeContext";
 
+import { retriveAllGenres } from "../services/genres.service";
+import { Genre } from "../models/Genre"; 
 const FavoriteGenre: React.FC = () => {
   const { theme, themeName } = useTheme();
-  const gener = [
-    "Família",
-    "Ficção Científica",
-    "Romance",
-    "Terror",
-    "Noir",
-    "Histórico",
-    "Fantasia",
-    "Aventura",
-    "Suspense",
-    "Mistério",
-    "Biografia",
-    "Drama",
-    "Policial",
-    "Comédia",
-    "Distopia",
-    "Espiritualidade",
-    "Autoajuda",
-    "Tecnologia",
-    "Thriller",
-    "Crônicas",
-    "Ensaio",
-    "Mitologia",
-    "Clássico",
-    "Gótico",
-    "Realismo Mágico",
-    "Infantojuvenil",
-    "Chick-Lit",
-    "Humor",
-    "Poesia",
-    "Épico",
-    "Cyberpunk",
-    "Viagem",
-    "Fábula",
-    "Religião",
-    "Psicologia",
-    "Filosofia",
-    "Sociedade",
-    "Conto",
-    "Natureza",
-  ];
-
+  const [genres, setGenres] = useState<Genre[]>([]); 
   const [selectedItens, setSelectedItens] = useState<string[]>([]);
   const { from } = useLocalSearchParams<{ from: string }>();
 
@@ -66,11 +27,20 @@ const FavoriteGenre: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchGenres = async () => {
+      const genresData = await retriveAllGenres();
+      console.log("to aqui: ", genresData);
+      setGenres(genresData.data); 
+    };
+    fetchGenres();
+  }, []);
+
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.Background }]}
     >
-      <View style={[styles.containerView]}>
+      <View style={styles.containerView}>
         <NunitoText
           style={[
             styles.h1,
@@ -83,17 +53,22 @@ const FavoriteGenre: React.FC = () => {
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.genreList}>
-          {gener.map((title) => (
-            <SelectionButton
-              title={title}
-              isSelected={selectedItens.includes(title)}
-              key={title}
-              onSelectChange={() => toggleSelection(title)}
-              isDisable={
-                selectedItens.length === 3 && !selectedItens.includes(title)
-              }
-            />
-          ))}
+          {genres.length > 0 ? (
+            genres.map((genre) => (
+              <SelectionButton
+                title={genre.genre_name}
+                isSelected={selectedItens.includes(genre.genre_name)}
+                key={genre.genre_id}
+                onSelectChange={() => toggleSelection(genre.genre_name)}
+                isDisable={
+                  selectedItens.length === 3 &&
+                  !selectedItens.includes(genre.genre_name)
+                }
+              />
+            ))
+          ) : (
+            <NunitoText>No genres found or genres is empty.</NunitoText>
+          )}
         </View>
       </ScrollView>
 
@@ -102,7 +77,14 @@ const FavoriteGenre: React.FC = () => {
           title={Strings.save}
           size="small"
           fontWeight="bold"
-          onPress={() => router.replace("/screens/home")}
+          onPress={() => {
+            // Salvar os gêneros no banco
+            if (from === "register") {
+              router.replace("/screens/home");
+            } else {
+              router.back();
+            }
+          }}
         />
       </View>
     </SafeAreaView>
