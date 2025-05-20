@@ -1,28 +1,53 @@
 import React, { useState, useEffect } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { router, useLocalSearchParams } from "expo-router";
+
 import CustomButton from "../components/Buttons/CustomButton";
 import SelectionButton from "../components/Buttons/SelectionButton";
 import NunitoText from "../components/Texts/NunitoText";
 import Strings from "../constants/Strings";
 import { useTheme } from "../context/ThemeContext";
 
-import { retriveAllGenres } from "../services/genres.service";
-import { Genre } from "../models/Genre"; 
+import {
+  retriveUserGenres,
+  retriveAllGenres,
+} from "../services/genres.service";
+import UserAPI from "../services/profileService";
+import { Genre } from "../models/Genre";
+
 const FavoriteGenre: React.FC = () => {
   const { theme, themeName } = useTheme();
-  const [genres, setGenres] = useState<Genre[]>([]); 
-  const [selectedItens, setSelectedItens] = useState<string[]>([]);
   const { from } = useLocalSearchParams<{ from: string }>();
 
-  const toggleSelection = (title: string) => {
-    if (selectedItens.length < 3 || selectedItens.includes(title)) {
-      setSelectedItens((iten) =>
-        iten.includes(title)
-          ? iten.filter((x) => x !== title)
-          : [...iten, title]
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+
+  const toggleSelection = (id: number) => {
+    setSelectedItems((prev) =>
+      prev.includes(id)
+        ? prev.filter((x) => x !== id)
+        : prev.length < 3
+        ? [...prev, id]
+        : prev
+    );
+  };
+
+  const saveGenre = async () => {
+    try {
+      await UserAPI().updateProfile(undefined, undefined, selectedItems);
+
+      if (from === "edit") {
+        router.back();
+      } else {
+        router.replace("/screens/home");
+      }
+    } catch (error) {
+      console.error("Erro ao salvar gênero:", error);
+      showErrorModal(
+        "Erro",
+        "Não foi possível salvar suas preferências. Tente novamente.",
+        "error"
       );
     }
   };
@@ -30,8 +55,14 @@ const FavoriteGenre: React.FC = () => {
   useEffect(() => {
     const fetchGenres = async () => {
       const genresData = await retriveAllGenres();
-      setGenres(genresData.data); 
+      setGenres(genresData.data);
+
+      const userGenresData = await retriveUserGenres();
+      setSelectedItems(
+        userGenresData.data.map((genre: Genre) => genre.genre_id)
+      );
     };
+
     fetchGenres();
   }, []);
 
@@ -55,18 +86,18 @@ const FavoriteGenre: React.FC = () => {
           {genres.length > 0 ? (
             genres.map((genre) => (
               <SelectionButton
-                title={genre.genre_name}
-                isSelected={selectedItens.includes(genre.genre_name)}
                 key={genre.genre_id}
-                onSelectChange={() => toggleSelection(genre.genre_name)}
+                title={genre.genre_name}
+                isSelected={selectedItems.includes(genre.genre_id)}
+                onSelectChange={() => toggleSelection(genre.genre_id)}
                 isDisable={
-                  selectedItens.length === 3 &&
-                  !selectedItens.includes(genre.genre_name)
+                  selectedItems.length === 3 &&
+                  !selectedItems.includes(genre.genre_id)
                 }
               />
             ))
           ) : (
-            <NunitoText>No genres found or genres is empty.</NunitoText>
+            <NunitoText>Nenhum gênero encontrado.</NunitoText>
           )}
         </View>
       </ScrollView>
@@ -76,14 +107,7 @@ const FavoriteGenre: React.FC = () => {
           title={Strings.save}
           size="small"
           fontWeight="bold"
-          onPress={() => {
-            // Salvar os gêneros no banco
-            if (from === "register") {
-              router.replace("/screens/home");
-            } else {
-              router.back();
-            }
-          }}
+          onPress={saveGenre}
         />
       </View>
     </SafeAreaView>
@@ -122,5 +146,13 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
 });
+
+function showErrorModal(
+  title: string,
+  message: string,
+  type: string
+) {
+  console.warn(`[${type.toUpperCase()}] ${title}: ${message}`);
+}
 
 export default FavoriteGenre;

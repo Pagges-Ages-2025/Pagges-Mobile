@@ -145,7 +145,13 @@ export default function EditProfileScreen() {
             <Text style={[styles.charCounter, { color: theme.primaryText }]}>
               {bioCharCount}/200
             </Text>
+            <CustomButton
+              title={Strings.editGenres}
+              onPress={()=>router.push({pathname: "/screens/favoriteGenre", params:{from: "edit"}})}
+              size="large"
+              type={changesMade ? "primary" : "outlined"}
 
+            />
             <CustomButton
               title={loading ? Strings.saving : Strings.save}
               onPress={handleSaveChanges}
