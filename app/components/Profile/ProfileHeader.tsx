@@ -14,6 +14,7 @@ import Strings from "@/app/constants/Strings";
 import DefaultProfileHeaderImage from "../../assets/images/default_profile_header_image.png";
 import { Ionicons } from "@expo/vector-icons";
 import profileUser from "../../assets/images/profile-user.png";
+import { Genre } from "@/app/models/Genre";
 interface ProfileHeaderProps {
   marginStart: number;
   profileImageUrl?: string;
@@ -21,7 +22,7 @@ interface ProfileHeaderProps {
   isAuthor: boolean;
   bEdit?: boolean;
   bEditPicture?: boolean;
-  genres?: string[]
+  genres?: Genre[]
   onPressEdit?: () => void;
   onPressCameraIcon?: () => void;
 }
@@ -90,7 +91,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         {!bEditPicture && (
           <View style={{ paddingLeft: 10, flexDirection: "row", flexWrap: "wrap", paddingRight: 6 }}>
             {genres?.map((genre, index) => {
-              const firstWord = genre.split(' ')[0];
+              const firstWord = genre.genre_name.split(' ')[0];
               const backgroundColor = colorsBackground[index % colorsBackground.length]
               const colorsTitle = colorsLabel[index % colorsLabel.length]
               return (
