@@ -5,7 +5,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import BookSearch, { Book } from "../components/SearchBar/SearchBar";
 import { useTheme } from "../context/ThemeContext";
 import SearchAPI from "../services/googleAPIService";
-import ModalBookDetails from "./book";
+import ModalBookDetails from "./bookDetails";
+
 import { SearchHistoryList } from "../components/SearchBar/SearchHistoryList";
 
 const SearchPage: React.FC = () => {

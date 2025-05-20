@@ -56,7 +56,7 @@ const PaggesTextInput: React.FC<PaggesTextInputIconNameProps> = ({
             name={leftIconName}
             size={24}
             color={theme.placeholder}
-            style={styles.icon}
+            style={[styles.icon, multiline && styles.iconMultiline]}
           />
         )
       }
@@ -70,7 +70,7 @@ const PaggesTextInput: React.FC<PaggesTextInputIconNameProps> = ({
               name={rightIconName}
               size={24}
               color={theme.placeholder}
-              style={styles.icon}
+              style={[styles.icon, multiline && styles.iconMultiline]}
             />
           </TouchableOpacity>
         )
@@ -116,20 +116,30 @@ const PaggesTextInputCustomIcons: React.FC<PaggesTextInputCustomIconsProps> = ({
   const { theme } = useTheme();
   return (
     <View
-      style={[style, styles.inputContainer, { borderColor: theme.placeholder }]}
+      style={[
+        style, 
+        styles.inputContainer, 
+        { borderColor: theme.placeholder },
+        multiline && styles.multilineContainer
+      ]}
     >
       {leftIcon}
       <TextInput
-        style={[styles.input, { color: theme.primaryText }]}
+        style={[
+          styles.input, 
+          { color: theme.primaryText },
+          multiline && styles.multilineInput
+        ]}
         placeholder={placeholder}
         placeholderTextColor={theme.placeholder}
         value={value}
-        numberOfLines={1}
+        numberOfLines={multiline ? undefined : 1}
         onChangeText={onChangeText}
         autoCapitalize="none"
         secureTextEntry={isSecureTextEntry}
         keyboardType={keyboardType}
         multiline={multiline}
+        textAlignVertical={multiline ? "top" : "center"}
       />
       {rightIcon}
     </View>
@@ -144,11 +154,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 15,
   },
+  multilineContainer: {
+    alignItems: "flex-start",
+    paddingVertical: 5,
+  },
   icon: {
     margin: 12,
   },
+  iconMultiline: {
+    marginTop: 12,
+  },
   input: {
     flex: 1,
+  },
+  multilineInput: {
+    paddingTop: 12,
+    paddingBottom: 12,
+    height: "100%",
   },
 });
 

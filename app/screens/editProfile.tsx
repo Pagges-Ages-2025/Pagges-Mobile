@@ -9,7 +9,7 @@ import {
 import { useTheme } from "../context/ThemeContext";
 import CustomButton from "@/app/components/Buttons/CustomButton";
 import ProfileHeader from "@/app/components/Profile/ProfileHeader";
-import { PaggesTextInput } from "../components/Texts/TextInput";
+import { PaggesTextInput } from "../components/Inputs/TextInput";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import UserAPI from "@/app/services/profileService";

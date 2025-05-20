@@ -58,16 +58,26 @@ export default function NavBar() {
       name: "Perfil",
       icon: "person-outline",
       route: userEmail
-        ? `/screens/profile?email=${userEmail}`
+        ? `/screens/profile?email=${encodeURIComponent(userEmail)}`
         : "/screens/profile",
     },
   ];
 
+  const isCurrentRoute = (route: string | undefined) => {
+    if (!route) return false;
+    const currentBasePath = pathname.split('?')[0];
+    const targetBasePath = route.split('?')[0];
+    return currentBasePath === targetBasePath;
+  };
+
   const handleNavigation = (item: (typeof navigationItems)[0]) => {
     if (item.action) {
       item.action();
+    } else if (item.route && !isCurrentRoute(item.route)) {
+      console.log('Navegando para nova página:', item.route);
+      router.replace(item.route as any);
     } else if (item.route) {
-      router.push(item.route as any);
+      console.log('Usuário já está na página:', pathname);
     }
   };
 
@@ -80,6 +90,7 @@ export default function NavBar() {
             styles.navItem,
             item.name === "Add" && styles.addButton,
             item.name === "Add" && { backgroundColor: theme.primary },
+            isCurrentRoute(item.route) && styles.activeNavItem,
           ]}
           onPress={() => handleNavigation(item)}
         >
@@ -89,7 +100,7 @@ export default function NavBar() {
             color={
               item.name === "Add"
                 ? theme.Background
-                : pathname === item.route
+                : isCurrentRoute(item.route)
                   ? theme.primary
                   : theme.placeholder
             }
@@ -101,7 +112,7 @@ export default function NavBar() {
                 color:
                   item.name === "Add"
                     ? theme.Background
-                    : pathname === item.route
+                    : isCurrentRoute(item.route)
                       ? theme.primary
                       : theme.placeholder,
               },
@@ -129,6 +140,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 8,
+  },
+  activeNavItem: {
+    borderRadius: 8,
   },
   addButton: {
     borderRadius: 50,

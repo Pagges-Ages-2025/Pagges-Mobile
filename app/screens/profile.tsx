@@ -2,6 +2,7 @@ import ProfileHeader from "@/app/components/Profile/ProfileHeader";
 import { User } from "@/app/models/User";
 import { useEffect, useState } from "react";
 import UserAPI from "@/app/services/profileService";
+import axiosInstance from "../services/axios-instance-singleton";
 import {
   ScrollView,
   View,
@@ -17,6 +18,8 @@ import Achievement from "../components/Achievements/Achievement";
 import { useRouter } from "expo-router";
 import { base64Uri } from "../utils/imageUtils";
 import NunitoText from "../components/Texts/NunitoText";
+import CustomButton from "../components/Buttons/CustomButton";
+import axios from "axios";
 
 const getToken = async () => {
   const userToken = await AsyncStorage.getItem("userToken");
@@ -25,6 +28,7 @@ const getToken = async () => {
 
 export default function ProfileScreen() {
   const [data, setData] = useState<User>();
+  const [userGenres, setUserGenres] = useState<string[]>();
   const { theme } = useTheme();
   const router = useRouter();
 
@@ -40,7 +44,7 @@ export default function ProfileScreen() {
         .then((response: { readBooks: number; readKms: number }) => {
           setStats(response);
         })
-        .catch((error: any) => {});
+        .catch((error: any) => { });
     };
     fetchStats();
   }, []);
@@ -52,10 +56,24 @@ export default function ProfileScreen() {
         .then((response: User) => {
           setData(response);
         })
-        .catch((error: any) => {});
+        .catch((error: any) => { });
     };
     fetchProfile();
   }, []);
+  
+  useEffect(() => {
+    const fetchUserGenres = async () => {
+      try {
+        const response = await axiosInstance.get('/user-genres/user');
+        setUserGenres(response.data.data);
+      } catch (error) {
+        console.error("Erro ao buscar os gêneros do usuário:", error);
+      }
+    };
+  
+    fetchUserGenres();
+  }, []);
+  
 
   const handleEditProfile = async () => {
     const token = await getToken();
@@ -93,6 +111,7 @@ export default function ProfileScreen() {
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: theme.Background }]}
+      showsVerticalScrollIndicator={false}
     >
       <View style={[styles.content, { backgroundColor: theme.Background }]}>
         <ProfileHeader
@@ -102,9 +121,11 @@ export default function ProfileScreen() {
           }
           name={data?.name || "Seu Perfil"}
           isAuthor={data?.isAuthor || false}
+          genres={userGenres ?? []}
           bEdit={true}
           onPressEdit={handleEditProfile}
         />
+
         <View style={styles.statsContainer}>
           <UserStats
             // kmLidos={data?.readKm || 0}
@@ -123,42 +144,38 @@ export default function ProfileScreen() {
 
         {/* Biblioteca pessoal buttons - Now placed above achievements */}
         <View style={styles.libraryButtonsContainer}>
-          <NunitoText style={styles.libraryTitle}>
+          <NunitoText style={[styles.libraryTitle, { color: theme.primaryText }]}>
             Biblioteca Pessoal
           </NunitoText>
+
           <View style={styles.libraryTabsContainer}>
-            <TouchableOpacity
-              style={[styles.libraryTab, { backgroundColor: theme.Background }]}
+
+            <CustomButton
+              title={"Quero Ler"}
               onPress={() => navigateToLibrary(0)}
-            >
-              <NunitoText
-                style={[styles.libraryTabText, { color: theme.primaryText }]}
-              >
-                Lidos
-              </NunitoText>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.libraryTab, { backgroundColor: theme.Background }]}
+              fullWidth={false}
+              size="small"
+              type="outlined"
+              height={30}
+            />
+            <CustomButton
+              title={"Lendo"}
               onPress={() => navigateToLibrary(1)}
-            >
-              <NunitoText
-                style={[styles.libraryTabText, { color: theme.primaryText }]}
-              >
-                Quero Ler
-              </NunitoText>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.libraryTab, { backgroundColor: theme.Background }]}
+              fullWidth={false}
+              size="small"
+              type="outlined"
+              height={30}
+            />
+            <CustomButton
+              title={"Lidos"}
               onPress={() => navigateToLibrary(2)}
-            >
-              <NunitoText
-                style={[styles.libraryTabText, { color: theme.primaryText }]}
-              >
-                Lendo
-              </NunitoText>
-            </TouchableOpacity>
+              fullWidth={false}
+              type="outlined"
+              size="small"
+              height={30}
+            />
+
+
           </View>
         </View>
 
@@ -169,8 +186,6 @@ export default function ProfileScreen() {
     </ScrollView>
   );
 }
-
-const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {
@@ -203,9 +218,8 @@ const styles = StyleSheet.create({
   },
   libraryTabsContainer: {
     flexDirection: "row",
-    backgroundColor: "#F4F4F4",
     borderRadius: 20,
-    padding: 3,
+    justifyContent: "space-around",
   },
   libraryTab: {
     flex: 1,
