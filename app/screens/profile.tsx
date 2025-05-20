@@ -19,7 +19,7 @@ import { useRouter } from "expo-router";
 import { base64Uri } from "../utils/imageUtils";
 import NunitoText from "../components/Texts/NunitoText";
 import CustomButton from "../components/Buttons/CustomButton";
-import axios from "axios";
+import { Genre } from "../models/Genre";
 
 const getToken = async () => {
   const userToken = await AsyncStorage.getItem("userToken");
@@ -28,7 +28,7 @@ const getToken = async () => {
 
 export default function ProfileScreen() {
   const [data, setData] = useState<User>();
-  const [userGenres, setUserGenres] = useState<string[]>();
+  const [userGenres, setUserGenres] = useState<Genre[]>();
   const { theme } = useTheme();
   const router = useRouter();
 
@@ -66,6 +66,7 @@ export default function ProfileScreen() {
       try {
         const response = await axiosInstance.get('/user-genres/user');
         setUserGenres(response.data.data);
+        console.log(response.data.data);
       } catch (error) {
         console.error("Erro ao buscar os gêneros do usuário:", error);
       }
