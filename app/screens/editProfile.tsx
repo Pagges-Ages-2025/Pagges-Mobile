@@ -87,10 +87,7 @@ export default function EditProfileScreen() {
         return;
       }
 
-      await UserAPI().updateProfile(
-        updateData.name,
-        updateData.biography
-      );
+      await UserAPI().updateProfile(updateData.name, updateData.biography);
 
       setChangesMade(false);
       router.push(`/screens/profile`);
@@ -123,6 +120,12 @@ export default function EditProfileScreen() {
             onPressCameraIcon={() =>
               console.log("Ícone de câmera pressionado!")
             }
+            onPressEditGenres={() =>
+              router.push({
+                pathname: "/screens/favoriteGenre",
+                params: { from: "edit" },
+              })
+            }
           />
 
           <View style={styles.formContainer}>
@@ -145,7 +148,6 @@ export default function EditProfileScreen() {
             <Text style={[styles.charCounter, { color: theme.primaryText }]}>
               {bioCharCount}/200
             </Text>
-
             <CustomButton
               title={loading ? Strings.saving : Strings.save}
               onPress={handleSaveChanges}
