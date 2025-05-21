@@ -15,6 +15,7 @@ import DefaultProfileHeaderImage from "../../assets/images/default_profile_heade
 import { Ionicons } from "@expo/vector-icons";
 import profileUser from "../../assets/images/profile-user.png";
 import { Genre } from "@/app/models/Genre";
+import CustomButton from "../Buttons/CustomButton";
 interface ProfileHeaderProps {
   marginStart: number;
   profileImageUrl?: string;
@@ -22,9 +23,10 @@ interface ProfileHeaderProps {
   isAuthor: boolean;
   bEdit?: boolean;
   bEditPicture?: boolean;
-  genres?: Genre[]
+  genres?: Genre[];
   onPressEdit?: () => void;
   onPressCameraIcon?: () => void;
+  onPressEditGenres: () => void;
 }
 
 const headerImageHeight = 123;
@@ -40,6 +42,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   genres,
   onPressEdit,
   onPressCameraIcon,
+  onPressEditGenres,
 }) => {
   const { theme } = useTheme();
   const colorsBackground = ["#9E0E53AA", "#F4D06F", "#388383C7"];
@@ -56,70 +59,106 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           source={DefaultProfileHeaderImage}
           style={styles.backgroundImage}
         >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            {bEditPicture ? (
+              <View
+                style={[
+                  styles.profileImage,
+                  { marginStart: marginStart, backgroundColor: "gray" },
+                ]}
+              />
+            ) : (
+              <Image
+                source={
+                  profileImageUrl ? { uri: profileImageUrl } : profileUser
+                }
+                style={[styles.profileImage, { marginStart: marginStart }]}
+              />
+            )}
 
-        <View style={{flexDirection: "row", alignItems: "center"}}> 
-          {bEditPicture ? (
-            <View
-              style={[
-                styles.profileImage,
-                { marginStart: marginStart, backgroundColor: "gray" },
-              ]}
-            />
-          ) : (
-            <Image
-              source={profileImageUrl ? { uri: profileImageUrl } : profileUser}
-              style={[styles.profileImage, { marginStart: marginStart }]}
-            />
-          )}
-
-          {bEdit && (
+            {bEdit && (
               <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
                 <Ionicons name="create-outline" size={32} />
               </TouchableOpacity>
-          )}
+            )}
 
-          {bEditPicture && (
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={onPressCameraIcon}
-              style={styles.cameraIcon}
-            >
-              <Ionicons name="camera" size={48} color={theme.white} />
-            </TouchableOpacity>
-          )}
+            {bEditPicture && (
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={onPressCameraIcon}
+                style={styles.cameraIcon}
+              >
+                <Ionicons name="camera" size={48} color={theme.white} />
+              </TouchableOpacity>
+            )}
 
-        {!bEditPicture && (
-          <View style={{ paddingLeft: 10, flexDirection: "row", flexWrap: "wrap", paddingRight: 6 }}>
-            {genres?.map((genre, index) => {
-              const firstWord = genre.genre_name.split(' ')[0];
-              const backgroundColor = colorsBackground[index % colorsBackground.length]
-              const colorsTitle = colorsLabel[index % colorsLabel.length]
-              return (
-                <View key={index} style={{ paddingLeft: 10 }}>
-                  <View
+            {
+              <View
+                style={{
+                  paddingLeft: 10,
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  paddingRight: 6,
+                }}
+              >
+                {bEditPicture ? (
+                  <View style={{ paddingLeft: 6, }}>
+                    <View
                     style={{
-                      backgroundColor,
-                      borderRadius: 30,
-                      height: 25,
-                      maxWidth: 100,
-                      justifyContent: "center",
-                      alignItems: "center",
-                      paddingHorizontal: 8,
-                      pointerEvents: "none",
-                      top: "240%",
-                    }}
-                  >
-                    <NunitoText style={{ color: colorsTitle, fontSize: 14, textAlign: "center" }}>
-                      {firstWord}
-                    </NunitoText>
+
+                            borderRadius: 30,
+                            height: 30,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            paddingHorizontal: 8,
+                            top: "240%",
+                          }}>
+                    <CustomButton
+                      
+                      title={Strings.editGenres}
+                      onPress={onPressEditGenres}
+                      size="small"
+                      type={"primary"}
+                    />
+                    </View>
                   </View>
-                </View>
-              );
-            })}
-          </View>
-        )}
-
-
+                ) : (
+                  genres?.map((genre, index) => {
+                    const firstWord = genre.genre_name.split(" ")[0];
+                    const backgroundColor =
+                      colorsBackground[index % colorsBackground.length];
+                    const colorsTitle = colorsLabel[index % colorsLabel.length];
+                    return (
+                      <View key={index} style={{ paddingLeft: 10 }}>
+                        <View
+                          style={{
+                            backgroundColor,
+                            borderRadius: 30,
+                            height: 25,
+                            maxWidth: 100,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            paddingHorizontal: 8,
+                            pointerEvents: "none",
+                            top: "240%",
+                          }}
+                        >
+                          <NunitoText
+                            style={{
+                              color: colorsTitle,
+                              fontSize: 14,
+                              textAlign: "center",
+                            }}
+                          >
+                            {firstWord}
+                          </NunitoText>
+                        </View>
+                      </View>
+                    );
+                  })
+                )}
+              </View>
+            }
           </View>
         </ImageBackground>
       </View>
