@@ -2,6 +2,7 @@ import ProfileHeader from "@/app/components/Profile/ProfileHeader";
 import { User } from "@/app/models/User";
 import { useEffect, useState } from "react";
 import UserAPI from "@/app/services/profileService";
+import axiosInstance from "../services/axios-instance-singleton";
 import {
   ScrollView,
   View,
@@ -18,6 +19,7 @@ import { useRouter } from "expo-router";
 import { base64Uri } from "../utils/imageUtils";
 import NunitoText from "../components/Texts/NunitoText";
 import CustomButton from "../components/Buttons/CustomButton";
+import { Genre } from "../models/Genre";
 
 const getToken = async () => {
   const userToken = await AsyncStorage.getItem("userToken");
@@ -26,6 +28,7 @@ const getToken = async () => {
 
 export default function ProfileScreen() {
   const [data, setData] = useState<User>();
+  const [userGenres, setUserGenres] = useState<Genre[]>();
   const { theme } = useTheme();
   const router = useRouter();
 
@@ -57,6 +60,21 @@ export default function ProfileScreen() {
     };
     fetchProfile();
   }, []);
+  
+  useEffect(() => {
+    const fetchUserGenres = async () => {
+      try {
+        const response = await axiosInstance.get('/user-genres/user');
+        setUserGenres(response.data.data);
+        console.log(response.data.data);
+      } catch (error) {
+        console.error("Erro ao buscar os gêneros do usuário:", error);
+      }
+    };
+  
+    fetchUserGenres();
+  }, []);
+  
 
   const handleEditProfile = async () => {
     const token = await getToken();
@@ -104,9 +122,11 @@ export default function ProfileScreen() {
           }
           name={data?.name || "Seu Perfil"}
           isAuthor={data?.isAuthor || false}
+          genres={userGenres ?? []}
           bEdit={true}
           onPressEdit={handleEditProfile}
         />
+
         <View style={styles.statsContainer}>
           <UserStats
             // kmLidos={data?.readKm || 0}

@@ -14,6 +14,7 @@ import Strings from "@/app/constants/Strings";
 import DefaultProfileHeaderImage from "../../assets/images/default_profile_header_image.png";
 import { Ionicons } from "@expo/vector-icons";
 import profileUser from "../../assets/images/profile-user.png";
+import { Genre } from "@/app/models/Genre";
 interface ProfileHeaderProps {
   marginStart: number;
   profileImageUrl?: string;
@@ -21,6 +22,7 @@ interface ProfileHeaderProps {
   isAuthor: boolean;
   bEdit?: boolean;
   bEditPicture?: boolean;
+  genres?: Genre[]
   onPressEdit?: () => void;
   onPressCameraIcon?: () => void;
 }
@@ -35,10 +37,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   isAuthor,
   bEdit = false,
   bEditPicture = false,
+  genres,
   onPressEdit,
   onPressCameraIcon,
 }) => {
   const { theme } = useTheme();
+  const colorsBackground = ["#9E0E53AA", "#F4D06F", "#388383C7"];
+  const colorsLabel = ["#FFFFFF", "#000000", "#FFFFFF"];
 
   const dynamicTextStyle: TextStyle = {
     color: theme.primaryText,
@@ -51,6 +56,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           source={DefaultProfileHeaderImage}
           style={styles.backgroundImage}
         >
+
+        <View style={{flexDirection: "row", alignItems: "center"}}> 
           {bEditPicture ? (
             <View
               style={[
@@ -66,9 +73,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           )}
 
           {bEdit && (
-            <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
-              <Ionicons name="create-outline" size={32} />
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
+                <Ionicons name="create-outline" size={32} />
+              </TouchableOpacity>
           )}
 
           {bEditPicture && (
@@ -80,6 +87,40 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <Ionicons name="camera" size={48} color={theme.white} />
             </TouchableOpacity>
           )}
+
+        {!bEditPicture && (
+          <View style={{ paddingLeft: 10, flexDirection: "row", flexWrap: "wrap", paddingRight: 6 }}>
+            {genres?.map((genre, index) => {
+              const firstWord = genre.genre_name.split(' ')[0];
+              const backgroundColor = colorsBackground[index % colorsBackground.length]
+              const colorsTitle = colorsLabel[index % colorsLabel.length]
+              return (
+                <View key={index} style={{ paddingLeft: 10 }}>
+                  <View
+                    style={{
+                      backgroundColor,
+                      borderRadius: 30,
+                      height: 25,
+                      maxWidth: 100,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingHorizontal: 8,
+                      pointerEvents: "none",
+                      top: "240%",
+                    }}
+                  >
+                    <NunitoText style={{ color: colorsTitle, fontSize: 14, textAlign: "center" }}>
+                      {firstWord}
+                    </NunitoText>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        )}
+
+
+          </View>
         </ImageBackground>
       </View>
       <View style={{ marginStart: marginStart }}>
@@ -123,7 +164,7 @@ const styles = StyleSheet.create({
   },
   editIcon: {
     position: "absolute",
-    top: "55%",
+    top: "42%",
     right: "5%",
   },
   genresContainer: {
@@ -136,7 +177,7 @@ const styles = StyleSheet.create({
   },
   cameraIcon: {
     position: "absolute",
-    top: "90%",
+    top: "62%",
     left: "11.5%",
   },
   username: {
