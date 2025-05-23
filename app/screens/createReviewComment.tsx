@@ -23,12 +23,10 @@ export default function CreateReviewCommentScreen() {
     console.log(selectedBook.id);
     try {
       const newPost = {
-        book_id: selectedBook.id,
+        book_id: 1,
         is_spoiler: isSpoilerChecked,
         text: reviewText,
         is_review: isReviewChecked,
-        title: "", // mesmo que vazio
-        parent_id: null, // ou um número válido, se estiver respondendo a outro post
       };
 
       await createPost(newPost);
