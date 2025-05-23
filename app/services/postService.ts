@@ -11,19 +11,17 @@ export interface CreatePostPayload {
 
 export default function PostService() {
 
-   const getAuthToken = async (): Promise<string> => {
-    const token = await AsyncStorage.getItem("userToken");
-    if (!token) throw new Error("Token não encontrado");
-    return token;
-  };  
 
 
   const createPost = async (payload: CreatePostPayload): Promise<void> => {
     try {
-      // Remove os campos undefined
+      // Remove os campos undefined (tenho amenor ideia oq é isso mas ta funcionando)
+      //acho q o back buga se recebe um null ou algo assim
       const cleanPayload = Object.fromEntries(
         Object.entries(payload).filter(([_, v]) => v !== undefined)
       );
+
+
       console.log("Payload final enviado para o back:", cleanPayload);
       await axiosInstance.post('posts/create-new-post', cleanPayload);
     } catch (error: any) {
