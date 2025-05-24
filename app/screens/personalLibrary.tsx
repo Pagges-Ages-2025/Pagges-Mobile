@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,13 @@ import {
   ScrollView,
   Modal,
   BackHandler,
+  Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import NunitoText from '../components/Texts/NunitoText';
 import CustomBook from '../components/Book/CustomBook';
 import { useTheme } from '../context/ThemeContext';
-import ModalBookDetails from './book';
+import ModalBookDetails from './bookDetails';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Book, BookCategory } from '../models/PersonalLibrary';
@@ -43,6 +44,7 @@ const Library: React.FC<LibraryProps> = ({
   const [selectedBook, setSelectedBook] = useState<any>(null);
   const [modalBookVisible, setModalBookVisible] = useState(false);
   const [isModalMode] = useState(isVisible !== undefined);
+  const slideAnim = useRef(new Animated.Value(actualPage)).current;
   
   // Handle back button press for standalone screen mode
   useEffect(() => {
@@ -82,7 +84,18 @@ const Library: React.FC<LibraryProps> = ({
 
   const changeBar = (index: number) => {
     setActualPage(index);
+    Animated.spring(slideAnim, {
+      toValue: index,
+      friction: 8,
+      tension: 50,
+      useNativeDriver: false,
+    }).start();
   };
+
+  // Inicializa a animação com o valor correto quando o componente é montado
+  useEffect(() => {
+    slideAnim.setValue(initialPageIndex);
+  }, []);
 
   const handlePress = (book: Book) => {
     setSelectedBook(book);
@@ -101,9 +114,9 @@ const Library: React.FC<LibraryProps> = ({
   }, [selectedBook]);
   
   useEffect(() => {
-    fetchBooksByArray('READ');
-    fetchBooksByArray('READING');
     fetchBooksByArray('TO_BE_READ');
+    fetchBooksByArray('READING');
+    fetchBooksByArray('READ');
   }, []);
 
   const content = (
@@ -128,7 +141,7 @@ const Library: React.FC<LibraryProps> = ({
 
       {/* abas */}
       <View style={styles.tabs}>
-        {['Lidos', 'Quero Ler', 'Lendo'].map((nome, index) => (
+        {['Quero Ler', 'Lendo', 'Lidos'].map((nome, index) => (
           <TouchableOpacity key={index} onPress={() => changeBar(index)} style={styles.button}>
             <Text style={[
               styles.textTabs,
@@ -143,18 +156,15 @@ const Library: React.FC<LibraryProps> = ({
 
       {/* barrinha animada */}
       <View style={styles.barContainer}>
-        <View
+        <Animated.View
           style={[
             styles.onTopBar,
             {
-              width: actualPage === 1
-                ? 0.9 * width / 3
-                : 0.9 * width / 3.5,
-              left: actualPage === 0
-                ? 0
-                : actualPage === 1
-                  ? (0.9 * width / 3)
-                  : (0.9 * width / 3) * 2 + ((0.9 * width / 3) - (0.9 * width / 3.5)),
+              width: width * 0.3,
+              left: slideAnim.interpolate({
+                inputRange: [0, 1, 2],
+                outputRange: [width * 0.0, width * 0.3, width * 0.6]
+              })
             }
           ]}
         />
@@ -170,7 +180,7 @@ const Library: React.FC<LibraryProps> = ({
           >
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
 
-              {readBooks.length > 0 ? readBooks.map((book) => (
+              {toReadBooks.length > 0 ? toReadBooks.map((book) => (
                 <View key={book.id} style={{ paddingHorizontal: 12, paddingVertical: 15 }}>
                   <CustomBook
                     size={book.size}
@@ -205,7 +215,7 @@ const Library: React.FC<LibraryProps> = ({
             nestedScrollEnabled
           >
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-              {toReadBooks.length > 0 ? toReadBooks.map((book) => (
+              {readingBooks.length > 0 ? readingBooks.map((book) => (
                 <View key={book.id} style={{ paddingHorizontal: 12, paddingVertical: 15 }}>
                   <CustomBook
                     size={book.size}
@@ -241,7 +251,7 @@ const Library: React.FC<LibraryProps> = ({
             nestedScrollEnabled
           >
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-              {readingBooks.length > 0 ? readingBooks.map((book) => (
+              {readBooks.length > 0 ? readBooks.map((book) => (
                 <View key={book.id} style={{ paddingHorizontal: 12, paddingVertical: 15 }}>
                   <CustomBook
                     size={book.size}
@@ -334,11 +344,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
     width: '90%',
+    marginBottom: 15,
   },
   button: {
     alignItems: 'center',
     paddingBottom: 10,
-    paddingHorizontal: 30,
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
   },
   circleButton: {
     alignItems: 'center',
@@ -364,16 +377,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#9D0F54',
     bottom: 0,
-    height: 2,
+    height: 3,
     justifyContent: 'center',
     position: 'absolute',
+    borderRadius: 1.5,
   },
   tabs: {
     flexDirection: 'row',
     paddingTop: 30,
+    width: '90%',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
   textTabs: {
     fontSize: 20,
+    textAlign: 'center',
   },
   scrollContent: {
     alignItems: "center",

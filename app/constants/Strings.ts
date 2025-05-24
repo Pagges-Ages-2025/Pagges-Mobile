@@ -27,5 +27,6 @@ export default {
   review:"Resenha",
   spoilerWarningPlain: "Contém spoiler",
   selectBook: "Selecionar um livro",
-  noBooks: "Nenhum livro encontrado"
+  noBooks: "Nenhum livro encontrado",
+  editGenres: "Editar gêneros favoritos"
 };

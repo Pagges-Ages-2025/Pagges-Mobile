@@ -32,6 +32,7 @@ const ReviewTextField: React.FC<ReviewTextFieldProps> = ({
         placeholderTextColor={primaryTextColorplaceholder}
         multiline
         textAlignVertical="top"
+        maxLength={2000}
         value={value}
         onChangeText={onChangeText}
       />
