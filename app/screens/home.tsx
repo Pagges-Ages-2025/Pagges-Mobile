@@ -3,6 +3,8 @@ import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import StaticSearchBar from "../components/SearchBar/StaticSearchBar";
 import { useTheme } from "../context/ThemeContext";
+import { ScrollView } from "react-native-gesture-handler";
+import HomeCarouselSection from "../components/Home-Carousel/HomeCarousel";
 import NunitoText from "../components/Texts/NunitoText";
 import CustomCarousel from "../components/Carousel/CustomCarousel";
 import CustomBook from "../components/Book/CustomBook";
@@ -21,14 +23,19 @@ export interface Book {
   avgRating?: number;
 }
 
+const mockCards = [
+  { id: "1", title: "Desafio Diário" },
+  { id: "2", title: "Desafio Diário" },
+  { id: "3", title: "Desafio Diário" },
+];
+
 const Home: React.FC = () => {
   const { theme } = useTheme();
   const { getTrendingBooks } = BooksService();
-  const [ trendingBooks, setTradingBooks ] = useState<Book[]>();
-  const [ selectedTrendingBook, setSelectedTrendingBook ] = useState<Book | null>(null);
-  const [ modalVisible, setModalVisible ] = useState(false);
+  const [trendingBooks, setTradingBooks] = useState<Book[]>();
+  const [selectedTrendingBook, setSelectedTrendingBook] = useState<Book | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-
 
   const handleCloseModal = () => {
     setModalVisible(false);
@@ -49,64 +56,75 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error("Erro ao buscar livros em alta:", error);
       setTradingBooks([]);
-    }   finally {
+    } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-  fetchTrendingBooks();
+    fetchTrendingBooks();
   }, [fetchTrendingBooks]);
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.Background }]}
-    >
-      <View style={styles.content}>
-        <StaticSearchBar />
-        <NunitoText
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.Background }]}>
+      <ScrollView>
+        <View style={styles.content}>
+          <StaticSearchBar />
+
+          <View style={styles.carouselContainer}>
+            <HomeCarouselSection route={"/screens/home"} cards={mockCards} />
+          </View>
+
+          <NunitoText
             style={[
               styles.secondTitle,
               { paddingBottom: 15, color: theme.primaryText },
             ]}
           >
-          Em alta
-        </NunitoText>
-        <CustomCarousel
-          isHorizontal
-          data={trendingBooks ? trendingBooks.map((book) => (
-              <CustomBook
-                size="small"
-                key={book.id}
-                bookId={book.id}
-                photoPath={book.coverUrl}
-                title={book.title}
-                author={book.authors.join(", ")}
-                onPress={() => handleSelectTrendingBook(book)}
-              />
-           )) : []}
-         />
-      </View>
-          {selectedTrendingBook && (
-              <ModalBookDetails
-                visible={modalVisible}
-                onClose={handleCloseModal}
-                rating={selectedTrendingBook.avgRating || 1}
-                title={selectedTrendingBook.title || "Título não disponível"}
-                pages={selectedTrendingBook.pages || 0}
-                synopsis={selectedTrendingBook.synopsis || "Sinopse não disponível"}
-                review="Sem avaliações disponíveis ainda."
-                authors={selectedTrendingBook.authors?.join(", ") || "Autor desconhecido"}
-                year={selectedTrendingBook.publicationYear?.substring(0, 4) || "Desconhecido"}
-                id={selectedTrendingBook.id?.toString() || "0"}
-                genre={selectedTrendingBook.genres?.[0] || "Gênero não especificado"}
-                google_image_url={selectedTrendingBook.coverUrl || ""}
-                onCreateReview={() =>
-                  console.log("Criar resenha para:", selectedTrendingBook.title)
-                }
-                onShare={() => console.log("Compartilhar:", selectedTrendingBook.title)}
-              />
-            )}
+            Em alta
+          </NunitoText>
+
+          <CustomCarousel
+            isHorizontal
+            data={
+              trendingBooks
+                ? trendingBooks.map((book) => (
+                    <CustomBook
+                      size="small"
+                      key={book.id}
+                      bookId={book.id}
+                      photoPath={book.coverUrl}
+                      title={book.title}
+                      author={book.authors.join(", ")}
+                      onPress={() => handleSelectTrendingBook(book)}
+                    />
+                  ))
+                : []
+            }
+          />
+        </View>
+
+        {selectedTrendingBook && (
+          <ModalBookDetails
+            visible={modalVisible}
+            onClose={handleCloseModal}
+            rating={selectedTrendingBook.avgRating || 1}
+            title={selectedTrendingBook.title || "Título não disponível"}
+            pages={selectedTrendingBook.pages || 0}
+            synopsis={selectedTrendingBook.synopsis || "Sinopse não disponível"}
+            review="Sem avaliações disponíveis ainda."
+            authors={selectedTrendingBook.authors?.join(", ") || "Autor desconhecido"}
+            year={selectedTrendingBook.publicationYear?.substring(0, 4) || "Desconhecido"}
+            id={selectedTrendingBook.id?.toString() || "0"}
+            genre={selectedTrendingBook.genres?.[0] || "Gênero não especificado"}
+            google_image_url={selectedTrendingBook.coverUrl || ""}
+            onCreateReview={() =>
+              console.log("Criar resenha para:", selectedTrendingBook.title)
+            }
+            onShare={() => console.log("Compartilhar:", selectedTrendingBook.title)}
+          />
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -121,7 +139,10 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     width: "90%",
   },
-   secondTitle: {
+  carouselContainer: {
+    paddingTop: 20,
+  },
+  secondTitle: {
     fontSize: 20,
     fontWeight: "bold",
     paddingTop: 30,

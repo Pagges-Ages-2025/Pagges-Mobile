@@ -24,7 +24,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CustomBook from "../components/Book/CustomBook";
 import { SinopseExpandable } from "../components/Book/sinopseExpandable";
 import CustomButton from "../components/Buttons/CustomButton";
-import CustomCarousel from "../components/Carousel/CustomCarousel";
+import CustomCarousel from "../components/Carousel/CustomHomeCarousel";
 import RatingModal from "../components/RatingModal/RatingModal";
 import { ReviewComment } from "../components/review-comments/review-comments";
 import StaticStars from "../components/StaticStars/StaticStars";
