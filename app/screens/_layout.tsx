@@ -85,6 +85,13 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
               
               gestureDirection: "vertical",
             }} />
+            <Stack.Screen name="genreLibrary"
+            options={{
+              animation: "slide_from_bottom",
+              animationDuration: 300,
+              
+              gestureDirection: "vertical",
+            }} />
             <Stack.Screen name="profile" />
             <Stack.Screen name="createreReviewComment" />
           </Stack>

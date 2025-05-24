@@ -10,16 +10,18 @@ import { router } from "expo-router";
 const Home: React.FC = () => {
   const { theme } = useTheme();
   const gener = [
-    "Família",
-    "Ficção Científica",
-    "Romance",
     "Terror",
+    "Romance",
+    "Família",
     "Noir",
-    "Histórico"
+    "Ficção Científica",
+    "Histórico",
   ];
-
   const genres = gener.map((item) => (
-    <CustomButton fontWeight={"semibold"} size={"small"} title={item} onPress={() => router.replace("/screens/favoriteGenre")}></CustomButton>
+    <CustomButton fontWeight={"semibold"} size={"small"} title={item} onPress={() => router.push({
+      pathname: "/screens/genreLibrary",
+      params: { selectedGenre: item },
+    })}></CustomButton>
   ));
 
   return (
