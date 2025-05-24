@@ -9,7 +9,7 @@ import {
 import { useTheme } from "../context/ThemeContext";
 import CustomButton from "@/app/components/Buttons/CustomButton";
 import ProfileHeader from "@/app/components/Profile/ProfileHeader";
-import { PaggesTextInput } from "../components/Texts/TextInput";
+import { PaggesTextInput } from "../components/Inputs/TextInput";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import UserAPI from "@/app/services/profileService";
@@ -111,7 +111,7 @@ export default function EditProfileScreen() {
         return;
       }
 
-      await UserAPI().updateProfile(updateData.name, updateData.biography, undefined, image);
+      await UserAPI().updateProfile(updateData.name, updateData.biography);
 
       setChangesMade(false);
       router.push(`/screens/profile`);
@@ -144,6 +144,12 @@ export default function EditProfileScreen() {
             bEditPicture={image ? false : true}
             isEditMode={true}
             onPressCameraIcon={() => pickImage()}
+            onPressEditGenres={() =>
+              router.push({
+                pathname: "/screens/favoriteGenre",
+                params: { from: "edit" },
+              })
+            }
           />
 
           <View style={styles.formContainer}>
@@ -166,7 +172,6 @@ export default function EditProfileScreen() {
             <Text style={[styles.charCounter, { color: theme.primaryText }]}>
               {bioCharCount}/200
             </Text>
-
             <CustomButton
               title={loading ? Strings.saving : Strings.save}
               onPress={handleSaveChanges}

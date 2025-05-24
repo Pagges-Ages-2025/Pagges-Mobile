@@ -14,6 +14,8 @@ export default function ScreensLayout() {
   const router = useRouter();
   const pathname = usePathname();
 
+
+  // NÃO MEXER AQUI (ASS: OTAVIO - AGES III)
   const handleLongPress = ({ nativeEvent }: any) => {
     if (nativeEvent.state === 4) {
       if (pathname !== "screens/tests/teste") {
@@ -22,7 +24,6 @@ export default function ScreensLayout() {
         router.back();
       }
     }
-    // router.push("screens/profile" as any);
   };
 
   return (
@@ -65,6 +66,7 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
             screenOptions={{
               headerShown: false,
               gestureEnabled: true,
+                       animation: "none"
             }}
           >{/*as rotas sao aqui */}
             <Stack.Screen name="splash" />
@@ -76,7 +78,13 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
             <Stack.Screen name="searchPage" />
             <Stack.Screen name="tests/teste" />
             <Stack.Screen name="book"/>
-            <Stack.Screen name="personalLibrary" />
+            <Stack.Screen name="personalLibrary"
+            options={{
+              animation: "slide_from_bottom",
+              animationDuration: 300,
+              
+              gestureDirection: "vertical",
+            }} />
             <Stack.Screen name="profile" />
             <Stack.Screen name="createreReviewComment" />
           </Stack>
