@@ -6,10 +6,8 @@ import { useTheme } from "../context/ThemeContext";
 import NunitoText from "../components/Texts/NunitoText";
 import CustomCarousel from "../components/Carousel/CustomCarousel";
 import CustomBook from "../components/Book/CustomBook";
-
-import { router } from "expo-router";
 import ModalBookDetails from "./book";
-import SearchAPI from "../services/googleAPIService";
+import BooksService from "../services/booksService";
 
 export interface Book {
   id: number;
@@ -21,44 +19,10 @@ export interface Book {
   generos: string[];
   sinopse?: string;
 }
-const initialBooks: Book[] = [
-  {
-    id: 1,
-    titulo: "O Hobbit",
-    autores: ["J.R.R. Tolkien"],
-    capa: "", 
-    paginas: 310,
-    anoDePublicacao: "1937",
-    generos: ["Fantasia", "Aventura"],
-    sinopse: "A aventura de Bilbo Bolseiro pela Terra Média.",
-  },
-  {
-    id: 2,
-    titulo: "1984",
-    autores: ["George Orwell"],
-    capa: "",
-    paginas: 328,
-    anoDePublicacao: "1949",
-    generos: ["Ficção Científica", "Distopia"],
-    sinopse: "Um clássico distópico sobre vigilância e controle.",
-  },
-  {
-    id: 3,
-    titulo: "Dom Casmurro",
-    autores: ["Machado de Assis"],
-    capa: "",
-    paginas: 256,
-    anoDePublicacao: "1899",
-    generos: ["Romance", "Literatura Brasileira"],
-    sinopse: "Um retrato psicológico sobre ciúmes e memórias.",
-  },
-];
-
-
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
-  const { getTrendingBooks } = SearchAPI();
+  const { getTrendingBooks } = BooksService();
   const [ trendingBooks, setTrendingBookds ] = useState<Book[]>();
   const [ selectedTrendingBook, setSelectedTrendingBook ] = useState<Book | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -100,26 +64,27 @@ const Home: React.FC = () => {
       <View style={styles.content}>
         <StaticSearchBar />
         <NunitoText
-                  style={[
-                    styles.secondTitle,
-                    { paddingBottom: 15, color: theme.primaryText },
-                  ]}
-                >
-                Livros em alta
-                </NunitoText>
-                <CustomCarousel
-                  isHorizontal
-                  data={trendingBooks ? trendingBooks.map((book) => (
-                     <CustomBook
-                        key={book.id}
-                        bookId={book.id}
-                        photoPath={book.capa}
-                        title={book.titulo}
-                        author={book.autores.join(", ")}
-                        onPress={() => handleSelectTrendingBook(book)}
-                      />
-                  )) : []}
-                />
+            style={[
+              styles.secondTitle,
+              { paddingBottom: 15, color: theme.primaryText },
+            ]}
+          >
+          Em alta
+        </NunitoText>
+        <CustomCarousel
+          isHorizontal
+          data={trendingBooks ? trendingBooks.map((book) => (
+              <CustomBook
+                size="small"
+                key={book.id}
+                bookId={book.id}
+                photoPath={book.capa}
+                title={book.titulo}
+                author={book.autores.join(", ")}
+                onPress={() => handleSelectTrendingBook(book)}
+              />
+           )) : []}
+         />
       </View>
           {selectedTrendingBook && (
               <ModalBookDetails
