@@ -1,6 +1,7 @@
 import { User } from "../models/User";
 import axiosInstance from "./axios-instance-singleton";
-// Se não funcionar mudar de localhost para o ip da máquina
+import * as ImagePicker from "expo-image-picker";
+
 const profileControllerUrl = "profile";
 
 export default function UserAPI() {
@@ -24,8 +25,7 @@ export default function UserAPI() {
     }
   };
 
-  const getUserStatistics = async (
-  ): Promise<{
+  const getUserStatistics = async (): Promise<{
     readBooks: number;
     readKms: number;
   }> => {
@@ -44,7 +44,7 @@ export default function UserAPI() {
     try {
       const response = await axiosInstance.put(
         `${profileControllerUrl}/biography`,
-        { biography: bio },
+        { biography: bio }
       );
       return response.data.data;
     } catch (error) {
@@ -76,11 +76,40 @@ export default function UserAPI() {
     }
   };
 
+  const updateProfileImage = async (
+    image: ImagePicker.ImagePickerAsset
+  ): Promise<User> => {
+    try {
+      const formData = new FormData();
+      formData.append("file", {
+        uri: image.uri,
+        name: image.fileName || "upload.jpg",
+        type: image.mimeType,
+      } as any);
+      console.log(formData);
+
+      const response = await axiosInstance.put(
+        `${profileControllerUrl}/profile-image`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      console.error("Erro ao atualizar perfil:", error);
+      throw error;
+    }
+  };
+
   return {
     getProfile,
     getProfileImage,
     getUserStatistics,
     updateBio,
     updateProfile,
+    updateProfileImage,
   };
 }
