@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import UserAPI from "@/app/services/profileService";
 import ErrorModal from "@/app/components/Modals/ErrorModal";
 import Strings from "../constants/Strings";
+import * as ImagePicker from "expo-image-picker";
 
 export default function EditProfileScreen() {
   const { theme } = useTheme();
@@ -35,6 +36,29 @@ export default function EditProfileScreen() {
   const [modalTitle, setModalTitle] = useState("");
   const [modalDescription, setModalDescription] = useState("");
   const [modalType, setModalType] = useState<"error" | "warning">("error");
+
+  const [image, setImage] = useState<ImagePicker.ImagePickerAsset | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    console.log("image changed" + image);
+  }, [image]);
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0]);
+      setChangesMade(true);
+    }
+  };
 
   const showErrorModal = (
     title: string,
@@ -78,7 +102,8 @@ export default function EditProfileScreen() {
       if (name && name !== profileName) updateData.name = name;
       if (bio && bio !== profileBiography) updateData.biography = bio;
 
-      if (!updateData.name && !updateData.biography) {
+      if (!updateData.name && !updateData.biography && !image) {
+        console.log("no changes detected");
         showErrorModal(
           Strings.warningTitle,
           Strings.noChangesDetected,
@@ -87,7 +112,12 @@ export default function EditProfileScreen() {
         return;
       }
 
-      await UserAPI().updateProfile(updateData.name, updateData.biography);
+      if (updateData.name || updateData.biography) {
+        await UserAPI().updateProfile(updateData.name, updateData.biography);
+      }
+      if (image) {
+        await UserAPI().updateProfileImage(image);
+      }
 
       setChangesMade(false);
       router.push(`/screens/profile`);
@@ -114,12 +144,12 @@ export default function EditProfileScreen() {
         <View>
           <ProfileHeader
             marginStart={30}
+            profileImageUrl={image?.uri}
             name={profileName?.toString() || ""}
             isAuthor={false}
-            bEditPicture={true}
-            onPressCameraIcon={() =>
-              console.log("Ícone de câmera pressionado!")
-            }
+            bEditPicture={image ? false : true}
+            isEditMode={true}
+            onPressCameraIcon={() => pickImage()}
             onPressEditGenres={() =>
               router.push({
                 pathname: "/screens/favoriteGenre",

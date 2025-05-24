@@ -24,6 +24,7 @@ interface ProfileHeaderProps {
   bEdit?: boolean;
   bEditPicture?: boolean;
   genres?: Genre[];
+  isEditMode: boolean;
   onPressEdit?: () => void;
   onPressCameraIcon?: () => void;
   onPressEditGenres: () => void;
@@ -40,6 +41,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   bEdit = false,
   bEditPicture = false,
   genres,
+  isEditMode = false,
   onPressEdit,
   onPressCameraIcon,
   onPressEditGenres,
@@ -60,35 +62,46 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           style={styles.backgroundImage}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            {bEditPicture ? (
+            {isEditMode && bEditPicture ? (
               <View
                 style={[
                   styles.profileImage,
-                  { marginStart: marginStart, backgroundColor: "gray" },
+                  {
+                    marginStart: marginStart,
+                    backgroundColor: "gray",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 50,
+                  },
                 ]}
-              />
+              >
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={onPressCameraIcon}
+                  style={styles.cameraIcon}
+                >
+                  <Ionicons name="camera" size={48} color={theme.white} />
+                </TouchableOpacity>
+              </View>
             ) : (
-              <Image
-                source={
-                  profileImageUrl ? { uri: profileImageUrl } : profileUser
-                }
+              <TouchableOpacity
+                activeOpacity={0.7}
+                disabled={!isEditMode}
+                onPress={onPressCameraIcon}
                 style={[styles.profileImage, { marginStart: marginStart }]}
-              />
+              >
+                <Image
+                  source={
+                    profileImageUrl ? { uri: profileImageUrl } : profileUser
+                  }
+                  style={{ flex: 1, borderRadius: 50 }}
+                />
+              </TouchableOpacity>
             )}
 
             {bEdit && (
               <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
                 <Ionicons name="create-outline" size={32} />
-              </TouchableOpacity>
-            )}
-
-            {bEditPicture && (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={onPressCameraIcon}
-                style={styles.cameraIcon}
-              >
-                <Ionicons name="camera" size={48} color={theme.white} />
               </TouchableOpacity>
             )}
 
@@ -102,24 +115,23 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 }}
               >
                 {bEditPicture ? (
-                  <View style={{ paddingLeft: 6, }}>
+                  <View style={{ paddingLeft: 6 }}>
                     <View
-                    style={{
-
-                            borderRadius: 30,
-                            height: 30,
-                            justifyContent: "center",
-                            alignItems: "center",
-                            paddingHorizontal: 8,
-                            top: "240%",
-                          }}>
-                    <CustomButton
-                      
-                      title={Strings.editGenres}
-                      onPress={onPressEditGenres}
-                      size="small"
-                      type={"primary"}
-                    />
+                      style={{
+                        borderRadius: 30,
+                        height: 30,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        paddingHorizontal: 8,
+                        top: "240%",
+                      }}
+                    >
+                      <CustomButton
+                        title={Strings.editGenres}
+                        onPress={onPressEditGenres}
+                        size="small"
+                        type={"primary"}
+                      />
                     </View>
                   </View>
                 ) : (
@@ -193,7 +205,6 @@ const styles = StyleSheet.create({
   profileImage: {
     width: profileImageSize,
     height: profileImageSize,
-    borderRadius: 50,
     marginTop: headerImageHeight * 0.75,
   },
   profileImageContainer: {
@@ -215,9 +226,8 @@ const styles = StyleSheet.create({
     fontWeight: 700,
   },
   cameraIcon: {
-    position: "absolute",
-    top: "62%",
-    left: "11.5%",
+    height: 48,
+    width: 48,
   },
   username: {
     fontSize: 18,
