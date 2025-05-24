@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Platform,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
 } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import CustomBook from "../Book/CustomBook";
@@ -57,14 +57,11 @@ export default function BookSearch({
   placeholder = "Buscar Livro...",
   onSearch,
   isBottomSheet = false,
-  
-
 }: BookSearchProps) {
   const [query, setQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { theme } = useTheme();
   const inputRef = useRef<TextInput>(null);
-
 
   const dynamicStyles = {
     height: SearchSize === "lg" ? 50 : SearchSize === "md" ? 40 : 35,
@@ -76,8 +73,8 @@ export default function BookSearch({
       iconColor === "primary"
         ? theme.primary
         : iconColor === "secondary"
-        ? theme.secondary
-        : "#666",
+          ? theme.secondary
+          : "#666",
     iconPositionStyle: iconPosition === "left" ? { left: 18 } : { right: 18 },
     inputPaddingStyle:
       iconPosition === "left"
@@ -111,10 +108,10 @@ export default function BookSearch({
   };
 
   useEffect(() => {
-    if (isBottomSheet){
+    if (isBottomSheet) {
       const timeout = setTimeout(() => {
         inputRef.current?.focus();
-      }, 300); 
+      }, 300);
       return () => clearTimeout(timeout);
     }
   }, []);
@@ -137,7 +134,14 @@ export default function BookSearch({
             >
               <TextInput
                 ref={inputRef}
-                style={[styles.input, dynamicStyles.inputPaddingStyle, {backgroundColor: theme.Background, color: theme.primaryText}]}
+                style={[
+                  styles.input,
+                  dynamicStyles.inputPaddingStyle,
+                  {
+                    backgroundColor: theme.Background,
+                    color: theme.primaryText,
+                  },
+                ]}
                 value={query}
                 onChangeText={handleSearch}
                 placeholder={placeholder}
@@ -145,35 +149,44 @@ export default function BookSearch({
                 onFocus={() => setShowSuggestions(true)}
               />
               <View
-                style={[styles.searchIconContainer, dynamicStyles.iconPositionStyle]}
+                style={[
+                  styles.searchIconContainer,
+                  dynamicStyles.iconPositionStyle,
+                ]}
               >
-                <Ionicons name="search" size={20} color={dynamicStyles.iconColor} />
+                <Ionicons
+                  name="search"
+                  size={20}
+                  color={dynamicStyles.iconColor}
+                />
               </View>
             </View>
-            {showSuggestions && query.length > 0 && (
-              !isBottomSheet && (
-                <View style={styles.suggestionsContainer}>
-                  <FlatList
-                      data={books}
-                    nestedScrollEnabled={true}
-                    keyboardShouldPersistTaps="handled"
-                    renderItem={({ item }) => (
-                      <CustomBook
-                        size="search"
-                        title={item.titulo}
-                        photoPath={item.capa}
-                        bookId={item.id}
-                        onPress={() => handleSelectBook(item)}
-                      />
-                    )}
-                    ListEmptyComponent={() => (
-                      <View style={styles.emptyContainer}>
-                        <Text style={[styles.emptyText, {color: theme.primaryText}]}>{Strings.noBooks}</Text>
-                      </View>
-                    )}
-                  />  
+            {showSuggestions && query.length > 0 && !isBottomSheet && (
+              <View style={styles.suggestionsContainer}>
+                <FlatList
+                  data={books}
+                  nestedScrollEnabled={true}
+                  keyboardShouldPersistTaps="handled"
+                  renderItem={({ item }) => (
+                    <CustomBook
+                      size="search"
+                      title={item.titulo}
+                      photoPath={item.capa}
+                      bookId={item.id}
+                      onPress={() => handleSelectBook(item)}
+                    />
+                  )}
+                  ListEmptyComponent={() => (
+                    <View style={styles.emptyContainer}>
+                      <Text
+                        style={[styles.emptyText, { color: theme.primaryText }]}
+                      >
+                        {Strings.noBooks}
+                      </Text>
+                    </View>
+                  )}
+                />
               </View>
-              )
             )}
           </View>
         </TouchableWithoutFeedback>
@@ -191,7 +204,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingBottom: 75,
     width: "100%",
-  }, 
+  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",

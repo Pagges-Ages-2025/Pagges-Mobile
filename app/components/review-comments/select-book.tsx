@@ -19,154 +19,170 @@ import CustomBook from "../Book/CustomBook";
 import BookSearch, { Book } from "../SearchBar/SearchBar";
 import NunitoText from "../Texts/NunitoText";
 
-const SelectBook = forwardRef((props, ref) => {
-  const { theme, themeName } = useTheme();
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const [buttonVisible, setButtonVisible] = useState(true);
-  const { height: SCREEN_HEIGHT } = Dimensions.get("window");
-  const snapPoints = useMemo(() => [SCREEN_HEIGHT * 0.6], []);
-  const [loading, setLoading] = useState(false);
-  const { searchBooks } = SearchAPI();
-  const [books, setBooks] = useState<Book[]>([]);
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+const SelectBook = forwardRef(
+  ({ onSelectBook }: { onSelectBook: (book: Book) => void }, ref) => {
+    const { theme, themeName } = useTheme();
+    const bottomSheetRef = useRef<BottomSheet>(null);
+    const [buttonVisible, setButtonVisible] = useState(true);
+    const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+    const snapPoints = useMemo(() => [SCREEN_HEIGHT * 0.6], []);
+    const [loading, setLoading] = useState(false);
+    const { searchBooks } = SearchAPI();
+    const [books, setBooks] = useState<Book[]>([]);
+    const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+    const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
-  const handleOpen = () => {
-    setIsBottomSheetOpen(true);
-    bottomSheetRef.current?.expand();
-    setButtonVisible(false);
-  };
+    const handleOpen = () => {
+      setIsBottomSheetOpen(true);
+      bottomSheetRef.current?.expand();
+      setButtonVisible(false);
+    };
 
-  const handleCloseBottomSheet = () => {
-    setButtonVisible(true);
-  };
+    const handleCloseBottomSheet = () => {
+      setButtonVisible(true);
+    };
 
-  const handleSelectBook = (book: Book) => {
-    console.log("Livro selecionado:", book);
+    const handleSelectBook = (book: Book) => {
+      //console.log("Livro selecionado:", book);
+      let updatedCapa = book.capa;
+      if (updatedCapa && updatedCapa.includes("zoom=1")) {
+        updatedCapa = updatedCapa.replace("zoom=1", "zoom=6");
+      }
 
-    setSelectedBook({ ...book, capa: book.capa });
-    setButtonVisible(true);
-    bottomSheetRef.current?.close();
-  };
+      const updatedBook = { ...book, capa: updatedCapa };
 
-  const handleSearch = async (term: string) => {
-    setLoading(true);
-    try {
-      const results = await searchBooks(term);
-      setBooks(results);
-      console.log(results);
-    } catch (error) {
-      console.error("Erro ao buscar livros:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      setSelectedBook(updatedBook);
+      setButtonVisible(true);
+      bottomSheetRef.current?.close();
+      onSelectBook && onSelectBook(updatedBook);
+    };
 
-  return (
-    <>
-      <GestureHandlerRootView
-        style={[styles.container, { backgroundColor: theme.Background }]}
-      >
-        <BottomSheet
-          style={{ backgroundColor: theme.Background }}
-          ref={bottomSheetRef}
-          snapPoints={snapPoints}
-          enablePanDownToClose={true}
-          index={-1}
-          backgroundStyle={styles.bottomSheet}
-          onClose={handleCloseBottomSheet}
-          keyboardBehavior="interactive"
-          keyboardBlurBehavior="restore"
-          backdropComponent={(props) => (
-            <BottomSheetBackdrop
-              {...props}
-              disappearsOnIndex={-1}
-              appearsOnIndex={0}
-              opacity={0.2}
-            />
-          )}
+    const handleSearch = async (term: string) => {
+      setLoading(true);
+      try {
+        const results = await searchBooks(term);
+        setBooks(results);
+        // console.log(results);
+      } catch (error) {
+        console.error("Erro ao buscar livros:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    return (
+      <>
+        <GestureHandlerRootView
+          style={[styles.container, { backgroundColor: theme.Background }]}
         >
-          <BottomSheetScrollView style={{ backgroundColor: theme.Background }}>
-            <View
-              style={[styles.search, { backgroundColor: theme.Background }]}
-            >
-              {isBottomSheetOpen && (
-                <View>
-                  <BookSearch
-                    SearchSize="md"
-                    iconPosition="left"
-                    iconColor="grey"
-                    borderRadius="md"
-                    books={books}
-                    onSelectBook={handleSelectBook}
-                    onSearch={handleSearch}
-                    isBottomSheet={true}
-                  />
-
-                  {loading ? (
-                    <ActivityIndicator
-                      size="small"
-                      color="#000"
-                      style={{ marginLeft: 10, marginTop: 20 }}
-                    />
-                  ) : books.length === 0 ? (
-                    <NunitoText style={{ textAlign: "center", marginTop: 20 }}>
-                      {Strings.noBooks}
-                    </NunitoText>
-                  ) : (
-                    books.map((item, index) => (
-                      <CustomBook
-                        key={item.id ?? index}
-                        size="search"
-                        title={item.titulo}
-                        photoPath={item.capa}
-                        bookId={item.id}
-                        onPress={() => handleSelectBook(item)}
-                      />
-                    ))
-                  )}
-                </View>
-              )}
-            </View>
-          </BottomSheetScrollView>
-        </BottomSheet>
-      </GestureHandlerRootView>
-
-      {buttonVisible && (
-        <View
-          style={[styles.selectText, { backgroundColor: theme.Background }]}
-        >
-          {selectedBook ? (
-            <CustomBook
-              size="search"
-              title={selectedBook.titulo}
-              photoPath={selectedBook.capa}
-              bookId={selectedBook.id}
-              onPress={handleOpen}
-            />
-          ) : (
-            <TouchableOpacity onPress={handleOpen} style={styles.selectButton}>
-              <NunitoText
-                style={{
-                  color: theme.quinaryText,
-                  fontSize: 17,
-                }}
-              >
-                {Strings.selectBook}
-              </NunitoText>
-              <Ionicons
-                name="chevron-up-outline"
-                size={20}
-                color={theme.quinaryText}
-                style={{ marginLeft: 15 }}
+          <BottomSheet
+            style={{ backgroundColor: theme.Background }}
+            ref={bottomSheetRef}
+            snapPoints={snapPoints}
+            enablePanDownToClose={true}
+            index={-1}
+            backgroundStyle={styles.bottomSheet}
+            onClose={handleCloseBottomSheet}
+            keyboardBehavior="interactive"
+            keyboardBlurBehavior="restore"
+            backdropComponent={(props) => (
+              <BottomSheetBackdrop
+                {...props}
+                disappearsOnIndex={-1}
+                appearsOnIndex={0}
+                opacity={0.2}
               />
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
-    </>
-  );
-});
+            )}
+          >
+            <BottomSheetScrollView
+              style={{ backgroundColor: theme.Background }}
+            >
+              <View
+                style={[styles.search, { backgroundColor: theme.Background }]}
+              >
+                {isBottomSheetOpen && (
+                  <View>
+                    <BookSearch
+                      SearchSize="md"
+                      iconPosition="left"
+                      iconColor="grey"
+                      borderRadius="md"
+                      books={books}
+                      onSelectBook={handleSelectBook}
+                      onSearch={handleSearch}
+                      isBottomSheet={true}
+                    />
+
+                    {loading ? (
+                      <ActivityIndicator
+                        size="small"
+                        color="#000"
+                        style={{ marginLeft: 10, marginTop: 20 }}
+                      />
+                    ) : books.length === 0 ? (
+                      <NunitoText
+                        style={{ textAlign: "center", marginTop: 20 }}
+                      >
+                        {Strings.noBooks}
+                      </NunitoText>
+                    ) : (
+                      books.map((item, index) => (
+                        <CustomBook
+                          key={item.id ?? index}
+                          size="search"
+                          title={item.titulo}
+                          photoPath={item.capa}
+                          bookId={item.id}
+                          onPress={() => handleSelectBook(item)}
+                        />
+                      ))
+                    )}
+                  </View>
+                )}
+              </View>
+            </BottomSheetScrollView>
+          </BottomSheet>
+        </GestureHandlerRootView>
+
+        {buttonVisible && (
+          <View
+            style={[styles.selectText, { backgroundColor: theme.Background }]}
+          >
+            {selectedBook ? (
+              <CustomBook
+                size="search"
+                title={selectedBook.titulo}
+                photoPath={selectedBook.capa}
+                bookId={selectedBook.id}
+                onPress={handleOpen}
+              />
+            ) : (
+              <TouchableOpacity
+                onPress={handleOpen}
+                style={styles.selectButton}
+              >
+                <NunitoText
+                  style={{
+                    color: theme.quinaryText,
+                    fontSize: 17,
+                  }}
+                >
+                  {Strings.selectBook}
+                </NunitoText>
+                <Ionicons
+                  name="chevron-up-outline"
+                  size={20}
+                  color={theme.quinaryText}
+                  style={{ marginLeft: 15 }}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+      </>
+    );
+  }
+);
 
 export default SelectBook;
 
