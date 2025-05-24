@@ -1,6 +1,6 @@
 import debounce from "lodash.debounce";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BookSearch, { Book } from "../components/SearchBar/SearchBar";
 import { useTheme } from "../context/ThemeContext";
@@ -8,6 +8,7 @@ import SearchAPI from "../services/googleAPIService";
 import ModalBookDetails from "./bookDetails";
 
 import { SearchHistoryList } from "../components/SearchBar/SearchHistoryList";
+import { registerBookInDatabase } from "../services/handle-select-book.service";
 
 const SearchPage: React.FC = () => {
   const { theme } = useTheme();
@@ -18,7 +19,6 @@ const SearchPage: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [searchHistory, setSearchHistory] = useState<Book[]>([]);
-
 
   const handleSearch = useCallback(
     async (term: string) => {
@@ -59,16 +59,17 @@ const SearchPage: React.FC = () => {
 
   const handleSelectBook = (book: Book) => {
     setSelectedBook(book);
-   // Coloca o livro pesquisado no histórico 
+    // Coloca o livro pesquisado no histórico
     if (book) {
-    setSearchHistory(prev => [book, ...prev].slice(0, 15));
-  }
+      registerBookInDatabase(book);
+      setSearchHistory((prev) => [book, ...prev].slice(0, 15));
+    }
     setModalVisible(true);
   };
 
   // Exclui um livro do histórico
   const handleDeleteHistoryItem = (index: number) => {
-    setSearchHistory(prev => prev.filter((_, i) => i !== index));
+    setSearchHistory((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -93,7 +94,13 @@ const SearchPage: React.FC = () => {
           />
         ) : (
           <View style={{ marginTop: 16 }}>
-            <Text style={{ color: theme.primaryText, fontSize: 16, textAlign: 'center' }}>
+            <Text
+              style={{
+                color: theme.primaryText,
+                fontSize: 16,
+                textAlign: "center",
+              }}
+            >
               Nenhuma pesquisa recente
             </Text>
           </View>

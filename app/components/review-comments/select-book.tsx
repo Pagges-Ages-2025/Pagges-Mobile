@@ -1,23 +1,29 @@
-import { View, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { useRef, useMemo, forwardRef, useState } from 'react';
-import Strings from '@/app/constants/Strings';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import NunitoText from '../Texts/NunitoText';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/app/context/ThemeContext';
-import BookSearch, { Book } from '../SearchBar/SearchBar';
-import SearchAPI from '@/app/services/googleAPIService';
-import ModalBookDetails from '@/app/screens/bookDetails';
-import React from 'react';
-import CustomBook from '../Book/CustomBook';
+import Strings from "@/app/constants/Strings";
+import { useTheme } from "@/app/context/ThemeContext";
+import SearchAPI from "@/app/services/googleAPIService";
+import { Ionicons } from "@expo/vector-icons";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
+import React, { forwardRef, useMemo, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import CustomBook from "../Book/CustomBook";
+import BookSearch, { Book } from "../SearchBar/SearchBar";
+import NunitoText from "../Texts/NunitoText";
 
 const SelectBook = forwardRef((props, ref) => {
-
   const { theme, themeName } = useTheme();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [buttonVisible, setButtonVisible] = useState(true);
-  const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+  const { height: SCREEN_HEIGHT } = Dimensions.get("window");
   const snapPoints = useMemo(() => [SCREEN_HEIGHT * 0.6], []);
   const [loading, setLoading] = useState(false);
   const { searchBooks } = SearchAPI();
@@ -28,25 +34,21 @@ const SelectBook = forwardRef((props, ref) => {
   const handleOpen = () => {
     setIsBottomSheetOpen(true);
     bottomSheetRef.current?.expand();
-    setButtonVisible(false); 
+    setButtonVisible(false);
   };
 
   const handleCloseBottomSheet = () => {
-    setButtonVisible(true); 
-  }
+    setButtonVisible(true);
+  };
 
   const handleSelectBook = (book: Book) => {
     console.log("Livro selecionado:", book);
-    let updatedCapa = book.capa;
-    if (updatedCapa && updatedCapa.includes('zoom=1')) {
-      updatedCapa = updatedCapa.replace('zoom=1', 'zoom=6');
-    }
 
-    setSelectedBook({ ...book, capa: updatedCapa });
+    setSelectedBook({ ...book, capa: book.capa });
     setButtonVisible(true);
     bottomSheetRef.current?.close();
   };
-  
+
   const handleSearch = async (term: string) => {
     setLoading(true);
     try {
@@ -62,13 +64,15 @@ const SelectBook = forwardRef((props, ref) => {
 
   return (
     <>
-      <GestureHandlerRootView style={[styles.container, { backgroundColor: theme.Background }]}>
+      <GestureHandlerRootView
+        style={[styles.container, { backgroundColor: theme.Background }]}
+      >
         <BottomSheet
-        style={{backgroundColor: theme.Background}}
+          style={{ backgroundColor: theme.Background }}
           ref={bottomSheetRef}
           snapPoints={snapPoints}
           enablePanDownToClose={true}
-          index={-1} 
+          index={-1}
           backgroundStyle={styles.bottomSheet}
           onClose={handleCloseBottomSheet}
           keyboardBehavior="interactive"
@@ -76,14 +80,16 @@ const SelectBook = forwardRef((props, ref) => {
           backdropComponent={(props) => (
             <BottomSheetBackdrop
               {...props}
-              disappearsOnIndex={-1} 
-              appearsOnIndex={0}     
-              opacity={0.2}          
+              disappearsOnIndex={-1}
+              appearsOnIndex={0}
+              opacity={0.2}
             />
           )}
         >
-          <BottomSheetScrollView style={{backgroundColor: theme.Background}}>
-            <View style={[styles.search, {backgroundColor: theme.Background}]}>
+          <BottomSheetScrollView style={{ backgroundColor: theme.Background }}>
+            <View
+              style={[styles.search, { backgroundColor: theme.Background }]}
+            >
               {isBottomSheetOpen && (
                 <View>
                   <BookSearch
@@ -92,7 +98,7 @@ const SelectBook = forwardRef((props, ref) => {
                     iconColor="grey"
                     borderRadius="md"
                     books={books}
-                    onSelectBook={handleSelectBook} 
+                    onSelectBook={handleSelectBook}
                     onSearch={handleSearch}
                     isBottomSheet={true}
                   />
@@ -104,13 +110,13 @@ const SelectBook = forwardRef((props, ref) => {
                       style={{ marginLeft: 10, marginTop: 20 }}
                     />
                   ) : books.length === 0 ? (
-                    <NunitoText style={{ textAlign: 'center', marginTop: 20 }}>
+                    <NunitoText style={{ textAlign: "center", marginTop: 20 }}>
                       {Strings.noBooks}
                     </NunitoText>
                   ) : (
                     books.map((item, index) => (
                       <CustomBook
-                        key={item.id ?? index} 
+                        key={item.id ?? index}
                         size="search"
                         title={item.titulo}
                         photoPath={item.capa}
@@ -125,9 +131,11 @@ const SelectBook = forwardRef((props, ref) => {
           </BottomSheetScrollView>
         </BottomSheet>
       </GestureHandlerRootView>
-            
+
       {buttonVisible && (
-        <View style={[styles.selectText, { backgroundColor: theme.Background }]}>
+        <View
+          style={[styles.selectText, { backgroundColor: theme.Background }]}
+        >
           {selectedBook ? (
             <CustomBook
               size="search"
@@ -137,25 +145,25 @@ const SelectBook = forwardRef((props, ref) => {
               onPress={handleOpen}
             />
           ) : (
-          <TouchableOpacity onPress={handleOpen} style={styles.selectButton}>
-            <NunitoText
-              style={{
-                color: theme.quinaryText,
-                fontSize: 17,
-              }}
-            >
-              {Strings.selectBook}
-            </NunitoText>
-            <Ionicons
-              name="chevron-up-outline"
-              size={20}
-              color={theme.quinaryText}
-              style={{ marginLeft: 15 }}
-            />
-          </TouchableOpacity>
+            <TouchableOpacity onPress={handleOpen} style={styles.selectButton}>
+              <NunitoText
+                style={{
+                  color: theme.quinaryText,
+                  fontSize: 17,
+                }}
+              >
+                {Strings.selectBook}
+              </NunitoText>
+              <Ionicons
+                name="chevron-up-outline"
+                size={20}
+                color={theme.quinaryText}
+                style={{ marginLeft: 15 }}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       )}
-  </View>
-)}
     </>
   );
 });
@@ -163,7 +171,7 @@ const SelectBook = forwardRef((props, ref) => {
 export default SelectBook;
 
 const styles = StyleSheet.create({
-  container:{
+  container: {
     flex: 1,
   },
   bottomSheet: {
@@ -172,14 +180,14 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 35,
   },
   selectText: {
-    padding: 10
+    padding: 10,
   },
   selectButton: {
-    flexDirection: "row", 
-    alignItems: "center", 
+    flexDirection: "row",
+    alignItems: "center",
   },
-  search:{
-    width:"90%",
-    alignSelf: 'center',
-  }
+  search: {
+    width: "90%",
+    alignSelf: "center",
+  },
 });
