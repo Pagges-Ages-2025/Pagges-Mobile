@@ -347,7 +347,9 @@ export default function ModalBookDetails({
             )}
 
             <NunitoText style={[styles.title, { color: theme.white }]}>
-              {title}
+              {title.length > 23 ?
+                title.substring(0, 40) + "..."
+                : title}
             </NunitoText>
             <NunitoText style={[styles.subtitle, { color: theme.white }]}>
               {authors}
@@ -613,6 +615,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 8,
     marginTop: 20,
+    textAlign: "justify",
   },
   subtitle: {
     fontSize: 20,
