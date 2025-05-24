@@ -1,6 +1,7 @@
 import Strings from "@/app/constants/Strings";
 import { useTheme } from "@/app/context/ThemeContext";
 import SearchAPI from "@/app/services/googleAPIService";
+import { registerBookInDatabase } from "@/app/services/handle-select-book.service";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -43,18 +44,11 @@ const SelectBook = forwardRef(
     };
 
     const handleSelectBook = (book: Book) => {
-      //console.log("Livro selecionado:", book);
-      let updatedCapa = book.capa;
-      if (updatedCapa && updatedCapa.includes("zoom=1")) {
-        updatedCapa = updatedCapa.replace("zoom=1", "zoom=6");
-      }
-
-      const updatedBook = { ...book, capa: updatedCapa };
-
-      setSelectedBook(updatedBook);
+      registerBookInDatabase(book);
+      setSelectedBook(book);
       setButtonVisible(true);
       bottomSheetRef.current?.close();
-      onSelectBook && onSelectBook(updatedBook);
+      onSelectBook && onSelectBook(book);
     };
 
     const handleSearch = async (term: string) => {
@@ -62,7 +56,6 @@ const SelectBook = forwardRef(
       try {
         const results = await searchBooks(term);
         setBooks(results);
-        // console.log(results);
       } catch (error) {
         console.error("Erro ao buscar livros:", error);
       } finally {
@@ -145,9 +138,7 @@ const SelectBook = forwardRef(
         </GestureHandlerRootView>
 
         {buttonVisible && (
-          <View
-            style={[styles.selectText, { backgroundColor: theme.Background }]}
-          >
+          <View style={{ backgroundColor: theme.Background }}>
             {selectedBook ? (
               <CustomBook
                 size="search"
@@ -159,7 +150,7 @@ const SelectBook = forwardRef(
             ) : (
               <TouchableOpacity
                 onPress={handleOpen}
-                style={styles.selectButton}
+                style={styles.searchBarButton}
               >
                 <NunitoText
                   style={{
@@ -195,15 +186,15 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 35,
     borderTopRightRadius: 35,
   },
-  selectText: {
-    padding: 10,
-  },
-  selectButton: {
+  searchBarButton: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    padding: 10,
   },
   search: {
-    width: "90%",
+    width: "100%",
+    paddingBottom: 10,
     alignSelf: "center",
   },
 });

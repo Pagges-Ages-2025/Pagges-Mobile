@@ -1,18 +1,17 @@
+import Strings from "@/app/constants/Strings";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  View,
-  TextInput,
   FlatList,
-  Text,
-  StyleSheet,
-  Platform,
-  TouchableWithoutFeedback,
   Keyboard,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import CustomBook from "../Book/CustomBook";
-import Strings from "@/app/constants/Strings";
 
 export interface Book {
   id: number;
@@ -202,7 +201,6 @@ const styles = StyleSheet.create({
   },
   outerContainer: {
     flex: 1,
-    paddingBottom: 75,
     width: "100%",
   },
   searchContainer: {

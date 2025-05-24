@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
     width: "90%",
     flex: 1,
     paddingTop: 30,
+    flexDirection: "column",
   },
 });
 
