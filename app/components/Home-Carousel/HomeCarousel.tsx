@@ -1,47 +1,47 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Dimensions, TouchableOpacity, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import CustomCarousel from "../Carousel/CustomCarousel"; // seu componente
+import CustomHomeCarousel from "../Carousel/CustomHomeCarousel"; // seu componente
 import { useTheme } from "../../context/ThemeContext";
+import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
 type CardItem = {
   id: string;
   title: string;
-  challengeId?: string;
 };
 
 type Props = {
   cards: CardItem[];
+  route: string;
+  onIndexChange?: (index: number) => void;
 };
 
-const HomeCarouselSection = ({ cards }: Props) => {
+const HomeCarouselSection = ({ cards, route, onIndexChange }: Props) => {
   const { theme } = useTheme();
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigation = useNavigation<any>();
 
-  const handlePress = (challengeId?: string) => {
-    if (challengeId) {
-      console.log("clicado", challengeId);
-      // navigation.navigate("dailyChallenge", { challengeId });
-      //ainda não tem a tela da rota
+  const handlePress = (route?: string) => {
+    if (route) {
+      console.log("clicado", route);
+      router.push(route as any); 
     }
   };
 
   return (
     <View style={styles.carouselContainer}>
       <View style={{ paddingHorizontal: 20 }}>
-        <CustomCarousel
+        <CustomHomeCarousel
           data={cards.map((item, index) => (
             <View
             key={item.id}
-            style={index === 1 ? { paddingHorizontal: 5 } : undefined}
           >
             <TouchableOpacity
               key={item.id}
-              // activeOpacity={0.8}
-              onPress={() => handlePress(item.challengeId)}
+              onPress={() => handlePress(route)}
               style={[
                 styles.card, 
                 {backgroundColor: theme.tertiaryText},
