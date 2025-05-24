@@ -2,13 +2,14 @@ import axiosInstance from "./axios-instance-singleton"
 
 export interface Book {
   id: number;
-  titulo: string;
-  autores: string[];
-  capa: string;
-  paginas: number;
-  anoDePublicacao: string;
-  generos: string[];
-  sinopse?: string;
+  title: string;
+  authors: string[];
+  coverUrl: string;
+  pages: number;
+  publicationYear: string;
+  genres: string[];
+  synopsis?: string;
+  avgRating?: number;
 }
 
 export default function BooksService() {
@@ -19,13 +20,14 @@ export default function BooksService() {
 
             const mappedBooks: Book[] = response.data.map((data: any) => ({
                 id: data.book_id,
-                titulo: data.title,
-                autores: data.authors?.split(",").map((a: string) => a.trim()) || [],
-                capa: data.google_image_url || data.cover || "",
-                paginas: data.pages,
-                anoDePublicacao: String(data.year),
-                generos: data.genre?.split(",").map((g: string) => g.trim()) || [],
-                sinopse: data.synopsis,
+                title: data.title,
+                authors: data.authors?.split(",").map((a: string) => a.trim()) || [],
+                coverUrl: data.google_image_url || data.cover || "",
+                pages: data.pages,
+                publicationYear: String(data.year),
+                genres: data.genre?.split(",").map((g: string) => g.trim()) || [],
+                synopsis: data.synopsis,
+                avgRating: data.averageRating || 1,
             }));
 
             return mappedBooks;
