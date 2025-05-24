@@ -2,7 +2,6 @@ import { User } from "../models/User";
 import axiosInstance from "./axios-instance-singleton";
 import * as ImagePicker from "expo-image-picker";
 
-// Se não funcionar mudar de localhost para o ip da máquina
 const profileControllerUrl = "profile";
 
 export default function UserAPI() {
@@ -57,26 +56,40 @@ export default function UserAPI() {
   const updateProfile = async (
     name?: string,
     biography?: string,
-    genreIds?: number[],
-    image?: ImagePicker.ImagePickerAsset
+    genreIds?: number[]
   ): Promise<User> => {
     try {
-      const formData = new FormData();
-
-      if (name) formData.append("name", name);
-      if (biography) formData.append("biography", biography);
-      if (genreIds) formData.append("genreIds", genreIds.join(","));
-      if (image) {
-        formData.append("file", {
-          uri: image.uri,
-          name: image.fileName || "upload.jpg",
-          type: image.mimeType,
-        } as any);
-        console.log(formData);
-      }
+      const payload: any = {};
+      if (name) payload.name = name;
+      if (biography) payload.biography = biography;
+      if (genreIds) payload.genreIds = genreIds;
 
       const response = await axiosInstance.put(
         `${profileControllerUrl}`,
+        payload
+      );
+
+      return response.data.data;
+    } catch (error) {
+      console.error("Erro ao atualizar perfil:", error);
+      throw error;
+    }
+  };
+
+  const updateProfileImage = async (
+    image: ImagePicker.ImagePickerAsset
+  ): Promise<User> => {
+    try {
+      const formData = new FormData();
+      formData.append("file", {
+        uri: image.uri,
+        name: image.fileName || "upload.jpg",
+        type: image.mimeType,
+      } as any);
+      console.log(formData);
+
+      const response = await axiosInstance.put(
+        `${profileControllerUrl}/profile-image`,
         formData,
         {
           headers: {
@@ -84,7 +97,6 @@ export default function UserAPI() {
           },
         }
       );
-
       return response.data.data;
     } catch (error) {
       console.error("Erro ao atualizar perfil:", error);
@@ -98,5 +110,6 @@ export default function UserAPI() {
     getUserStatistics,
     updateBio,
     updateProfile,
+    updateProfileImage,
   };
 }

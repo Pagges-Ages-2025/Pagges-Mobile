@@ -103,6 +103,7 @@ export default function EditProfileScreen() {
       if (bio && bio !== profileBiography) updateData.biography = bio;
 
       if (!updateData.name && !updateData.biography && !image) {
+        console.log("no changes detected");
         showErrorModal(
           Strings.warningTitle,
           Strings.noChangesDetected,
@@ -111,7 +112,12 @@ export default function EditProfileScreen() {
         return;
       }
 
-      await UserAPI().updateProfile(updateData.name, updateData.biography);
+      if (updateData.name || updateData.biography) {
+        await UserAPI().updateProfile(updateData.name, updateData.biography);
+      }
+      if (image) {
+        await UserAPI().updateProfileImage(image);
+      }
 
       setChangesMade(false);
       router.push(`/screens/profile`);
