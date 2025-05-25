@@ -92,6 +92,14 @@ const Home: React.FC = () => {
             <HomeCarouselSection route={"/screens/home"} cards={mockCards} />
           </View>
           
+        <NunitoText
+          style={[
+            styles.secondTitle,
+            { paddingBottom: 0, color: theme.primaryText },
+          ]}
+        >
+          Gêneros
+        </NunitoText>
         <View style={styles.genreContent}>
           <CustomCarousel isHorizontal data={genres} />
         </View>

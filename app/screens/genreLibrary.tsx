@@ -37,9 +37,7 @@ const Library: React.FC<LibraryProps> = ({
   const router = useRouter();
   const params = useLocalSearchParams();
   const initialPageIndex = params.pageIndex ? Number(params.pageIndex) : pageIndex;
-  const selectedGenres = Array.isArray(params.selectedGenre)
-  ? params.selectedGenre
-  : [params.selectedGenre];
+  const selectedGenres = params.selectedGenre.toString();
   
   const [actualPage] = useState(initialPageIndex);
   const [toGenreBooks, setGenreBooks] = useState<Book[]>([]);
@@ -48,7 +46,7 @@ const Library: React.FC<LibraryProps> = ({
   const [loading, setLoading] = useState(true);
   const [isModalMode] = useState(isVisible !== undefined);
   const slideAnim = useRef(new Animated.Value(actualPage)).current;
-  const { searchByGenre } = SearchAPI();
+  const { searchBooks } = SearchAPI();
   
   // Handle back button press for standalone screen mode
   useEffect(() => {
@@ -70,9 +68,9 @@ const Library: React.FC<LibraryProps> = ({
     }
   };
 
-  const fetchBooksByArray = async (genres: string[]) => {
+  const fetchBooks = async (genres: string) => {
     try {     
-      const mappedBooks = await searchByGenre(genres);
+      const mappedBooks = await searchBooks(genres);
       setGenreBooks(mappedBooks);
       setLoading(false);
     }
@@ -104,7 +102,7 @@ const Library: React.FC<LibraryProps> = ({
   }, [selectedBook]);
   
   useEffect(() => {
-    fetchBooksByArray(selectedGenres);
+    fetchBooks(selectedGenres);
   }, []);
 
   const content = (
