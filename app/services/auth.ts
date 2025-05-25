@@ -20,10 +20,12 @@ export default function AuthAPI() {
   const executeLoginUserRequest = async (
     loginRequestData: LoginRequestData
   ): Promise<LoginResponseDto> => {
-    const response = await axiosInstance.post(`/auth/login`, {
+    console.log(axiosInstance.defaults.baseURL);
+    const response = await axiosInstance.post(`auth/login`, {
       email: loginRequestData.email,
       password: loginRequestData.password,
     });
+    
     const responseData: LoginResponseDto = response.data;
     return responseData;
   };

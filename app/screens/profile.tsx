@@ -189,13 +189,8 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-  },
-  statsContainer: {
+  achievementContainer: {
+    marginBottom: 20,
     marginHorizontal: 30,
     marginTop: 20,
   },
@@ -203,34 +198,49 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
     marginTop: 20,
   },
-  achievementContainer: {
-    marginHorizontal: 30,
-    marginTop: 20,
-    marginBottom: 20,
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
   },
   libraryButtonsContainer: {
-    marginHorizontal: 30,
-    marginTop: 10,
     marginBottom: 30,
+    marginHorizontal: 30,
+    marginTop: 10
+  },
+  libraryTab: {
+    alignItems: "center",
+    borderRadius: 20,
+    flex: 1,
+    justifyContent: "center",
+    paddingVertical: 8,
+  },
+  libraryTabText: {
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  libraryTabsContainer: {
+    borderRadius: 20,
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  libraryTabsContainer: {
+    backgroundColor: "#F4F4F4",
+    borderRadius: 20,
+    flexDirection: "row",
+    padding: 3,
   },
   libraryTitle: {
     fontSize: 18,
     marginBottom: 15,
   },
-  libraryTabsContainer: {
-    flexDirection: "row",
-    borderRadius: 20,
-    justifyContent: "space-around",
+  libraryTitle: {
+    fontSize: 18,
+    marginBottom: 15,
   },
-  libraryTab: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  libraryTabText: {
-    fontSize: 14,
-    fontWeight: "500",
+  statsContainer: {
+    marginHorizontal: 30,
+    marginTop: 20,
   },
 });

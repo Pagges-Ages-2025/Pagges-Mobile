@@ -125,11 +125,15 @@ const PaggesTextInputCustomIcons: React.FC<PaggesTextInputCustomIconsProps> = ({
     >
       {leftIcon}
       <TextInput
+<<<<<<< Updated upstream:app/components/Inputs/TextInput.tsx
         style={[
           styles.input, 
           { color: theme.primaryText },
           multiline && styles.multilineInput
         ]}
+=======
+        style={[styles.input, { color: "#333" }]}
+>>>>>>> Stashed changes:app/components/Texts/TextInput.tsx
         placeholder={placeholder}
         placeholderTextColor={theme.placeholder}
         value={value}
@@ -147,6 +151,7 @@ const PaggesTextInputCustomIcons: React.FC<PaggesTextInputCustomIconsProps> = ({
 };
 
 const styles = StyleSheet.create({
+<<<<<<< Updated upstream:app/components/Inputs/TextInput.tsx
   inputContainer: {
     flex: 1,
     flexDirection: "row",
@@ -158,6 +163,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     paddingVertical: 5,
   },
+=======
+>>>>>>> Stashed changes:app/components/Texts/TextInput.tsx
   icon: {
     margin: 12,
   },
@@ -167,10 +174,19 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
   },
+<<<<<<< Updated upstream:app/components/Inputs/TextInput.tsx
   multilineInput: {
     paddingTop: 12,
     paddingBottom: 12,
     height: "100%",
+=======
+  inputContainer: {
+    alignItems: "center",
+    borderRadius: 15,
+    borderWidth: 1,
+    flex: 1,
+    flexDirection: "row",
+>>>>>>> Stashed changes:app/components/Texts/TextInput.tsx
   },
 });
 

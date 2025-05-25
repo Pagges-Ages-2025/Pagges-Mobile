@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import Section from "../components/section";
-import LottieView from "lottie-react-native";
+// import LottieView from "lottie-react-native";
 
 const AnimationSection = () => {
   const [open, setOpen] = useState({
@@ -13,7 +13,7 @@ const AnimationSection = () => {
   const toggle = (key: keyof typeof open) =>
     setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  const lottieRef = useRef<LottieView>(null);
+  // const lottieRef = useRef<LottieView>(null);
 
   return (
     <Section
@@ -28,13 +28,13 @@ const AnimationSection = () => {
         onToggle={() => toggle("loading")}
       >
         <View style={styles.grid}>
-          <LottieView
+          {/* <LottieView
             ref={lottieRef}
             source={require("../../../assets/animations/bookLoading.json")}
             style={styles.lottie}
             autoPlay={true}
             loop={true}
-          />
+          /> */}
         </View>
       </Section>
       <Section
@@ -43,13 +43,13 @@ const AnimationSection = () => {
         onToggle={() => toggle("login")}
       >
         <View style={styles.grid}>
-          <LottieView
+          {/* <LottieView
             ref={lottieRef}
             source={require("../../../assets/animations/login.json")}
             style={styles.lottie}
             autoPlay={true}
             loop={true}
-          />
+          /> */}
         </View>
       </Section>
     </Section>
@@ -65,8 +65,8 @@ const styles = StyleSheet.create({
   },
   lottie: {
     alignSelf: "center",
-    width: 300,
     height: 300,
+    width: 300,
   },
 });
 
