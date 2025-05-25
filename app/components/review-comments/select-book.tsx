@@ -61,12 +61,16 @@ const SelectBook = forwardRef(
       setButtonVisible(true);
     };
 
-    const handleSelectBook = (book: ExtendedBook) => {
-      registerBookInDatabase(book as Book);
-      setSelectedBook(book);
+    const handleSelectBook = async (book: ExtendedBook) => {
+      const registerdBook = await registerBookInDatabase(book as Book);
+      const bookWithRegisteredId = {
+        ...book,
+        id: registerdBook.book_id
+      };
+      setSelectedBook(bookWithRegisteredId);
       setButtonVisible(true);
       bottomSheetRef.current?.close();
-      onSelectBook && onSelectBook(book);
+      onSelectBook && onSelectBook(bookWithRegisteredId);
     };
 
     const handleSearch = async (term: string) => {

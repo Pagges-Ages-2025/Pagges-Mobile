@@ -71,8 +71,7 @@ export default function CreateReviewCommentScreen() {
         text: reviewText,
         is_review: isReviewChecked,
       };
-
-      console.log("Enviando post:", newPost);
+    
       await createPost(newPost);
 
       // Limpa os campos após sucesso
