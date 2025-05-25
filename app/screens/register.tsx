@@ -17,6 +17,7 @@ import NunitoText from "../components/Texts/NunitoText";
 import { PaggesTextInput } from "../components/Inputs/TextInput";
 import Strings from "../constants/Strings";
 import AuthAPI from "../services/auth";
+import { useTheme } from "../context/ThemeContext";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -34,6 +35,7 @@ export default function RegisterScreen() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [error, setError] = useState<string>("");
+  const { theme } = useTheme();
 
   useEffect(() => {
     Animated.parallel([
@@ -51,10 +53,9 @@ export default function RegisterScreen() {
   }, []);
 
   useEffect(() => {
-    const nameValid = fullName.length > 5;
     const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const passwordValid = password.length > 0 && password == confirmPassword;
-    setIsFormValid(nameValid && emailValid && passwordValid);
+    setIsFormValid(emailValid && passwordValid);
   }, [fullName, email, password, confirmPassword]);
 
   const handleSubmit = async () => {
@@ -73,6 +74,7 @@ export default function RegisterScreen() {
       router.replace("/screens/favoriteGenre");
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        console.log(error);
         setError(error.response?.data.message);
       }
     }
@@ -97,14 +99,17 @@ export default function RegisterScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: theme.Background }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerStyle={[
+          styles.scrollContainer,
+          { backgroundColor: theme.Background },
+        ]}
         scrollEnabled={false}
       >
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: theme.Background }]}>
           <Animated.View
             style={[
               styles.content,
@@ -243,6 +248,7 @@ export default function RegisterScreen() {
                       color: "red",
                       marginBottom: 8,
                       textAlign: "center",
+                      backgroundColor: "blue",
                     }}
                   >
                     {error}
@@ -305,7 +311,6 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: "center",
-    backgroundColor: "white",
     flex: 1,
     justifyContent: "center",
     padding: 20,
