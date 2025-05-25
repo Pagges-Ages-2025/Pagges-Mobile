@@ -7,15 +7,14 @@ import { useTheme } from "../context/ThemeContext";
 import SearchAPI from "../services/googleAPIService";
 import ModalBookDetails from "./bookDetails";
 import { router } from "expo-router";
-
 import { SearchHistoryList } from "../components/SearchBar/SearchHistoryList";
-import { registerBookInDatabase } from "../services/handle-select-book.service";
-import { 
-  loadSearchHistory, 
-  addBookToSearchHistory, 
+import {
+  loadSearchHistory,
+  addBookToSearchHistory,
   removeBookFromSearchHistory,
-  clearSearchHistory
+  clearSearchHistory,
 } from "../services/search-history.service";
+import { getBookWithRegisteredId } from "./bookDetails";
 
 const SearchPage: React.FC = () => {
   const { theme } = useTheme();
@@ -86,27 +85,23 @@ const SearchPage: React.FC = () => {
 
   // Quando o campo de pesquisa fica vazio, esconde os resultados
   useEffect(() => {
-    if (!searchQuery || searchQuery.trim() === '') {
+    if (!searchQuery || searchQuery.trim() === "") {
       setShowingResults(false);
     }
   }, [searchQuery]);
 
   const handleSelectBook = async (book: Book) => {
-    setSelectedBook(book);
-    // Coloca o livro pesquisado no histórico
-    if (book) {
-      // Registra o livro no banco de dados da aplicação
-      registerBookInDatabase(book);
-      
-      // Adiciona ao histórico de pesquisas local e no AsyncStorage
-      try {
-        const updatedHistory = await addBookToSearchHistory(book);
-        setSearchHistory(updatedHistory);
-      } catch (error) {
-        console.error("Erro ao atualizar histórico:", error);
-      }
+    getBookWithRegisteredId(book, (bookWithRegisteredId) => {
+      setSelectedBook(bookWithRegisteredId);
+      setModalVisible(true);
+    });
+    // Adiciona ao histórico de pesquisas local e no AsyncStorage
+    try {
+      const updatedHistory = await addBookToSearchHistory(book);
+      setSearchHistory(updatedHistory);
+    } catch (error) {
+      console.error("Erro ao atualizar histórico:", error);
     }
-    setModalVisible(true);
   };
 
   // Exclui um livro do histórico
@@ -137,7 +132,7 @@ const SearchPage: React.FC = () => {
 
   // Função para esconder as sugestões e limpar a pesquisa
   const handleClearSearch = () => {
-    setSearchQuery('');
+    setSearchQuery("");
     setBooks([]);
     setShowingResults(false);
   };
@@ -185,7 +180,6 @@ const SearchPage: React.FC = () => {
         <ModalBookDetails
           visible={modalVisible}
           onClose={handleCloseModal}
-          rating={4.0}
           title={selectedBook.titulo}
           pages={selectedBook.paginas || 0}
           synopsis={selectedBook.sinopse || "Sinopse não disponível"}
@@ -198,23 +192,27 @@ const SearchPage: React.FC = () => {
           onCreateReview={() => {
             // Fecha o modal e depois navega para a tela de criação
             handleCloseModal();
-            
+
             // Dados do livro para passar para a tela de criação
             const bookData = {
               bookId: selectedBook.id?.toString() || "0",
               bookTitle: selectedBook.titulo,
-              bookAuthors: selectedBook.autores?.join(", ") || "Autor desconhecido",
-              bookCover: selectedBook.capa || ""
+              bookAuthors:
+                selectedBook.autores?.join(", ") || "Autor desconhecido",
+              bookCover: selectedBook.capa || "",
             };
-            
+
             // Navega após um pequeno atraso para garantir que o modal foi fechado
             setTimeout(() => {
-              console.log("SearchPage - Navegando para criação de resenha com:", bookData);
-              
+              console.log(
+                "SearchPage - Navegando para criação de resenha com:",
+                bookData
+              );
+
               // Usar router.replace para garantir uma navegação limpa
               router.replace({
                 pathname: "/screens/createReviewComment",
-                params: bookData
+                params: bookData,
               });
             }, 500);
           }}

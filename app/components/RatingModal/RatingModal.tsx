@@ -9,14 +9,14 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 import { Theme } from "@/app/constants/Theme";
 import StarRating from "../StarRating/StarRating";
-import RatingAPI from "@/app/services/booksService";
+import BooksService from "@/app/services/booksService";
 
 interface RatingModalProps {
   visible: boolean;
   onClose: () => void;
   book: string;
   bookId: number;
-  onRate?: (newRating: number) => void;
+  onRate?: () => void;
 }
 
 const RatingModal: React.FC<RatingModalProps> = ({
@@ -29,13 +29,13 @@ const RatingModal: React.FC<RatingModalProps> = ({
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const [rating, setRating] = useState(0);
-  const { RateBook } = RatingAPI();
 
   const handleRate = async (bookId: number, rating: number) => {
     try {
-      await RateBook(bookId, rating);
+      console.log("Avaliando livro:", bookId, rating);
+      await BooksService().RateBook(bookId, rating);
       if (onRate) {
-        onRate(rating);
+        onRate();
       }
       onClose();
     } catch (error) {

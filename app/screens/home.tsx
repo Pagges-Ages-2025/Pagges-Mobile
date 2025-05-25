@@ -8,20 +8,9 @@ import HomeCarouselSection from "../components/Home-Carousel/HomeCarousel";
 import NunitoText from "../components/Texts/NunitoText";
 import CustomCarousel from "../components/Carousel/CustomCarousel";
 import CustomBook from "../components/Book/CustomBook";
-import ModalBookDetails from "./bookDetails";
+import ModalBookDetails, { getBookWithRegisteredId } from "./bookDetails";
 import BooksService from "../services/booksService";
-
-export interface Book {
-  id: number;
-  title: string;
-  authors: string[];
-  coverUrl: string;
-  pages: number;
-  publicationYear: string;
-  genres: string[];
-  synopsis?: string;
-  avgRating?: number;
-}
+import { Book } from "../components/SearchBar/SearchBar";
 
 const mockCards = [
   { id: "1", title: "Desafio Diário" },
@@ -33,7 +22,9 @@ const Home: React.FC = () => {
   const { theme } = useTheme();
   const { getTrendingBooks } = BooksService();
   const [trendingBooks, setTradingBooks] = useState<Book[]>();
-  const [selectedTrendingBook, setSelectedTrendingBook] = useState<Book | null>(null);
+  const [selectedTrendingBook, setSelectedTrendingBook] = useState<Book | null>(
+    null
+  );
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -66,7 +57,9 @@ const Home: React.FC = () => {
   }, [fetchTrendingBooks]);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.Background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.Background }]}
+    >
       <ScrollView>
         <View style={styles.content}>
           <StaticSearchBar />
@@ -93,9 +86,9 @@ const Home: React.FC = () => {
                       size="small"
                       key={book.id}
                       bookId={book.id}
-                      photoPath={book.coverUrl}
-                      title={book.title}
-                      author={book.authors.join(", ")}
+                      photoPath={book.capa}
+                      title={book.titulo}
+                      author={book.autores.join(", ")}
                       onPress={() => handleSelectTrendingBook(book)}
                     />
                   ))
@@ -108,20 +101,29 @@ const Home: React.FC = () => {
           <ModalBookDetails
             visible={modalVisible}
             onClose={handleCloseModal}
-            rating={selectedTrendingBook.avgRating || 1}
-            title={selectedTrendingBook.title || "Título não disponível"}
-            pages={selectedTrendingBook.pages || 0}
-            synopsis={selectedTrendingBook.synopsis || "Sinopse não disponível"}
+            title={selectedTrendingBook.titulo || "Título não disponível"}
+            pages={selectedTrendingBook.paginas || 0}
+            synopsis={selectedTrendingBook.sinopse || "Sinopse não disponível"}
             review="Sem avaliações disponíveis ainda."
-            authors={selectedTrendingBook.authors?.join(", ") || "Autor desconhecido"}
-            year={selectedTrendingBook.publicationYear?.substring(0, 4) || "Desconhecido"}
-            id={selectedTrendingBook.id?.toString() || "0"}
-            genre={selectedTrendingBook.genres?.[0] || "Gênero não especificado"}
-            google_image_url={selectedTrendingBook.coverUrl || ""}
-            onCreateReview={() =>
-              console.log("Criar resenha para:", selectedTrendingBook.title)
+            authors={
+              selectedTrendingBook.autores?.join(", ") || "Autor desconhecido"
             }
-            onShare={() => console.log("Compartilhar:", selectedTrendingBook.title)}
+            year={
+              selectedTrendingBook.anoDePublicacao?.substring(0, 4) ||
+              "Desconhecido"
+            }
+            id={selectedTrendingBook.id?.toString() || "0"}
+            genre={
+              selectedTrendingBook.generos?.[0] || "Gênero não especificado"
+            }
+            google_image_url={selectedTrendingBook.capa || ""}
+            onCreateReview={() =>
+              console.log("Criar resenha para:", selectedTrendingBook.titulo)
+            }
+            onShare={() =>
+              console.log("Compartilhar:", selectedTrendingBook.titulo)
+            }
+            bookId={selectedTrendingBook.id}
           />
         )}
       </ScrollView>
