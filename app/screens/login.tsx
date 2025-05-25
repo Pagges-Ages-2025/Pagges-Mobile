@@ -17,6 +17,7 @@ import NunitoText from "../components/Texts/NunitoText";
 import { PaggesTextInput } from "../components/Inputs/TextInput";
 import Strings from "../constants/Strings";
 import AuthAPI from "../services/auth";
+import { useTheme } from "../context/ThemeContext";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export default function LoginScreen() {
   const lottieRef = useRef<LottieView>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { theme } = useTheme();
 
   const handleSubmitLoginButton = async () => {
     if (!email || !password) {
@@ -99,7 +101,7 @@ export default function LoginScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerStyle={[styles.scrollContainer, { backgroundColor: theme.Background }]}
         scrollEnabled={false}
       >
         <View style={styles.container}>
@@ -197,7 +199,6 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: "center",
-    backgroundColor: "white",
     flex: 1,
     justifyContent: "center",
     padding: 20,

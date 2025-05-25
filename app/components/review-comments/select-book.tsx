@@ -65,7 +65,7 @@ const SelectBook = forwardRef(
       const registerdBook = await registerBookInDatabase(book as Book);
       const bookWithRegisteredId = {
         ...book,
-        id: registerdBook.book_id
+        id: registerdBook.book_id,
       };
       setSelectedBook(bookWithRegisteredId);
       setButtonVisible(true);
@@ -106,7 +106,10 @@ const SelectBook = forwardRef(
             snapPoints={snapPoints}
             enablePanDownToClose={true}
             index={-1}
-            backgroundStyle={styles.bottomSheet}
+            backgroundStyle={[
+              styles.bottomSheet,
+              { backgroundColor: theme.Background },
+            ]}
             onClose={handleCloseBottomSheet}
             keyboardBehavior="interactive"
             keyboardBlurBehavior="restore"
@@ -118,6 +121,7 @@ const SelectBook = forwardRef(
                 opacity={0.2}
               />
             )}
+            handleIndicatorStyle={{ backgroundColor: theme.primaryText }}
           >
             <BottomSheetScrollView
               style={{ backgroundColor: theme.Background }}
