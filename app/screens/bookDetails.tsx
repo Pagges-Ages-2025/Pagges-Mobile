@@ -8,12 +8,19 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Alert,
   ImageBackground,
   Modal,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   ToastAndroid,
@@ -69,7 +76,6 @@ export default function ModalBookDetails({
   onShare,
 }: ModalBookDetailsProps) {
   const { theme } = useTheme();
-  const [isMaximized, setIsMaximized] = useState(false);
   const [showMoreText, setShowMoreText] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentRating, setCurrentRating] = useState(rating);
@@ -77,23 +83,7 @@ export default function ModalBookDetails({
   const [ratingCount, setRatingCount] = useState(1);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const roundedStars = Math.round(currentRating);
-  const snapPoints = useMemo(() => ["62%", "85%"], []);
-
-  const MAX_SNAP_POINT_INDEX = 1;
-
-  const handleSheetChanges = useCallback(
-    (index: number) => {
-      if (index > MAX_SNAP_POINT_INDEX) {
-        bottomSheetRef.current?.snapToIndex(MAX_SNAP_POINT_INDEX);
-        return;
-      } else if (index === MAX_SNAP_POINT_INDEX) {
-        setIsMaximized(true);
-      } else {
-        setIsMaximized(false);
-      }
-    },
-    [bottomSheetRef, MAX_SNAP_POINT_INDEX]
-  );
+  const snapPoints = useMemo(() => ["62%"], []);
 
   const updateBookState = async (id: string, state: string) => {
     try {
@@ -116,9 +106,7 @@ export default function ModalBookDetails({
           );
         }
       } else {
-        console.error(
-          `Erro ao adicionar livro com estado ${state}:`,
-        );
+        console.error(`Erro ao adicionar livro com estado ${state}:`);
         if (Platform.OS === "android") {
           ToastAndroid.show(
             "Erro ao adicionar livro à biblioteca",
@@ -206,7 +194,7 @@ export default function ModalBookDetails({
       },
     },
     {
-      label: "Estou lendo",
+      label: "Lendo",
       onPress: async () => {
         console.log("Ação: Estou lendo");
         await updateBookState(id, "READING");
@@ -266,41 +254,15 @@ export default function ModalBookDetails({
           }}
         >
           <View style={styles.overlay} />
-
-          <View style={styles.bookContentContainer}>
-            {isMaximized ? (
-              <View style={{ flexDirection: "row", marginBottom: 0 }}>
-                <TouchableOpacity onPress={handleBackPress}>
-                  <Ionicons
-                    name="return-up-back-outline"
-                    size={30}
-                    color={theme.white}
-                    style={{ paddingRight: 20 }}
-                  />
-                </TouchableOpacity>
-                <View
-                  style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    paddingRight: 10,
-                    paddingLeft: 10,
-                    width: "85%",
-                  }}
-                >
-                  <NunitoText
-                    style={{
-                      color: theme.quinaryText,
-                      fontSize: 20,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {title.length > 23
-                      ? title?.substring(0, 23) + "..."
-                      : title}
-                  </NunitoText>
-                </View>
-              </View>
-            ) : (
+          <View
+            style={{
+              flex: 1,
+              paddingTop: 24,
+              paddingStart: 24,
+              paddingEnd: 24,
+            }}
+          >
+            <View style={styles.bookContentContainer}>
               <View
                 style={{
                   flexDirection: "row",
@@ -344,246 +306,217 @@ export default function ModalBookDetails({
                   <AntDesign name="export" size={24} color={theme.white} />
                 </TouchableOpacity>
               </View>
-            )}
 
-            <NunitoText style={[styles.title, { color: theme.white }]}>
-              {title.length > 40
-                ? title.substring(0, 40).trim() + "..."
-                : title}
-            </NunitoText>
-            <NunitoText style={[styles.subtitle, { color: theme.white }]}>
-              {authors
-                ? authors.length > 30
-                  ? authors.substring(0, 30).trim + "..."
-                  : authors
-                : "Autor desconhecido"}
-            </NunitoText>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 8,
-              }}
-            >
-              <NunitoText style={[styles.date, { color: theme.white }]}>
-                {year}
+              <NunitoText style={[styles.title, { color: theme.white }]}>
+                {title.length > 40
+                  ? title.substring(0, 40).trim() + "..."
+                  : title}
               </NunitoText>
-              <NunitoText style={{ color: theme.white, paddingHorizontal: 10 }}>
-                {" "}
-                -{" "}
+              <NunitoText style={[styles.subtitle, { color: theme.white }]}>
+                {authors
+                  ? authors.length > 30
+                    ? authors.substring(0, 30).trim + "..."
+                    : authors
+                  : "Autor desconhecido"}
               </NunitoText>
-              <NunitoText style={[styles.gender, { color: theme.white }]}>
-                {genre}
-              </NunitoText>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "flex-start",
-              }}
-            >
-              <View style={styles.starsContainer}>
-                <StaticStars
-                  rating={userRating > 0 ? userRating : rating}
-                  onPress={() => {
-                    setModalVisible(true);
-                  }}
-                />
-                <RatingModal
-                  visible={modalVisible}
-                  onClose={() => setModalVisible(false)}
-                  onRate={(newRating) => {
-                    handleNewRating(newRating);
-                    setModalVisible(false);
-                  }}
-                  book={title}
-                />
-              </View>
-
-              <TouchableOpacity
-                onPress={handleCreateReview}
+              <View
                 style={{
-                  borderRadius: 15,
-                  backgroundColor: theme.quinaryText,
-                  width: "35%",
-                  height: 20,
-                  alignItems: "center",
-                  justifyContent: "center",
                   flexDirection: "row",
-                  marginRight: 10,
+                  alignItems: "center",
+                  marginBottom: 8,
                 }}
               >
-                <NunitoText
-                  style={{
-                    fontSize: 15,
-                    fontWeight: "bold",
-                    color: theme.quaternaryText,
-                  }}
-                >
-                  Criar Resenha
+                <NunitoText style={[styles.date, { color: theme.white }]}>
+                  {year}
                 </NunitoText>
-              </TouchableOpacity>
+                <NunitoText
+                  style={{ color: theme.white, paddingHorizontal: 10 }}
+                >
+                  {" "}
+                  -{" "}
+                </NunitoText>
+                <NunitoText style={[styles.gender, { color: theme.white }]}>
+                  {genre}
+                </NunitoText>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "flex-start",
+                }}
+              >
+                <View style={styles.starsContainer}>
+                  <StaticStars
+                    rating={userRating > 0 ? userRating : rating}
+                    onPress={() => {
+                      setModalVisible(true);
+                    }}
+                  />
+                  <RatingModal
+                    visible={modalVisible}
+                    onClose={() => setModalVisible(false)}
+                    onRate={(newRating) => {
+                      handleNewRating(newRating);
+                      setModalVisible(false);
+                    }}
+                    book={title}
+                  />
+                </View>
+              </View>
             </View>
           </View>
-
-          <GestureHandlerRootView style={styles.container}>
-            <BottomSheet
-              backgroundStyle={{ backgroundColor: theme.Background }}
-              ref={bottomSheetRef}
-              snapPoints={snapPoints}
-              index={0}
-              onChange={handleSheetChanges}
-              enablePanDownToClose={false}
-              enableOverDrag={false}
-              handleComponent={BottomSheetHandle}
-              enableContentPanningGesture={false}
-            >
-              <BottomSheetScrollView>
-                <View style={styles.bookNumbersContainer}>
-                  {bookStats.map((stat, index) => (
-                    <View
-                      key={index}
-                      style={{
-                        paddingHorizontal: 18,
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <NunitoText
-                        style={[
-                          styles.bookNumbers,
-                          { color: theme.primaryText },
-                        ]}
-                      >
-                        {stat.value}
-                      </NunitoText>
-                      <NunitoText
-                        style={[
-                          styles.bookNumbersTitle,
-                          { color: theme.primaryText },
-                        ]}
-                      >
-                        {stat.label}
-                      </NunitoText>
-                    </View>
-                  ))}
-                </View>
-
-                <View style={styles.statusBookContainer}>
-                  {bookActions.map((action, index) => (
-                    <CustomButton
-                      width={150}
-                      height={30}
-                      key={index}
-                      title={action.label}
-                      onPress={action.onPress}
-                    />
-                  ))}
-                </View>
-
-                <SinopseExpandable synopsis={synopsis} />
-
+          <ScrollView
+            style={{
+              flex: 2,
+              flexGrow: 2,
+              backgroundColor: theme.Background,
+              paddingStart: 24,
+              paddingEnd: 24,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+            }}
+          >
+            <View style={styles.bookNumbersContainer}>
+              {bookStats.map((stat, index) => (
                 <View
-                  style={{ alignItems: "flex-start", justifyContent: "center" }}
+                  key={index}
+                  style={{
+                    paddingHorizontal: 18,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
                 >
                   <NunitoText
+                    style={[styles.bookNumbers, { color: theme.primaryText }]}
+                  >
+                    {stat.value}
+                  </NunitoText>
+                  <NunitoText
                     style={[
-                      styles.secondTitle,
-                      { paddingBottom: 25, color: theme.primaryText },
+                      styles.bookNumbersTitle,
+                      { color: theme.primaryText },
                     ]}
                   >
-                    Principais Resenhas e Comentários
+                    {stat.label}
                   </NunitoText>
+                </View>
+              ))}
+            </View>
 
-                  <ReviewComment
-                    comment={true}
-                    byAuthor={true}
-                    datePost={"30/01/2025"}
-                    text={
-                      "Amei o livro, muito bom mesmo! Recomendo muito. A história é envolvente e os personagens são bem desenvolvidos."
-                    }
-                    fullNamePostAuthor={"Monica Alvarenga"}
-                  />
-
-                  <ReviewComment
-                    comment={false}
-                    byAuthor={false}
-                    fullNamePostAuthor={"Monica Alvarenga"}
-                    datePost={"22/08/2024"}
-                    text={
-                      "Memórias da Meia-Noite é um romance de Sidney Sheldon que mistura mistério, drama e uma boa dose de suspense. A história gira em torno de Katherine, uma mulher marcada por tragédias pessoais e uma vida cheia de reviravoltas. Ela se vê envolvida em uma trama que desafia sua compreensão de confiança, vingança e sobrevivência, enquanto tenta descobrir os segredos obscuros de seu passado e lidar com as consequências de suas escolhas.Com o estilo característico de Sheldon, a narrativa é envolvente e cheia de surpresas, mantendo o leitor na expectativa até o final. A trama é recheada de personagens complexos e dilemas emocionais, explorando temas como o perdão, a vingança e os jogos de poder. A escrita é fluída, o ritmo é rápido e as reviravoltas são sempre inesperadas. É uma história que prende o leitor até a última página, com um final impactante."
-                    }
+            <View style={styles.statusBookContainer}>
+              {bookActions.map((action, index) => (
+                <View style={{ flex: 1 }}>
+                  <CustomButton
+                    size="small"
+                    containerStyle={{ flex: 1 }}
+                    key={index}
+                    title={action.label}
+                    onPress={action.onPress}
                   />
                 </View>
+              ))}
+            </View>
 
-                <View
-                  style={{ alignItems: "center", justifyContent: "center" }}
-                >
-                  <TouchableOpacity
-                    onPress={undefined}
-                    style={{
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: theme.primary,
-                      width: "87%",
-                      height: 25,
-                      borderRadius: 30,
-                    }}
-                  >
-                    <Text style={{ color: theme.quinaryText }}>
-                      Acessar mais
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+            <SinopseExpandable synopsis={synopsis} />
 
-                <View style={{ marginBottom: 30 }}></View>
+            <View
+              style={{
+                alignItems: "flex-start",
+                justifyContent: "center",
+              }}
+            >
+              <NunitoText
+                style={[
+                  styles.secondTitle,
+                  { paddingBottom: 25, color: theme.primaryText },
+                ]}
+              >
+                Principais Resenhas e Comentários
+              </NunitoText>
 
-                <NunitoText
-                  style={[
-                    styles.secondTitle,
-                    { paddingBottom: 15, color: theme.primaryText },
-                  ]}
-                >
-                  Livros do mesmo autor
-                </NunitoText>
-                <CustomCarousel
-                  isHorizontal
-                  data={[
-                    <CustomBook
-                      key={1}
-                      bookId={0}
-                      photoPath={require("../assets/images/book-cover.png")}
-                    />,
-                  ]}
-                />
+              <ReviewComment
+                comment={true}
+                byAuthor={true}
+                datePost={"30/01/2025"}
+                text={
+                  "Amei o livro, muito bom mesmo! Recomendo muito. A história é envolvente e os personagens são bem desenvolvidos."
+                }
+                fullNamePostAuthor={"Monica Alvarenga"}
+              />
 
-                <View style={{ marginBottom: 15 }}></View>
+              <ReviewComment
+                comment={false}
+                byAuthor={false}
+                fullNamePostAuthor={"Monica Alvarenga"}
+                datePost={"22/08/2024"}
+                text={
+                  "Memórias da Meia-Noite é um romance de Sidney Sheldon que mistura mistério, drama e uma boa dose de suspense. A história gira em torno de Katherine, uma mulher marcada por tragédias pessoais e uma vida cheia de reviravoltas. Ela se vê envolvida em uma trama que desafia sua compreensão de confiança, vingança e sobrevivência, enquanto tenta descobrir os segredos obscuros de seu passado e lidar com as consequências de suas escolhas.Com o estilo característico de Sheldon, a narrativa é envolvente e cheia de surpresas, mantendo o leitor na expectativa até o final. A trama é recheada de personagens complexos e dilemas emocionais, explorando temas como o perdão, a vingança e os jogos de poder. A escrita é fluída, o ritmo é rápido e as reviravoltas são sempre inesperadas. É uma história que prende o leitor até a última página, com um final impactante."
+                }
+              />
+            </View>
 
-                <NunitoText
-                  style={[
-                    styles.secondTitle,
-                    { paddingBottom: 15, color: theme.primaryText },
-                  ]}
-                >
-                  Livros semelhantes
-                </NunitoText>
-                <CustomCarousel
-                  isHorizontal
-                  data={[
-                    <CustomBook
-                      key={1}
-                      bookId={0}
-                      photoPath={require("../assets/images/book-cover.png")}
-                    />,
-                  ]}
-                />
+            <View style={{ alignItems: "center", justifyContent: "center" }}>
+              <TouchableOpacity
+                onPress={undefined}
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: theme.primary,
+                  width: "87%",
+                  height: 25,
+                  borderRadius: 30,
+                }}
+              >
+                <Text style={{ color: theme.quinaryText }}>Acessar mais</Text>
+              </TouchableOpacity>
+            </View>
 
-                <View style={{ marginBottom: 500 }}></View>
-              </BottomSheetScrollView>
-            </BottomSheet>
-          </GestureHandlerRootView>
+            <View style={{ marginBottom: 30 }}></View>
+
+            <NunitoText
+              style={[
+                styles.secondTitle,
+                { paddingBottom: 15, color: theme.primaryText },
+              ]}
+            >
+              Livros do mesmo autor
+            </NunitoText>
+            <CustomCarousel
+              isHorizontal
+              data={[
+                <CustomBook
+                  key={1}
+                  bookId={0}
+                  photoPath={require("../assets/images/book-cover.png")}
+                />,
+              ]}
+            />
+
+            <View style={{ marginBottom: 15 }}></View>
+
+            <NunitoText
+              style={[
+                styles.secondTitle,
+                { paddingBottom: 15, color: theme.primaryText },
+              ]}
+            >
+              Livros semelhantes
+            </NunitoText>
+            <CustomCarousel
+              isHorizontal
+              data={[
+                <CustomBook
+                  key={1}
+                  bookId={0}
+                  photoPath={require("../assets/images/book-cover.png")}
+                />,
+              ]}
+            />
+
+            <View style={{ marginBottom: 500 }}></View>
+          </ScrollView>
         </ImageBackground>
       </View>
     );
@@ -643,12 +576,7 @@ const styles = StyleSheet.create({
     paddingRight: 5,
   },
   bookContentContainer: {
-    position: "absolute",
-    top: "7%",
-    left: "5%",
-    right: "5%",
-    paddingHorizontal: 10,
-    marginBottom: 10,
+    flex: 1,
   },
   bookNumbers: {
     fontSize: 19,
@@ -662,7 +590,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 10,
+    paddingTop: 44,
   },
   secondTitle: {
     fontSize: 20,
@@ -702,8 +630,8 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   statusBookContainer: {
+    flex: 1,
     gap: 10,
-    transform: "scale(0.8)",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
