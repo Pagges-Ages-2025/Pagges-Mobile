@@ -1,34 +1,61 @@
-import { useTheme } from "../context/ThemeContext";
-import React, { useEffect, useState } from "react";
 import { User } from "@/app/models/User";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  Animated,
+  Image,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
-  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import NunitoText from "../components/Texts/NunitoText";
 import profileUser from "../assets/images/profile-user.png";
+import NunitoText from "../components/Texts/NunitoText";
+import { useTheme } from "../context/ThemeContext";
+import { Challange } from "../models/Challanges";
+import ChallangesAPI from "../services/challanges";
 import UserAPI from "../services/profileService";
 import { base64Uri } from "../utils/imageUtils";
 import DailyChallenge from "./DailyChallenge";
-import ChallangesAPI from "../services/challanges";
-import { Challanges } from "../models/Challanges";
 
 export default function Challenges() {
   const [data, setData] = useState<User>();
   const [showChallange, setShowChallange] = useState(false);
-  const [challangeData, setChallangeData] = useState<Challanges>();
+  const [challangeData, setChallangeData] = useState<Challange>();
+  const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
   const { theme } = useTheme();
+
+  const animatePoints = (points: number) => {
+    setEarnedPoints(points);
+    // Reset animation value
+    fadeAnim.setValue(0);
+
+    // Start fade in
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      // Keep visible for 1 second
+      Animated.delay(1000),
+      // Fade out
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setEarnedPoints(null);
+    });
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await UserAPI().getProfile();
         setData(response);
-        console.log(response)
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
@@ -37,10 +64,14 @@ export default function Challenges() {
   }, []);
 
   const handleButtonPress = async () => {
-    const response = await ChallangesAPI().getCurrentChallange();
-    setChallangeData(response);
-    setShowChallange(true);
-  }
+    try {
+      const response = await ChallangesAPI().getCurrentChallange();
+      setChallangeData(response);
+      setShowChallange(true);
+    } catch (error) {
+      console.error("Error fetching current daily challange:", error);
+    }
+  };
 
   return (
     <SafeAreaView
@@ -59,13 +90,37 @@ export default function Challenges() {
             }
             style={styles.profileImage}
           />
-          <View style={{ marginStart: 12 }}>
+          <View style={{ marginStart: 12, flex: 1 }}>
             <NunitoText style={styles.rankingLabel}>
               {data?.ranking ? data.ranking : "xº"} lugar ranking geral
             </NunitoText>
-            <NunitoText style={[styles.points, { color: theme.primary }]}>
-              {data?.readBooks ? data.points : "X"} PONTOS
-            </NunitoText>
+            <View style={styles.pointsContainer}>
+              <NunitoText style={[styles.points, { color: theme.primary }]}>
+                {data?.readBooks ? data.points : "X"} PONTOS
+              </NunitoText>
+              {earnedPoints && (
+                <Animated.View
+                  style={[
+                    styles.earnedPointsContainer,
+                    {
+                      opacity: fadeAnim,
+                      transform: [
+                        {
+                          translateX: fadeAnim.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [20, 0],
+                          }),
+                        },
+                      ],
+                    },
+                  ]}
+                >
+                  <NunitoText style={styles.earnedPoints}>
+                    +{earnedPoints} pontos
+                  </NunitoText>
+                </Animated.View>
+              )}
+            </View>
           </View>
         </View>
 
@@ -99,13 +154,27 @@ export default function Challenges() {
         </View>
       </ScrollView>
 
-      { challangeData && <DailyChallenge
-      visible={showChallange}
-      onClose={() => {setShowChallange(false)}}
-      question= {challangeData!.question}
-      alternatives= {challangeData!.alternatives}
-      points= {challangeData!.points}
-      ></DailyChallenge>}
+      {challangeData && (
+        <DailyChallenge
+          visible={showChallange}
+          onClose={async (earnedPoints) => {
+            setShowChallange(false);
+            if (earnedPoints) {
+              animatePoints(earnedPoints);
+              try {
+                const response = await UserAPI().getProfile();
+                setData(response);
+              } catch (error) {
+                console.error("Error refreshing profile:", error);
+              }
+            }
+          }}
+          question={challangeData!.question}
+          alternatives={challangeData!.alternatives}
+          points={challangeData!.points}
+          challengeId={challangeData!.challenge_id}
+        ></DailyChallenge>
+      )}
     </SafeAreaView>
   );
 }
@@ -157,5 +226,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 12,
+  },
+  pointsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  earnedPointsContainer: {
+    marginLeft: 10,
+    paddingTop: 5,
+  },
+  earnedPoints: {
+    color: "#4CAF50",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });

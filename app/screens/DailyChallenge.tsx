@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Modal, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
-import NunitoText from "../components/Texts/NunitoText";
-import CustomButton from "../components/Buttons/CustomButton";
-import ErrorModal from "../components/Modals/ErrorModal";
-import DailyCheckModal from "../components/Modals/DailyCheckModal";
-import { useTheme } from "../context/ThemeContext";
 import { AntDesign } from "@expo/vector-icons";
+import { AxiosError } from "axios";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { Modal, StyleSheet, TouchableOpacity, View } from "react-native";
+import CustomButton from "../components/Buttons/CustomButton";
+import DailyChallengeCheckModal from "../components/Modals/DailyCheckModal";
+import ErrorModal from "../components/Modals/ErrorModal";
+import NunitoText from "../components/Texts/NunitoText";
+import { useTheme } from "../context/ThemeContext";
 import ChallangesAPI from "../services/challanges";
 
 interface Alternatives {
@@ -16,10 +17,11 @@ interface Alternatives {
 
 interface DailyChallengeProps {
   visible: boolean;
-  onClose: () => void;
+  onClose: (earnedPoints?: number) => void;
   question: string;
   alternatives: Alternatives[];
   points: number;
+  challengeId: number;
 }
 
 const DailyChallenge: React.FC<DailyChallengeProps> = ({
@@ -27,16 +29,18 @@ const DailyChallenge: React.FC<DailyChallengeProps> = ({
   onClose,
   question,
   alternatives,
+  challengeId,
+  points,
 }) => {
   const { theme } = useTheme();
   const router = useRouter();
   const [selectedAlternative, setSelectedAlternative] = useState<number | null>(
     null
   );
-  const [showResult, setShowResult] = useState<boolean>(false);
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(false);
+  const [showResult, setShowResult] = useState<boolean | null>(null);
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
-  const [errormessage, setErrorMessage] = useState<string>(
+  const [errorMessage, setErrorMessage] = useState<string>(
     "Selecione uma alternativa antes de confirmar."
   );
 
@@ -45,27 +49,44 @@ const DailyChallenge: React.FC<DailyChallengeProps> = ({
   };
 
   const handleConfirm = async () => {
+    // If user didn't select an alternative, show error modal
     if (selectedAlternative === null) {
       setShowErrorModal(true);
       return;
     }
 
-    const isAnswerCorrect = await ChallangesAPI().checkAnswar(
-      alternatives[selectedAlternative].alternative_id
-    );
+    try {
+      const isAnswerCorrect = await ChallangesAPI().checkAnswar(
+        alternatives[selectedAlternative].alternative_id
+      );
 
-    setIsCorrect(isAnswerCorrect);
-    if(isCorrect == null) {
-        setErrorMessage("Ja respondeu o desafio diario");
-        setShowErrorModal(true);
+      if (isAnswerCorrect) {
+        setIsCorrect(true);
+        setShowResult(true);
+      } else {
+        setIsCorrect(false);
+        setShowResult(true);
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 400) {
+          setErrorMessage("Este desafio diário já foi respondido!");
+          setShowErrorModal(true);
+          return;
+        }
+      }
     }
-    setShowResult(true);
   };
 
   const handleClose = () => {
     setSelectedAlternative(null);
     setShowResult(false);
-    onClose();
+    // If the answer was correct, pass the points to onClose
+    if (isCorrect) {
+      onClose(points);
+    } else {
+      onClose();
+    }
   };
 
   return (
@@ -73,8 +94,6 @@ const DailyChallenge: React.FC<DailyChallengeProps> = ({
       <Modal
         visible={visible}
         animationType="slide"
-        transparent={true}
-        presentationStyle="fullScreen"
         onRequestClose={handleClose}
       >
         <View style={[styles.container, { backgroundColor: theme.Background }]}>
@@ -91,7 +110,7 @@ const DailyChallenge: React.FC<DailyChallengeProps> = ({
                 ]}
               >
                 <NunitoText style={[styles.header, { color: "black" }]}>
-                  Desafio 21
+                  Desafio {challengeId}
                 </NunitoText>
               </View>
             </View>
@@ -137,19 +156,22 @@ const DailyChallenge: React.FC<DailyChallengeProps> = ({
             </View>
           </View>
 
-          {isCorrect && <DailyCheckModal
-            visible={showResult}
-            onClose={() => {
-              handleClose();
-            }}
-            isCorrect={isCorrect!}
-          />}
+          {showResult !== null && (
+            <DailyChallengeCheckModal
+              visible={showResult}
+              onClose={() => {
+                handleClose();
+              }}
+              isCorrect={isCorrect!}
+              points={points}
+            />
+          )}
 
           <ErrorModal
             visible={showErrorModal}
             onClose={() => setShowErrorModal(false)}
             title="Atenção"
-            description={errormessage}
+            description={errorMessage}
             type="warning"
           />
         </View>
