@@ -31,7 +31,7 @@ const RatingModal: React.FC<RatingModalProps> = ({
   const [rating, setRating] = useState(0);
   const { RateBook } = RatingAPI();
 
-  const handleRate = async () => {
+  const handleRate = async (bookId: number, rating: number) => {
     try {
       await RateBook(bookId, rating);
       if (onRate) {
@@ -62,7 +62,7 @@ const RatingModal: React.FC<RatingModalProps> = ({
 
           <TouchableOpacity style={styles.button} onPress={async () => {
             try {
-              await RateBook(bookId, rating);
+              await handleRate(bookId, rating);
               onClose();
             } catch (error) {
             console.error("Erro ao avaliar:", error);

@@ -72,7 +72,7 @@ export default function BooksService() {
         await axiosInstance.post(
             `/books/rate-book`,
             {
-            bookId: bookId,
+            book_id: bookId,
             rating: rating,
             },
             {

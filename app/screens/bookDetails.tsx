@@ -364,6 +364,7 @@ export default function ModalBookDetails({
                       setModalVisible(false);
                     }}
                     book={title}
+                    bookId={Number(id)}
                   />
                 </View>
               </View>
