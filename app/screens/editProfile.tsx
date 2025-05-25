@@ -228,20 +228,20 @@ const styles = StyleSheet.create({
     top: 50,
     zIndex: 10,
   },
+  charCounter: {
+    alignSelf: "flex-end",
+    fontSize: 12,
+    marginBottom: 60,
+    marginRight: 20,
+  },
   container: {
     flex: 1,
   },
   formContainer: {
     alignSelf: "center",
     flex: 1,
+    gap: 5,
     paddingVertical: "15%",
     width: "90%",
-    gap: 5,
-  },
-  charCounter: {
-    alignSelf: "flex-end",
-    marginRight: 20,
-    marginBottom: 60,
-    fontSize: 12,
   },
 });
