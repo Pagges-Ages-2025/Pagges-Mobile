@@ -7,7 +7,7 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-import React, { forwardRef, useMemo, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -20,8 +20,19 @@ import CustomBook from "../Book/CustomBook";
 import BookSearch, { Book } from "../SearchBar/SearchBar";
 import NunitoText from "../Texts/NunitoText";
 
+// Interface estendida para suportar ambos os formatos de livro
+interface ExtendedBook extends Book {
+  title?: string;
+  google_image_url?: string;
+}
+
+interface SelectBookProps {
+  onSelectBook: (book: ExtendedBook) => void;
+  initialBook?: ExtendedBook | null;
+}
+
 const SelectBook = forwardRef(
-  ({ onSelectBook }: { onSelectBook: (book: Book) => void }, ref) => {
+  ({ onSelectBook, initialBook }: SelectBookProps, ref) => {
     const { theme, themeName } = useTheme();
     const bottomSheetRef = useRef<BottomSheet>(null);
     const [buttonVisible, setButtonVisible] = useState(true);
@@ -29,9 +40,16 @@ const SelectBook = forwardRef(
     const snapPoints = useMemo(() => [SCREEN_HEIGHT * 0.6], []);
     const [loading, setLoading] = useState(false);
     const { searchBooks } = SearchAPI();
-    const [books, setBooks] = useState<Book[]>([]);
-    const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+    const [books, setBooks] = useState<ExtendedBook[]>([]);
+    const [selectedBook, setSelectedBook] = useState<ExtendedBook | null>(null);
     const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+
+    // Utiliza o livro inicial quando disponível
+    useEffect(() => {
+      if (initialBook) {
+        setSelectedBook(initialBook);
+      }
+    }, [initialBook]);
 
     const handleOpen = () => {
       setIsBottomSheetOpen(true);
@@ -43,8 +61,8 @@ const SelectBook = forwardRef(
       setButtonVisible(true);
     };
 
-    const handleSelectBook = (book: Book) => {
-      registerBookInDatabase(book);
+    const handleSelectBook = (book: ExtendedBook) => {
+      registerBookInDatabase(book as Book);
       setSelectedBook(book);
       setButtonVisible(true);
       bottomSheetRef.current?.close();
@@ -55,12 +73,22 @@ const SelectBook = forwardRef(
       setLoading(true);
       try {
         const results = await searchBooks(term);
-        setBooks(results);
+        setBooks(results as ExtendedBook[]);
       } catch (error) {
         console.error("Erro ao buscar livros:", error);
       } finally {
         setLoading(false);
       }
+    };
+
+    // Função para obter o título do livro independente da estrutura
+    const getBookTitle = (book: ExtendedBook) => {
+      return book.titulo || book.title || "";
+    };
+
+    // Função para obter a capa do livro independente da estrutura
+    const getBookCover = (book: ExtendedBook) => {
+      return book.capa || book.google_image_url || "";
     };
 
     return (
@@ -100,7 +128,7 @@ const SelectBook = forwardRef(
                       iconPosition="left"
                       iconColor="grey"
                       borderRadius="md"
-                      books={books}
+                      books={books as Book[]}
                       onSelectBook={handleSelectBook}
                       onSearch={handleSearch}
                       isBottomSheet={true}
@@ -123,8 +151,8 @@ const SelectBook = forwardRef(
                         <CustomBook
                           key={item.id ?? index}
                           size="search"
-                          title={item.titulo}
-                          photoPath={item.capa}
+                          title={getBookTitle(item)}
+                          photoPath={getBookCover(item)}
                           bookId={item.id}
                           onPress={() => handleSelectBook(item)}
                         />
@@ -142,8 +170,8 @@ const SelectBook = forwardRef(
             {selectedBook ? (
               <CustomBook
                 size="search"
-                title={selectedBook.titulo}
-                photoPath={selectedBook.capa}
+                title={getBookTitle(selectedBook)}
+                photoPath={getBookCover(selectedBook)}
                 bookId={selectedBook.id}
                 onPress={handleOpen}
               />

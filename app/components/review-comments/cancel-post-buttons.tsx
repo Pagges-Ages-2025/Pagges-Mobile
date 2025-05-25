@@ -22,7 +22,7 @@ export default function CancelPost({
 
   const navigateTo = useCallback((screen: "searchPage" | "book") => {
     if (screen) {
-      router.push(`/screens/${screen}`);
+      router.push(`/screens/${screen}` as any);
     }
   }, []);
 
@@ -46,7 +46,7 @@ export default function CancelPost({
       <CustomButton
         onPress={onPost}
         size="small"
-        width={90}
+        width={100}
         height={35}
         title={Strings.post}
         type="secondary"
@@ -62,6 +62,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "transparent",
-    height: 40,
+    height: 50,
   },
 });

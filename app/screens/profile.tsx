@@ -1,6 +1,6 @@
 import ProfileHeader from "@/app/components/Profile/ProfileHeader";
 import { User } from "@/app/models/User";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import UserAPI from "@/app/services/profileService";
 import axiosInstance from "../services/axios-instance-singleton";
 import {
@@ -15,7 +15,7 @@ import { useTheme } from "../context/ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Biography from "../components/Biography/Biography";
 import Achievement from "../components/Achievements/Achievement";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { base64Uri } from "../utils/imageUtils";
 import NunitoText from "../components/Texts/NunitoText";
 import CustomButton from "../components/Buttons/CustomButton";
@@ -28,7 +28,7 @@ const getToken = async () => {
 
 export default function ProfileScreen() {
   const [data, setData] = useState<User>();
-  const [userGenres, setUserGenres] = useState<Genre[]>();
+  const [userGenres, setUserGenres] = useState<Genre[]>([]);
   const { theme } = useTheme();
   const router = useRouter();
 
@@ -37,44 +37,48 @@ export default function ProfileScreen() {
     readKms: 0,
   });
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      UserAPI()
-        .getUserStatistics()
-        .then((response: { readBooks: number; readKms: number }) => {
-          setStats(response);
-        })
-        .catch((error: any) => { });
-    };
-    fetchStats();
-  }, []);
+  const fetchUserGenres = async () => {
+    try {
+      const response = await axiosInstance.get('/user-genres/user');
+      setUserGenres(response.data.data);
+      console.log("Gêneros atualizados:", response.data.data);
+    } catch (error) {
+      console.error("Erro ao buscar os gêneros do usuário:", error);
+    }
+  };
+
+  const fetchProfile = async () => {
+    UserAPI()
+      .getProfile()
+      .then((response: User) => {
+        setData(response);
+      })
+      .catch((error: any) => { });
+  };
+
+  const fetchStats = async () => {
+    UserAPI()
+      .getUserStatistics()
+      .then((response: { readBooks: number; readKms: number }) => {
+        setStats(response);
+      })
+      .catch((error: any) => { });
+  };
+
+  // Atualiza dados quando a tela recebe foco
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+      fetchStats();
+      fetchUserGenres();
+    }, [])
+  );
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      UserAPI()
-        .getProfile()
-        .then((response: User) => {
-          setData(response);
-        })
-        .catch((error: any) => { });
-    };
     fetchProfile();
-  }, []);
-  
-  useEffect(() => {
-    const fetchUserGenres = async () => {
-      try {
-        const response = await axiosInstance.get('/user-genres/user');
-        setUserGenres(response.data.data);
-        console.log(response.data.data);
-      } catch (error) {
-        console.error("Erro ao buscar os gêneros do usuário:", error);
-      }
-    };
-  
+    fetchStats();
     fetchUserGenres();
   }, []);
-  
 
   const handleEditProfile = async () => {
     const token = await getToken();
@@ -122,9 +126,14 @@ export default function ProfileScreen() {
           }
           name={data?.name || "Seu Perfil"}
           isAuthor={data?.isAuthor || false}
-          genres={userGenres ?? []}
+          genres={userGenres}
           bEdit={true}
           onPressEdit={handleEditProfile}
+          isEditMode={false}
+          onPressEditGenres={() => router.push({
+            pathname: "/screens/favoriteGenre",
+            params: { from: "edit" },
+          })}
         />
 
         <View style={styles.statsContainer}>

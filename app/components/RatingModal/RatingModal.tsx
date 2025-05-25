@@ -13,7 +13,7 @@ import StarRating from "../StarRating/StarRating";
 interface RatingModalProps {
   visible: boolean;
   onClose: () => void;
-  onRate: () => void;
+  onRate: (rating: number) => void;
   book: string;
 }
 
@@ -44,7 +44,11 @@ const RatingModal: React.FC<RatingModalProps> = ({
             Sua avaliação será somada com as demais na nota do livro
           </Text>
 
-          <TouchableOpacity style={styles.button} onPress={onRate}>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={() => onRate(rating)}
+            disabled={rating === 0}
+          >
             <Text style={styles.buttonText}>Avaliar</Text>
           </TouchableOpacity>
         </View>
