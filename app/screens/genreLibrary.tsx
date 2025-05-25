@@ -124,7 +124,7 @@ const Library: React.FC<LibraryProps> = ({
                 <NunitoText style={{ fontSize: 14, maxWidth:100, textAlign: 'center', color: theme.quinaryText, fontWeight:'bold'}}>
                   {book.titulo}
                 </NunitoText>
-                <NunitoText style={{ fontSize: 13, maxWidth:100, textAlign: 'center', color: theme.quinaryText}}>
+                <NunitoText style={{ paddingTop:5, fontSize: 12, maxWidth:100, textAlign: 'center', color: theme.quinaryText,fontWeight: 'bold'}}>
                   {book.autores}
                 </NunitoText>
               </View>
