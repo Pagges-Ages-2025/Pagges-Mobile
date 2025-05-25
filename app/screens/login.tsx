@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useRouter } from "expo-router";
-// import LottieView from "lottie-react-native";
+import LottieView from "lottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -25,7 +25,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const lottieRef = useRef<LottieView>(null);
+  const lottieRef = useRef<LottieView>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,15 +43,13 @@ export default function LoginScreen() {
         email,
         password,
       });
-      console.log(responseData)
+
       await AsyncStorage.setItem("userToken", responseData.accessToken);
       await AsyncStorage.setItem("userEmail", email);
 
       router.replace("/screens/home");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log(error.response?.data);
-        console.log('teste')
         setError(
           error.status === 401
             ? "Usuário ou senha inválido"
@@ -119,13 +117,13 @@ export default function LoginScreen() {
               Bem-vindo de volta, leitor(a)!
             </NunitoText>
 
-            {/* <LottieView
+            <LottieView
               ref={lottieRef}
               source={require("../assets/animations/login.json")}
               style={styles.lottie}
               autoPlay={true}
               loop={true}
-            /> */}
+            />
 
             <PaggesTextInput
               style={styles.inputContainer}

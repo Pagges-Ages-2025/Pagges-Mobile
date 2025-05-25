@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   libraryButtonsContainer: {
     marginBottom: 30,
     marginHorizontal: 30,
-    marginTop: 10
+    marginTop: 10,
   },
   libraryTab: {
     alignItems: "center",
@@ -224,16 +224,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     flexDirection: "row",
     justifyContent: "space-around",
-  },
-  libraryTabsContainer: {
-    backgroundColor: "#F4F4F4",
-    borderRadius: 20,
-    flexDirection: "row",
-    padding: 3,
-  },
-  libraryTitle: {
-    fontSize: 18,
-    marginBottom: 15,
   },
   libraryTitle: {
     fontSize: 18,
