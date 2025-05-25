@@ -219,6 +219,7 @@ const SearchPage: React.FC = () => {
             }, 500);
           }}
           onShare={() => console.log("Compartilhar:", selectedBook.titulo)}
+          bookId={selectedBook.id}
         />
       )}
     </SafeAreaView>

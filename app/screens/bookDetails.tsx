@@ -48,6 +48,7 @@ interface ModalBookDetailsProps {
   google_image_url?: string;
   onCreateReview?: () => void;
   onShare?: () => void;
+  bookId?: number;
 }
 
 export default function ModalBookDetails({
@@ -67,6 +68,7 @@ export default function ModalBookDetails({
   google_image_url,
   onCreateReview,
   onShare,
+  bookId = 0,
 }: ModalBookDetailsProps) {
   const { theme } = useTheme();
   const [isMaximized, setIsMaximized] = useState(false);
@@ -413,11 +415,9 @@ export default function ModalBookDetails({
                 <RatingModal
                   visible={modalVisible}
                   onClose={() => setModalVisible(false)}
-                  onRate={(newRating) => {
-                    handleNewRating(newRating);
-                    setModalVisible(false);
-                  }}
+                  onRate={(newRating) => handleNewRating(newRating)}
                   book={title}
+                  bookId={bookId}
                 />
               </View>
 

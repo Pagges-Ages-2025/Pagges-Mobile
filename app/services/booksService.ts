@@ -1,4 +1,5 @@
-import axiosInstance from "./axios-instance-singleton"
+import axiosInstance from "./axios-instance-singleton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface Book {
   id: number;
@@ -13,6 +14,13 @@ export interface Book {
 }
 
 export default function BooksService() {
+
+    const getAuthToken = async (): Promise<string> => {
+        const token = await AsyncStorage.getItem("userToken");
+        if (!token) throw new Error("Token não encontrado");
+            return token;
+    };
+
 
     const getTrendingBooks = async () => {
         try {
@@ -38,8 +46,51 @@ export default function BooksService() {
         }
     }
 
+    const getAverageRating = async (bookId: number): Promise<number> => {
+        const token = await getAuthToken();
+
+        try {
+        const response = await axiosInstance.get(`/books/avarageRankBook/${bookId}`, {
+            headers: {
+            Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const average = response.data.average;
+        return average ? Math.round(average) : 0;
+        } catch (error) {
+        console.error("Erro ao buscar média de avaliação:", error);
+        return 0;
+        }
+    };
+
+
+    const RateBook = async (bookId: number, rating: number): Promise<void> => {
+        const token = await getAuthToken();
+
+        try {
+        await axiosInstance.post(
+            `/books/rate-book`,
+            {
+            bookId: bookId,
+            rating: rating,
+            },
+            {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            }
+        );
+        } catch (error) {
+        console.error("Erro ao enviar avaliação:", error);
+        throw error;
+        }
+    };
+    
     return {
         getTrendingBooks,
+        getAverageRating,
+        RateBook,
     }
     
 }
