@@ -10,6 +10,8 @@ import CustomCarousel from "../components/Carousel/CustomCarousel";
 import CustomBook from "../components/Book/CustomBook";
 import ModalBookDetails from "./bookDetails";
 import BooksService from "../services/booksService";
+import { retriveUserGenres } from "../services/genres.service";
+import SearchAPI from "../services/googleAPIService";
 
 export interface Book {
   id: number;
@@ -33,13 +35,21 @@ const Home: React.FC = () => {
   const { theme } = useTheme();
   const { getTrendingBooks } = BooksService();
   const [trendingBooks, setTradingBooks] = useState<Book[]>();
+  const [favoriteBasedBook, setFavoriteBasedBook] = useState<Book[]>();
   const [selectedTrendingBook, setSelectedTrendingBook] = useState<Book | null>(null);
+  const [selectedFavoriteBasedBook, setSelectedFavoriteBasedBook] = useState<Book | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { searchByGenre } = SearchAPI();
 
   const handleCloseModal = () => {
     setModalVisible(false);
     setSelectedTrendingBook(null);
+  };
+
+    const handleCloseFavoriteModal = () => {
+    setModalVisible(false);
+    setSelectedFavoriteBasedBook(null);
   };
 
   const handleSelectTrendingBook = (book: Book) => {
@@ -64,6 +74,54 @@ const Home: React.FC = () => {
   useEffect(() => {
     fetchTrendingBooks();
   }, [fetchTrendingBooks]);
+
+    const handleSelectFavoriteBasedBook = (book: Book) => {
+    setSelectedFavoriteBasedBook(book);
+    setModalVisible(true);
+  };
+
+  const fetchFavoriteBasedBooks = useCallback(async () => {
+    setLoading(true);
+    try {
+      const genresResponse = await retriveUserGenres();
+      const genres = genresResponse.data.map((g) => g.genre_name);
+
+      const booksByGenre: Book[] = [];
+
+      const topGenres = genres.slice(0, 3);
+
+      for (const genre of topGenres) {
+        const books = await searchByGenre(genre);
+        const formattedBooks = Array.isArray(books)
+          ? books.map((data: any) => ({
+              id: data.book_id,
+              title: data.title,
+              authors: data.authors?.split(",").map((a: string) => a.trim()) || [],
+              coverUrl: data.google_image_url || data.cover || "",
+              pages: data.pages,
+              publicationYear: String(data.year),
+              genres: data.genre?.split(",").map((g: string) => g.trim()) || [],
+              synopsis: data.synopsis,
+              avgRating: data.averageRating || 1,
+            }))
+          : [];
+
+        booksByGenre.push(...formattedBooks);
+      }
+
+      setFavoriteBasedBook(booksByGenre);
+    } catch (error) {
+      console.error("Erro ao buscar livros baseados nos favoritos:", error);
+      setFavoriteBasedBook([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTrendingBooks();
+    fetchFavoriteBasedBooks();
+  }, [fetchTrendingBooks, fetchFavoriteBasedBooks]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.Background }]}>
@@ -102,6 +160,35 @@ const Home: React.FC = () => {
                 : []
             }
           />
+
+          <NunitoText
+            style={[
+              styles.secondTitle,
+              { paddingBottom: 15, color: theme.primaryText },
+            ]}
+          >
+            Com base nos seus favoritos
+          </NunitoText>
+
+          <CustomCarousel
+            isHorizontal
+            data={
+              favoriteBasedBook
+                ? favoriteBasedBook.map((book) => (
+                    <CustomBook
+                      size="medium"
+                      key={book.id}
+                      bookId={book.id}
+                      photoPath={book.coverUrl}
+                      title={book.title}
+                      author={book.authors.join(", ")}
+                      onPress={() => handleSelectFavoriteBasedBook(book)}
+                    />
+                  ))
+                : []
+            }
+          />
+
         </View>
 
         {selectedTrendingBook && (
@@ -124,6 +211,8 @@ const Home: React.FC = () => {
             onShare={() => console.log("Compartilhar:", selectedTrendingBook.title)}
           />
         )}
+
+
       </ScrollView>
     </SafeAreaView>
   );
