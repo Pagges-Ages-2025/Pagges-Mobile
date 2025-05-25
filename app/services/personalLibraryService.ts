@@ -26,7 +26,21 @@ export default function PersonalLibraryService() {
     }
   };
 
+  const addBookToLibrary = async (bookId: string, state: string) => {
+    try {
+      const response = await axiosInstance.put(
+        `/personal-library/addBook/${bookId}`,
+        state
+      );
+      return response
+    } catch (error) {
+      console.error(`Erro ao livro à biblioteca`);
+      throw error;
+    }
+  };
+
   return {
     fetchBooksByArray,
+    addBookToLibrary,
   };
 }

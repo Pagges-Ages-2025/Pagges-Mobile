@@ -8,7 +8,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   ImageBackground,
@@ -30,7 +30,7 @@ import { ReviewComment } from "../components/review-comments/review-comments";
 import StaticStars from "../components/StaticStars/StaticStars";
 import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
-
+import PersonalLibraryService from "../services/personalLibraryService";
 interface ModalBookDetailsProps {
   visible: boolean;
   onClose: () => void;
@@ -97,28 +97,12 @@ export default function ModalBookDetails({
 
   const updateBookState = async (id: string, state: string) => {
     try {
-      // For testing, use this hardcoded token that works in personalLibrary.tsx
-      const token =
-        (await AsyncStorage.getItem("userToken")) ||
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2Mzc2MzQwLCJleHAiOjE3NDY0NjI3NDB9.qHYM2FNTzv-2jYFZS3Vd3h9VzynXAe8ItFog0yLrlrs";
-
-      console.log(`Adding book ${id} to ${state} library`);
-
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}/personal-library/addBook/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            state: state,
-          }),
-        }
+      const response = await PersonalLibraryService().addBookToLibrary(
+        id,
+        state
       );
 
-      if (response.ok) {
+      if (response.status === 200) {
         console.log(`Adicionado a ${state} da biblioteca pessoal`);
         if (Platform.OS === "android") {
           ToastAndroid.show(
@@ -132,10 +116,8 @@ export default function ModalBookDetails({
           );
         }
       } else {
-        const errorText = await response.text();
         console.error(
           `Erro ao adicionar livro com estado ${state}:`,
-          errorText
         );
         if (Platform.OS === "android") {
           ToastAndroid.show(
@@ -164,7 +146,7 @@ export default function ModalBookDetails({
 
   const handleNewRating = (newRating: number) => {
     setUserRating(newRating);
-    
+
     const total = currentRating * ratingCount;
     const updatedCount = ratingCount + 1;
     const newAverage = (total + newRating) / updatedCount;
@@ -184,7 +166,7 @@ export default function ModalBookDetails({
       console.log("Tentando abrir tela de criação de resenha");
       // Fechar o modal e liberar recursos imediatamente
       onClose();
-      
+
       // Tentar navegação direta depois de um delay para garantir que o modal foi fechado
       setTimeout(() => {
         try {
@@ -365,17 +347,16 @@ export default function ModalBookDetails({
             )}
 
             <NunitoText style={[styles.title, { color: theme.white }]}>
-              {title.length > 40 ?
-                title.substring(0, 40).trim() + "..."
+              {title.length > 40
+                ? title.substring(0, 40).trim() + "..."
                 : title}
             </NunitoText>
             <NunitoText style={[styles.subtitle, { color: theme.white }]}>
-              {authors ? 
-                authors.length > 30 ?
-                  authors.substring(0, 30).trim + "..."
+              {authors
+                ? authors.length > 30
+                  ? authors.substring(0, 30).trim + "..."
                   : authors
-                : "Autor desconhecido"
-              }
+                : "Autor desconhecido"}
             </NunitoText>
             <View
               style={{
