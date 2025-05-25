@@ -113,15 +113,22 @@ const Library: React.FC<LibraryProps> = ({
               />
             ):
             toGenreBooks.length > 0 ? toGenreBooks.map((book) => (
+              <>
               <View key={book.id} style={{ paddingHorizontal: 12, paddingVertical: 15 }}>
                 <CustomBook
                   size={"small"}
-                  title={book.titulo}
                   photoPath={book.capa}
                   onPress={() => handleSelectBook(book)}
                   bookId={book.id}
                 />
+                <NunitoText style={{ fontSize: 14, maxWidth:100, textAlign: 'center', color: theme.quinaryText, fontWeight:'bold'}}>
+                  {book.titulo}
+                </NunitoText>
+                <NunitoText style={{ fontSize: 13, maxWidth:100, textAlign: 'center', color: theme.quinaryText}}>
+                  {book.autores}
+                </NunitoText>
               </View>
+              </>
             )) : (
               <View style={styles.centered}>
                 <View style={{ paddingBottom: 10, height: 500, alignItems: 'center', justifyContent: 'center' }}>
