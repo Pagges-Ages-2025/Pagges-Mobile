@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   genreContent:{
-    paddingTop:30,
+    paddingTop:15,
   },
   secondTitle: {
     fontSize: 20,
