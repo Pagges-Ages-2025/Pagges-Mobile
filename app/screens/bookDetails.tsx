@@ -24,7 +24,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CustomBook from "../components/Book/CustomBook";
 import { SinopseExpandable } from "../components/Book/sinopseExpandable";
 import CustomButton from "../components/Buttons/CustomButton";
-import CustomCarousel from "../components/Carousel/CustomCarousel";
+import CustomCarousel from "../components/Carousel/CustomHomeCarousel";
 import RatingModal from "../components/RatingModal/RatingModal";
 import { ReviewComment } from "../components/review-comments/review-comments";
 import StaticStars from "../components/StaticStars/StaticStars";
@@ -73,6 +73,7 @@ export default function ModalBookDetails({
   const [showMoreText, setShowMoreText] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentRating, setCurrentRating] = useState(rating);
+  const [userRating, setUserRating] = useState(0);
   const [ratingCount, setRatingCount] = useState(1);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const roundedStars = Math.round(currentRating);
@@ -162,6 +163,8 @@ export default function ModalBookDetails({
   };
 
   const handleNewRating = (newRating: number) => {
+    setUserRating(newRating);
+    
     const total = currentRating * ratingCount;
     const updatedCount = ratingCount + 1;
     const newAverage = (total + newRating) / updatedCount;
@@ -178,7 +181,22 @@ export default function ModalBookDetails({
     if (onCreateReview) {
       onCreateReview();
     } else {
-      setModalVisible(true);
+      console.log("Tentando abrir tela de criação de resenha");
+      // Fechar o modal e liberar recursos imediatamente
+      onClose();
+      
+      // Tentar navegação direta depois de um delay para garantir que o modal foi fechado
+      setTimeout(() => {
+        try {
+          console.log("Navegando para tela de criação de resenha");
+          // Usar router.navigate porque o push pode estar preservando o histórico de navegação
+          router.push("/screens/createReviewComment");
+        } catch (error) {
+          console.error("Falha na navegação:", error);
+          // Alternativa de navegação em caso de falha
+          router.replace("/screens/home");
+        }
+      }, 700); // Aumentar o delay para dar mais tempo para o modal fechar
     }
   };
 
@@ -347,10 +365,17 @@ export default function ModalBookDetails({
             )}
 
             <NunitoText style={[styles.title, { color: theme.white }]}>
-              {title}
+              {title.length > 40 ?
+                title.substring(0, 40).trim() + "..."
+                : title}
             </NunitoText>
             <NunitoText style={[styles.subtitle, { color: theme.white }]}>
-              {authors}
+              {authors ? 
+                authors.length > 30 ?
+                  authors.substring(0, 30).trim + "..."
+                  : authors
+                : "Autor desconhecido"
+              }
             </NunitoText>
             <View
               style={{
@@ -380,7 +405,7 @@ export default function ModalBookDetails({
             >
               <View style={styles.starsContainer}>
                 <StaticStars
-                  rating={rating}
+                  rating={userRating > 0 ? userRating : rating}
                   onPress={() => {
                     setModalVisible(true);
                   }}
@@ -388,7 +413,8 @@ export default function ModalBookDetails({
                 <RatingModal
                   visible={modalVisible}
                   onClose={() => setModalVisible(false)}
-                  onRate={() => {
+                  onRate={(newRating) => {
+                    handleNewRating(newRating);
                     setModalVisible(false);
                   }}
                   book={title}
@@ -637,7 +663,7 @@ const styles = StyleSheet.create({
   },
   bookContentContainer: {
     position: "absolute",
-    top: "5%",
+    top: "7%",
     left: "5%",
     right: "5%",
     paddingHorizontal: 10,

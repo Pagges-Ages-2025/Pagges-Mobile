@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import Section from "../components/section";
 import CustomBook from "../../../components/Book/CustomBook"; 
-import CustomCarousel from "../../../components/Carousel/CustomCarousel";
+import CustomCarousel from "../../../components/Carousel/CustomHomeCarousel";
 
 const { width } = Dimensions.get("window");
 

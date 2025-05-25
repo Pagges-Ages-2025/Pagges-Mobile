@@ -16,6 +16,9 @@ import UserAPI from "@/app/services/profileService";
 import ErrorModal from "@/app/components/Modals/ErrorModal";
 import Strings from "../constants/Strings";
 import * as ImagePicker from "expo-image-picker";
+import NunitoText from "../components/Texts/NunitoText";
+import { Genre } from "../models/Genre";
+import axiosInstance from "../services/axios-instance-singleton";
 
 export default function EditProfileScreen() {
   const { theme } = useTheme();
@@ -31,6 +34,7 @@ export default function EditProfileScreen() {
   const [bioCharCount, setBioCharCount] = useState<number>(bio.length);
   const [changesMade, setChangesMade] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [userGenres, setUserGenres] = useState<Genre[]>([]);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
@@ -40,6 +44,19 @@ export default function EditProfileScreen() {
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | undefined>(
     undefined
   );
+
+  useEffect(() => {
+    const fetchUserGenres = async () => {
+      try {
+        const response = await axiosInstance.get('/user-genres/user');
+        setUserGenres(response.data.data);
+      } catch (error) {
+        console.error("Erro ao buscar os gêneros do usuário:", error);
+      }
+    };
+  
+    fetchUserGenres();
+  }, []);
 
   useEffect(() => {
     console.log("image changed" + image);
@@ -156,6 +173,7 @@ export default function EditProfileScreen() {
                 params: { from: "edit" },
               })
             }
+            genres={userGenres || []}
           />
 
           <View style={styles.formContainer}>
@@ -210,20 +228,20 @@ const styles = StyleSheet.create({
     top: 50,
     zIndex: 10,
   },
+  charCounter: {
+    alignSelf: "flex-end",
+    fontSize: 12,
+    marginBottom: 60,
+    marginRight: 20,
+  },
   container: {
     flex: 1,
   },
   formContainer: {
     alignSelf: "center",
     flex: 1,
+    gap: 5,
     paddingVertical: "15%",
     width: "90%",
-    gap: 5,
-  },
-  charCounter: {
-    alignSelf: "flex-end",
-    marginRight: 20,
-    marginBottom: 60,
-    fontSize: 12,
   },
 });
