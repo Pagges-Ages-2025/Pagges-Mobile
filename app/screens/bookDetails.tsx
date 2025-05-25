@@ -2,10 +2,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import BottomSheet, {
-  BottomSheetHandle,
-  BottomSheetScrollView,
-} from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, {
@@ -38,10 +34,12 @@ import StaticStars from "../components/StaticStars/StaticStars";
 import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
 import PersonalLibraryService from "../services/personalLibraryService";
+import BooksService from "../services/booksService";
+import { Book } from "../components/SearchBar/SearchBar";
+import { registerBookInDatabase } from "../services/handle-select-book.service";
 interface ModalBookDetailsProps {
   visible: boolean;
   onClose: () => void;
-  rating: number;
   title: string;
   pages?: number;
   readersNumber?: number;
@@ -55,12 +53,12 @@ interface ModalBookDetailsProps {
   google_image_url?: string;
   onCreateReview?: () => void;
   onShare?: () => void;
+  bookId: number;
 }
 
 export default function ModalBookDetails({
   visible,
   onClose,
-  rating,
   title,
   readersNumber = 1000,
   pages,
@@ -74,16 +72,29 @@ export default function ModalBookDetails({
   google_image_url,
   onCreateReview,
   onShare,
+  bookId,
 }: ModalBookDetailsProps) {
   const { theme } = useTheme();
-  const [showMoreText, setShowMoreText] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [currentRating, setCurrentRating] = useState(rating);
-  const [userRating, setUserRating] = useState(0);
-  const [ratingCount, setRatingCount] = useState(1);
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const roundedStars = Math.round(currentRating);
-  const snapPoints = useMemo(() => ["62%"], []);
+  const [averageRating, setAverageRating] = useState(0);
+
+  const updateAverageRating = () => {
+    try {
+      console.log("updateAverageRating:", bookId);
+      BooksService()
+        .getAverageRating(bookId)
+        .then((response) => {
+          console.log("Média de avaliação:", response);
+          setAverageRating(response);
+        });
+    } catch (error) {
+      console.error("Erro ao buscar média de avaliação:", error);
+    }
+  };
+
+  useEffect(() => {
+    updateAverageRating();
+  }, []);
 
   const updateBookState = async (id: string, state: string) => {
     try {
@@ -132,17 +143,6 @@ export default function ModalBookDetails({
     }
   };
 
-  const handleNewRating = (newRating: number) => {
-    setUserRating(newRating);
-
-    const total = currentRating * ratingCount;
-    const updatedCount = ratingCount + 1;
-    const newAverage = (total + newRating) / updatedCount;
-
-    setCurrentRating(newAverage);
-    setRatingCount(updatedCount);
-  };
-
   const handleBackPress = () => {
     onClose();
   };
@@ -181,7 +181,7 @@ export default function ModalBookDetails({
   const bookStats = [
     { value: readersNumber, label: "Leitores" },
     { value: pages, label: "Páginas" },
-    { value: currentRating?.toFixed(1), label: "Avaliação" },
+    { value: averageRating?.toFixed(1), label: "Avaliação" },
     { value: `#${rankingNumber}`, label: "Ranking" },
   ];
 
@@ -229,7 +229,6 @@ export default function ModalBookDetails({
           processedUrl = processedUrl.replace("http:", "https:");
         }
 
-        console.log("URL de imagem processada:", processedUrl);
         return processedUrl;
       } catch (error) {
         console.error("Erro ao processar URL da imagem:", error);
@@ -249,7 +248,6 @@ export default function ModalBookDetails({
           source={coverImage}
           style={styles.backgroundImage}
           onError={(e) => {
-            console.log("Error loading book cover:", e.nativeEvent.error);
             setCoverImageError(true);
           }}
         >
@@ -349,7 +347,7 @@ export default function ModalBookDetails({
               >
                 <View style={styles.starsContainer}>
                   <StaticStars
-                    rating={userRating > 0 ? userRating : rating}
+                    rating={Math.round(averageRating)}
                     onPress={() => {
                       setModalVisible(true);
                     }}
@@ -357,13 +355,37 @@ export default function ModalBookDetails({
                   <RatingModal
                     visible={modalVisible}
                     onClose={() => setModalVisible(false)}
-                    onRate={(newRating) => {
-                      handleNewRating(newRating);
+                    onRate={() => {
+                      updateAverageRating();
                       setModalVisible(false);
                     }}
                     book={title}
+                    bookId={Number(id)}
                   />
                 </View>
+                <TouchableOpacity
+                  onPress={() => setModalVisible(true)}
+                  style={{
+                    borderRadius: 15,
+                    backgroundColor: theme.primary,
+                    width: "35%",
+                    height: 25,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "row",
+                    marginRight: 10,
+                  }}
+                >
+                  <NunitoText
+                    style={{
+                      fontSize: 15,
+                      fontWeight: "bold",
+                      color: theme.white,
+                    }}
+                  >
+                    Avaliar
+                  </NunitoText>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -532,6 +554,20 @@ export default function ModalBookDetails({
       <BookContent />
     </Modal>
   );
+}
+
+export async function getBookWithRegisteredId(
+  book: Book,
+  callback: (book: Book) => void
+) {
+  const registerdBook = await registerBookInDatabase(book);
+
+  const bookWithRegisteredId = {
+    ...book,
+    id: registerdBook.book_id,
+  };
+
+  callback(bookWithRegisteredId);
 }
 
 const styles = StyleSheet.create({
