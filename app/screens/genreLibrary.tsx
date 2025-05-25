@@ -5,8 +5,6 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
-  Modal,
-  BackHandler,
   Animated,
   ActivityIndicator,
 } from 'react-native';
@@ -14,7 +12,6 @@ import { Ionicons } from '@expo/vector-icons';
 import NunitoText from '../components/Texts/NunitoText';
 import CustomBook from '../components/Book/CustomBook';
 import { useTheme } from '../context/ThemeContext';
-import ModalBookDetails from './bookDetails';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 //import { Book } from '../models/genreLibrary';
 import { Book } from "../components/SearchBar/SearchBar";
@@ -23,13 +20,11 @@ import { registerBookInDatabase } from '../services/handle-select-book.service';
 const { width } = Dimensions.get('window');
 
   interface LibraryProps {
-    isVisible?: boolean;
     onClose?: () => void;
     pageIndex?: number;
   }
 
 const Library: React.FC<LibraryProps> = ({
-  isVisible,
   onClose,
   pageIndex = 0,
 }) => {
@@ -42,30 +37,12 @@ const Library: React.FC<LibraryProps> = ({
   const [actualPage] = useState(initialPageIndex);
   const [toGenreBooks, setGenreBooks] = useState<Book[]>([]);
   const [selectedBook, setSelectedBook] = useState<any>(null);
-  const [modalBookVisible, setModalBookVisible] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [isModalMode] = useState(isVisible !== undefined);
   const slideAnim = useRef(new Animated.Value(actualPage)).current;
   const { searchBooks } = SearchAPI();
-  
-  // Handle back button press for standalone screen mode
-  useEffect(() => {
-    if (!isModalMode) {
-      const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-        router.back();
-        return true;
-      });
-      
-      return () => backHandler.remove();
-    }
-  }, [isModalMode, router]);
 
   const handleClose = () => {
-    if (isModalMode && onClose) {
-      onClose();
-    } else {
       router.back();
-    }
   };
 
   const fetchBooks = async (genres: string) => {
@@ -89,11 +66,6 @@ const Library: React.FC<LibraryProps> = ({
       setSelectedBook(book);
       //onSelectBook && onSelectBook(book);
     };
-
-  const handleCloseModal = () => {
-    setModalBookVisible(false);
-    setSelectedBook(null);
-  };
   
   useEffect(() => {
     if (selectedBook) {
@@ -105,7 +77,7 @@ const Library: React.FC<LibraryProps> = ({
     fetchBooks(selectedGenres);
   }, []);
 
-  const content = (
+  return (
     <View style={[styles.container, {backgroundColor: theme.personalLibraryBackground}]}>
       {/* header */}
       <View style={styles.headerPage}>
@@ -163,54 +135,6 @@ const Library: React.FC<LibraryProps> = ({
         </ScrollView>
       </View>
     </View>
-  );
-
-  // Return either as a modal or a direct component
-  return isModalMode ? (
-    <Modal
-     animationType='slide'
-     visible={isVisible}
-     onRequestClose={handleClose}
-     presentationStyle='fullScreen'
-    >
-      {content}
-      {selectedBook && (
-        <ModalBookDetails
-          visible={modalBookVisible}
-          onClose={handleCloseModal}
-          rating={selectedBook.ratings?.[0]?.rating ?? 0}
-          title={selectedBook.title}
-          pages={selectedBook.pages}
-          synopsis={selectedBook.synopsis}
-          authors={selectedBook.authors}
-          google_image_url={selectedBook.google_image_url}
-          genre={selectedBook.genre}
-          year={selectedBook.year}
-          review={selectedBook.review}
-          id={selectedBook.id}
-        />
-      )}
-    </Modal>
-  ) : (
-    <>
-      {content}
-      {selectedBook && (
-        <ModalBookDetails
-          visible={modalBookVisible}
-          onClose={handleCloseModal}
-          rating={selectedBook.ratings?.[0]?.rating ?? 0}
-          title={selectedBook.title}
-          pages={selectedBook.pages}
-          synopsis={selectedBook.synopsis}
-          authors={selectedBook.authors}
-          google_image_url={selectedBook.google_image_url}
-          genre={selectedBook.genre}
-          year={selectedBook.year}
-          review={selectedBook.review}
-          id={selectedBook.id}
-        />
-      )}
-    </>
   );
 };
 
