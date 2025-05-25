@@ -8,14 +8,19 @@ interface Props {
   text: string; 
   onDelete: () => void;
   isHistoryItem?: boolean;
+  onSelect?: () => void;  // Nova prop para selecionar o item
 }
 
 
-export const SearchHistoryItem = ({ text, onDelete, isHistoryItem}: Props) => {
+export const SearchHistoryItem = ({ text, onDelete, isHistoryItem, onSelect }: Props) => {
   const { theme } = useTheme(); 
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.Background }]}>      
+    <TouchableOpacity 
+      style={[styles.container, { backgroundColor: theme.Background }]}
+      onPress={onSelect}
+      disabled={!onSelect}
+    >      
       {/* Ícone de relógio à esquerda */}
       {isHistoryItem && <MaterialIcons name="history" size={24} color={theme.placeholder} />}
 
@@ -24,11 +29,16 @@ export const SearchHistoryItem = ({ text, onDelete, isHistoryItem}: Props) => {
 
       {/* Botão para excluir o item, exibido apenas se for um item do histórico */}
       {isHistoryItem && (
-        <TouchableOpacity onPress={onDelete}>
+        <TouchableOpacity 
+          onPress={(e) => {
+            e.stopPropagation(); // Impede que o evento de clique se propague para o componente pai
+            onDelete();
+          }}
+        >
           <Feather name="x" size={24} color={theme.placeholder} />
         </TouchableOpacity>
       )}
-    </View>
+    </TouchableOpacity>
   );
 };
 

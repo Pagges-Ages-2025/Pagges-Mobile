@@ -44,7 +44,8 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
     "/screens/splash",
     "/screens/welcome",
     "/screens/book",
-    "/screens/favoriteGenre"
+    "/screens/favoriteGenre",
+    "/screens/createReviewComment"
   ];
 
   const { themeName } = useTheme();
@@ -86,7 +87,7 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
               gestureDirection: "vertical",
             }} />
             <Stack.Screen name="profile" />
-            <Stack.Screen name="createreReviewComment" />
+            <Stack.Screen name="createReviewComment" />
           </Stack>
           {!removeNavbarFromPageList.includes(pathname) && <NavBar />}
         </View>

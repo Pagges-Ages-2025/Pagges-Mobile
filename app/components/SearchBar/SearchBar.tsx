@@ -1,5 +1,5 @@
 import Strings from "@/app/constants/Strings";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   FlatList,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -42,6 +43,7 @@ interface BookSearchProps {
   placeholder?: string;
   onSearch?: (term: string) => void;
   isBottomSheet?: boolean;
+  searchText?: string;
 }
 
 export default function BookSearch({
@@ -56,11 +58,19 @@ export default function BookSearch({
   placeholder = "Buscar Livro...",
   onSearch,
   isBottomSheet = false,
+  searchText,
 }: BookSearchProps) {
   const [query, setQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { theme } = useTheme();
   const inputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (searchText !== undefined) {
+      setQuery(searchText);
+      setShowSuggestions(searchText.length > 0 && books.length > 0);
+    }
+  }, [searchText, books.length]);
 
   const dynamicStyles = {
     height: SearchSize === "lg" ? 50 : SearchSize === "md" ? 40 : 35,
@@ -92,17 +102,28 @@ export default function BookSearch({
 
   const handleSearch = (text: string) => {
     setQuery(text);
-    setShowSuggestions(true);
-    // Só dispara a busca se o texto não estiver vazio
-    if (onSearch && text.trim().length > 0) {
-      onSearch(text);
+    setShowSuggestions(text.length > 0);
+    
+    if (onSearch) {
+      if (text.trim().length > 0) {
+        onSearch(text);
+      } else {
+        onSearch("");
+      }
     }
   };
 
-  // Função para fechar sugestões e teclado
+  const handleClearSearch = () => {
+    setQuery("");
+    setShowSuggestions(false);
+    if (onSearch) {
+      onSearch("");
+    }
+    inputRef.current?.focus();
+  };
+
   const handlePressOutside = () => {
     setShowSuggestions(false);
-    setQuery(""); // Limpa o texto da busca
     Keyboard.dismiss();
   };
 
@@ -145,7 +166,7 @@ export default function BookSearch({
                 onChangeText={handleSearch}
                 placeholder={placeholder}
                 placeholderTextColor={theme.placeholder}
-                onFocus={() => setShowSuggestions(true)}
+                onFocus={() => setShowSuggestions(query.length > 0)}
               />
               <View
                 style={[
@@ -153,14 +174,24 @@ export default function BookSearch({
                   dynamicStyles.iconPositionStyle,
                 ]}
               >
-                <Ionicons
-                  name="search"
-                  size={20}
-                  color={dynamicStyles.iconColor}
-                />
+                {query.length > 0 ? (
+                  <TouchableOpacity onPress={handleClearSearch}>
+                    <MaterialIcons
+                      name="cancel"
+                      size={20}
+                      color={dynamicStyles.iconColor}
+                    />
+                  </TouchableOpacity>
+                ) : (
+                  <Ionicons
+                    name="search"
+                    size={20}
+                    color={dynamicStyles.iconColor}
+                  />
+                )}
               </View>
             </View>
-            {showSuggestions && query.length > 0 && !isBottomSheet && (
+            {showSuggestions && query.length > 0 && books.length > 0 && !isBottomSheet && (
               <View style={styles.suggestionsContainer}>
                 <FlatList
                   data={books}
