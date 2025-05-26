@@ -5,7 +5,7 @@ export default function PersonalLibraryService() {
   const fetchBooksByArray = async (category: BookCategory): Promise<Book[]> => {
     try {
       const response = await axiosInstance.get(
-        `/personal-library/getBooksArray/${category}`
+        `/personal-library/getBookshelfByState?category=${category}`
       );
 
       const mappedBooks = response.data.map(
@@ -26,13 +26,16 @@ export default function PersonalLibraryService() {
     }
   };
 
-  const addBookToLibrary = async (bookId: string, state: string) => {
+  const addBookToLibrary = async (bookId: number, state: string) => {
     try {
-      const response = await axiosInstance.put(
-        `/personal-library/addBook/${bookId}`,
-        state
+      const response = await axiosInstance.post(
+        `/personal-library/addBookToBookshelf`,
+        {
+          book_id: bookId,
+          state: state,
+        }
       );
-      return response
+      return response;
     } catch (error) {
       console.error(`Erro ao livro à biblioteca`);
       throw error;

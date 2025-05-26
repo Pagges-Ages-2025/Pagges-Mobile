@@ -96,7 +96,7 @@ export default function Challenges() {
             </NunitoText>
             <View style={styles.pointsContainer}>
               <NunitoText style={[styles.points, { color: theme.primary }]}>
-                {data?.readBooks ? data.points : "X"} PONTOS
+                {data?.points == undefined ? 0 : data.points} PONTOS
               </NunitoText>
               {earnedPoints && (
                 <Animated.View

@@ -2,15 +2,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   ImageBackground,
@@ -23,20 +16,19 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CustomBook from "../components/Book/CustomBook";
 import { SinopseExpandable } from "../components/Book/sinopseExpandable";
 import CustomButton from "../components/Buttons/CustomButton";
 import CustomCarousel from "../components/Carousel/CustomHomeCarousel";
 import RatingModal from "../components/RatingModal/RatingModal";
 import { ReviewComment } from "../components/review-comments/review-comments";
+import { Book } from "../components/SearchBar/SearchBar";
 import StaticStars from "../components/StaticStars/StaticStars";
 import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
-import PersonalLibraryService from "../services/personalLibraryService";
 import BooksService from "../services/booksService";
-import { Book } from "../components/SearchBar/SearchBar";
 import { registerBookInDatabase } from "../services/handle-select-book.service";
+import PersonalLibraryService from "../services/personalLibraryService";
 interface ModalBookDetailsProps {
   visible: boolean;
   onClose: () => void;
@@ -53,7 +45,7 @@ interface ModalBookDetailsProps {
   google_image_url?: string;
   onCreateReview?: () => void;
   onShare?: () => void;
-  bookId: number;
+  bookId: number; // ID Autogerado do banco de dados
 }
 
 export default function ModalBookDetails({
@@ -96,10 +88,10 @@ export default function ModalBookDetails({
     updateAverageRating();
   }, []);
 
-  const updateBookState = async (id: string, state: string) => {
+  const updateBookState = async (bookId: number, state: string) => {
     try {
       const response = await PersonalLibraryService().addBookToLibrary(
-        id,
+        bookId,
         state
       );
 
@@ -190,21 +182,21 @@ export default function ModalBookDetails({
       label: "Já li",
       onPress: async () => {
         console.log("Ação: Já li");
-        await updateBookState(id, "READ");
+        await updateBookState(bookId, "READ");
       },
     },
     {
       label: "Lendo",
       onPress: async () => {
         console.log("Ação: Estou lendo");
-        await updateBookState(id, "READING");
+        await updateBookState(bookId, "READING");
       },
     },
     {
       label: "Quero ler",
       onPress: async () => {
         console.log("Ação: Quero ler");
-        await updateBookState(id, "TO_BE_READ");
+        await updateBookState(bookId, "TO_BE_READ");
       },
     },
   ];

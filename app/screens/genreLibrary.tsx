@@ -1,39 +1,38 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
+  ActivityIndicator,
+  Animated,
   Dimensions,
   ScrollView,
-  Animated,
-  ActivityIndicator,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import NunitoText from '../components/Texts/NunitoText';
-import CustomBook from '../components/Book/CustomBook';
-import { useTheme } from '../context/ThemeContext';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import CustomBook from "../components/Book/CustomBook";
+import NunitoText from "../components/Texts/NunitoText";
+import { useTheme } from "../context/ThemeContext";
 //import { Book } from '../models/genreLibrary';
 import { Book } from "../components/SearchBar/SearchBar";
-import SearchAPI from '../services/googleAPIService';
-import { registerBookInDatabase } from '../services/handle-select-book.service';
-const { width } = Dimensions.get('window');
+import SearchAPI from "../services/googleAPIService";
+import { registerBookInDatabase } from "../services/handle-select-book.service";
+const { width } = Dimensions.get("window");
 
-  interface LibraryProps {
-    onClose?: () => void;
-    pageIndex?: number;
-  }
+interface LibraryProps {
+  onClose?: () => void;
+  pageIndex?: number;
+}
 
-const Library: React.FC<LibraryProps> = ({
-  onClose,
-  pageIndex = 0,
-}) => {
+const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
   const { theme } = useTheme();
   const router = useRouter();
   const params = useLocalSearchParams();
-  const initialPageIndex = params.pageIndex ? Number(params.pageIndex) : pageIndex;
+  const initialPageIndex = params.pageIndex
+    ? Number(params.pageIndex)
+    : pageIndex;
   const selectedGenres = params.selectedGenre.toString();
-  
+
   const [actualPage] = useState(initialPageIndex);
   const [toGenreBooks, setGenreBooks] = useState<Book[]>([]);
   const [selectedBook, setSelectedBook] = useState<any>(null);
@@ -42,43 +41,47 @@ const Library: React.FC<LibraryProps> = ({
   const { searchBooks } = SearchAPI();
 
   const handleClose = () => {
-      router.back();
+    router.back();
   };
 
   const fetchBooks = async (genres: string) => {
-    try {     
+    try {
       const mappedBooks = await searchBooks(genres);
       setGenreBooks(mappedBooks);
       setLoading(false);
-    }
-    catch (error) {
+    } catch (error) {
       console.error(`Erro ao buscar livros do genero ${genres}:`, error);
     }
-  }
+  };
 
   // Inicializa a animação com o valor correto quando o componente é montado
   useEffect(() => {
     slideAnim.setValue(initialPageIndex);
   }, []);
 
-    const handleSelectBook = (book: Book) => {
-      registerBookInDatabase(book);
-      setSelectedBook(book);
-      //onSelectBook && onSelectBook(book);
-    };
-  
+  const handleSelectBook = (book: Book) => {
+    registerBookInDatabase(book);
+    setSelectedBook(book);
+    //onSelectBook && onSelectBook(book);
+  };
+
   useEffect(() => {
     if (selectedBook) {
-      console.log('Livro selecionado:', selectedBook);
+      console.log("Livro selecionado:", selectedBook);
     }
   }, [selectedBook]);
-  
+
   useEffect(() => {
     fetchBooks(selectedGenres);
   }, []);
 
   return (
-    <View style={[styles.container, {backgroundColor: theme.personalLibraryBackground}]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: theme.personalLibraryBackground },
+      ]}
+    >
       {/* header */}
       <View style={styles.headerPage}>
         <TouchableOpacity onPress={handleClose} style={[styles.circleButton]}>
@@ -91,48 +94,90 @@ const Library: React.FC<LibraryProps> = ({
         </TouchableOpacity>
 
         <View style={{ paddingLeft: "13%" }}>
-          <NunitoText style={{ fontSize: 20, fontWeight: "bold", color: theme.quinaryText }}>
+          <NunitoText
+            style={{
+              fontSize: 20,
+              fontWeight: "bold",
+              color: theme.quinaryText,
+            }}
+          >
             {selectedGenres}
           </NunitoText>
         </View>
       </View>
 
-      <View style={{ flex: 1, width: '100%' }}>
+      <View style={{ flex: 1, width: "100%" }}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           style={{ flex: 1 }}
           nestedScrollEnabled
         >
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              justifyContent: "center",
+            }}
+          >
             {loading ? (
               <ActivityIndicator
                 size="small"
                 color="#000"
                 style={{ marginLeft: 10, marginTop: 20 }}
               />
-            ):
-            toGenreBooks.length > 0 ? toGenreBooks.map((book) => (
-              <>
-              <View key={book.id} style={{ paddingHorizontal: 12, paddingVertical: 15 }}>
-                <CustomBook
-                  size={"small"}
-                  photoPath={book.capa}
-                  onPress={() => handleSelectBook(book)}
-                  bookId={book.id}
-                />
-                <NunitoText style={{ fontSize: 14, maxWidth:100, textAlign: 'center', color: theme.quinaryText, fontWeight:'bold'}}>
-                  {book.titulo}
-                </NunitoText>
-                <NunitoText style={{ paddingTop:5, fontSize: 12, maxWidth:100, textAlign: 'center', color: theme.quinaryText,fontWeight: 'bold'}}>
-                  {book.autores}
-                </NunitoText>
-              </View>
-              </>
-            )) : (
+            ) : toGenreBooks.length > 0 ? (
+              toGenreBooks.map((book) => (
+                <React.Fragment key={book.id}>
+                  <View style={{ paddingHorizontal: 12, paddingVertical: 15 }}>
+                    <CustomBook
+                      size={"small"}
+                      photoPath={book.capa}
+                      onPress={() => handleSelectBook(book)}
+                      bookId={book.id}
+                    />
+                    <NunitoText
+                      style={{
+                        fontSize: 14,
+                        maxWidth: 100,
+                        textAlign: "center",
+                        color: theme.quinaryText,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {book.titulo}
+                    </NunitoText>
+                    <NunitoText
+                      style={{
+                        paddingTop: 5,
+                        fontSize: 12,
+                        maxWidth: 100,
+                        textAlign: "center",
+                        color: theme.quinaryText,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {book.autores}
+                    </NunitoText>
+                  </View>
+                </React.Fragment>
+              ))
+            ) : (
               <View style={styles.centered}>
-                <View style={{ paddingBottom: 10, height: 500, alignItems: 'center', justifyContent: 'center' }}>
-                  <NunitoText style={{ fontSize: 18, fontWeight: "bold", color: theme.quinaryText }}>
+                <View
+                  style={{
+                    paddingBottom: 10,
+                    height: 500,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <NunitoText
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      color: theme.quinaryText,
+                    }}
+                  >
                     Nenhum livro de {selectedGenres} encontrado...
                   </NunitoText>
                 </View>
@@ -149,62 +194,62 @@ export default Library;
 
 const styles = StyleSheet.create({
   activeTab: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   barContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     height: 2,
-    justifyContent: 'center',
-    position: 'relative',
-    width: '90%',
+    justifyContent: "center",
+    position: "relative",
+    width: "90%",
     marginBottom: 15,
   },
   button: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingBottom: 10,
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 10,
   },
   circleButton: {
-    alignItems: 'center',
+    alignItems: "center",
     borderRadius: 20,
     height: 40,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingLeft: 3,
     width: 40,
   },
   container: {
     flex: 1,
-    width: '100%',
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
   },
   headerPage: {
-    alignItems: 'center',
+    alignItems: "center",
     flexDirection: "row",
     marginTop: 80,
     paddingLeft: 30,
-    width: '100%',
+    width: "100%",
   },
   onTopBar: {
-    alignItems: 'center',
-    backgroundColor: '#9D0F54',
+    alignItems: "center",
+    backgroundColor: "#9D0F54",
     bottom: 0,
     height: 3,
-    justifyContent: 'center',
-    position: 'absolute',
+    justifyContent: "center",
+    position: "absolute",
     borderRadius: 1.5,
   },
   tabs: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingTop: 30,
-    width: '90%',
-    justifyContent: 'space-between',
+    width: "90%",
+    justifyContent: "space-between",
     marginBottom: 10,
   },
   textTabs: {
     fontSize: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   scrollContent: {
     alignItems: "center",
@@ -213,7 +258,7 @@ const styles = StyleSheet.create({
   },
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
