@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import StaticSearchBar from "../components/SearchBar/StaticSearchBar";
 import { useTheme } from "../context/ThemeContext";
@@ -33,9 +33,11 @@ const Home: React.FC = () => {
   const { theme } = useTheme();
   const { getTrendingBooks } = BooksService();
   const [trendingBooks, setTradingBooks] = useState<Book[]>();
-  const [selectedTrendingBook, setSelectedTrendingBook] = useState<Book | null>(null);
+  const [selectedTrendingBook, setSelectedTrendingBook] = useState<Book | null>(
+    null
+  );
   const [modalVisible, setModalVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleCloseModal = () => {
     setModalVisible(false);
@@ -53,11 +55,12 @@ const Home: React.FC = () => {
       const results = await getTrendingBooks();
       const formattedResults = Array.isArray(results) ? results : [];
       setTradingBooks(formattedResults);
+
+      setLoading(false);
     } catch (error) {
       console.error("Erro ao buscar livros em alta:", error);
       setTradingBooks([]);
-    } finally {
-      setLoading(false);
+      setLoading(false); 
     }
   }, []);
 
@@ -66,7 +69,9 @@ const Home: React.FC = () => {
   }, [fetchTrendingBooks]);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.Background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.Background }]}
+    >
       <ScrollView>
         <View style={styles.content}>
           <StaticSearchBar />
@@ -84,24 +89,32 @@ const Home: React.FC = () => {
             Em alta
           </NunitoText>
 
-          <CustomCarousel
-            isHorizontal
-            data={
-              trendingBooks
-                ? trendingBooks.map((book) => (
-                    <CustomBook
-                      size="small"
-                      key={book.id}
-                      bookId={book.id}
-                      photoPath={book.coverUrl}
-                      title={book.title}
-                      author={book.authors.join(", ")}
-                      onPress={() => handleSelectTrendingBook(book)}
-                    />
-                  ))
-                : []
-            }
-          />
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.primary} />
+            </View>
+          ) : trendingBooks && trendingBooks.length > 0 ? (
+            <CustomCarousel
+              isHorizontal
+              data={trendingBooks.map((book) => (
+                <CustomBook
+                  size="small"
+                  key={book.id}
+                  bookId={book.id}
+                  photoPath={book.coverUrl}
+                  title={book.title}
+                  author={book.authors.join(", ")}
+                  onPress={() => handleSelectTrendingBook(book)}
+                />
+              ))}
+            />
+          ) : (
+            <View style={styles.emptyContainer}>
+              <NunitoText style={{ color: theme.primaryText }}>
+                <ActivityIndicator size="large" color="#9D0F54" />
+              </NunitoText>
+            </View>
+          )}
         </View>
 
         {selectedTrendingBook && (
@@ -113,15 +126,24 @@ const Home: React.FC = () => {
             pages={selectedTrendingBook.pages || 0}
             synopsis={selectedTrendingBook.synopsis || "Sinopse não disponível"}
             review="Sem avaliações disponíveis ainda."
-            authors={selectedTrendingBook.authors?.join(", ") || "Autor desconhecido"}
-            year={selectedTrendingBook.publicationYear?.substring(0, 4) || "Desconhecido"}
+            authors={
+              selectedTrendingBook.authors?.join(", ") || "Autor desconhecido"
+            }
+            year={
+              selectedTrendingBook.publicationYear?.substring(0, 4) ||
+              "Desconhecido"
+            }
             id={selectedTrendingBook.id?.toString() || "0"}
-            genre={selectedTrendingBook.genres?.[0] || "Gênero não especificado"}
+            genre={
+              selectedTrendingBook.genres?.[0] || "Gênero não especificado"
+            }
             google_image_url={selectedTrendingBook.coverUrl || ""}
             onCreateReview={() =>
               console.log("Criar resenha para:", selectedTrendingBook.title)
             }
-            onShare={() => console.log("Compartilhar:", selectedTrendingBook.title)}
+            onShare={() =>
+              console.log("Compartilhar:", selectedTrendingBook.title)
+            }
           />
         )}
       </ScrollView>
@@ -148,6 +170,16 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     paddingLeft: 30,
     paddingBottom: 10,
+  },
+  loadingContainer: {
+    height: 150,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyContainer: {
+    height: 150,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
