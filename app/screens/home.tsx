@@ -10,6 +10,8 @@ import CustomCarousel from "../components/Carousel/CustomCarousel";
 import CustomBook from "../components/Book/CustomBook";
 import ModalBookDetails, { getBookWithRegisteredId } from "./bookDetails";
 import BooksService from "../services/booksService";
+import CustomButton from "../components/Buttons/CustomButton";
+import { router } from "expo-router";
 import { Book } from "../components/SearchBar/SearchBar";
 
 const mockCards = [
@@ -17,6 +19,21 @@ const mockCards = [
   { id: "2", title: "Desafio Diário" },
   { id: "3", title: "Desafio Diário" },
 ];
+  const gener = [
+    "Terror",
+    "Romance",
+    "Família",
+    "Noir",
+    "Ficção Científica",
+    "Histórico",
+  ];
+  const genres = gener.map((item) => (
+    <CustomButton fontWeight={"semibold"} size={"small"} title={item} onPress={() => router.push({
+      pathname: "/screens/genreLibrary",
+      params: { selectedGenre: item },
+    })}></CustomButton>
+  ));
+
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
@@ -67,6 +84,18 @@ const Home: React.FC = () => {
           <View style={styles.carouselContainer}>
             <HomeCarouselSection route={"/screens/home"} cards={mockCards} />
           </View>
+          
+        <NunitoText
+          style={[
+            styles.secondTitle,
+            { paddingBottom: 0, color: theme.primaryText },
+          ]}
+        >
+          Gêneros
+        </NunitoText>
+        <View style={styles.genreContent}>
+          <CustomCarousel isHorizontal data={genres} />
+        </View>
 
           <NunitoText
             style={[
@@ -143,6 +172,9 @@ const styles = StyleSheet.create({
   },
   carouselContainer: {
     paddingTop: 20,
+  },
+  genreContent:{
+    paddingTop:15,
   },
   secondTitle: {
     fontSize: 20,
