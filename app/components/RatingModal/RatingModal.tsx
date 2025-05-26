@@ -9,23 +9,39 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 import { Theme } from "@/app/constants/Theme";
 import StarRating from "../StarRating/StarRating";
+import BooksService from "@/app/services/booksService";
 
 interface RatingModalProps {
   visible: boolean;
   onClose: () => void;
-  onRate: (rating: number) => void;
   book: string;
+  bookId: number;
+  onRate?: () => void;
 }
 
 const RatingModal: React.FC<RatingModalProps> = ({
   visible,
   onClose,
-  onRate,
   book,
+  bookId,
+  onRate,
 }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const [rating, setRating] = useState(0);
+
+  const handleRate = async (bookId: number, rating: number) => {
+    try {
+      console.log("Avaliando livro:", bookId, rating);
+      await BooksService().RateBook(bookId, rating);
+      if (onRate) {
+        onRate();
+      }
+      onClose();
+    } catch (error) {
+      console.error("Erro ao avaliar:", error);
+    }
+  };
 
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -44,11 +60,14 @@ const RatingModal: React.FC<RatingModalProps> = ({
             Sua avaliação será somada com as demais na nota do livro
           </Text>
 
-          <TouchableOpacity 
-            style={styles.button} 
-            onPress={() => onRate(rating)}
-            disabled={rating === 0}
-          >
+          <TouchableOpacity style={styles.button} onPress={async () => {
+            try {
+              await handleRate(bookId, rating);
+              onClose();
+            } catch (error) {
+            console.error("Erro ao avaliar:", error);
+            }
+            }}>
             <Text style={styles.buttonText}>Avaliar</Text>
           </TouchableOpacity>
         </View>

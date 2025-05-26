@@ -1,7 +1,6 @@
 import Strings from "@/app/constants/Strings";
 import { useTheme } from "@/app/context/ThemeContext";
 import SearchAPI from "@/app/services/googleAPIService";
-import { registerBookInDatabase } from "@/app/services/handle-select-book.service";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -19,6 +18,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CustomBook from "../Book/CustomBook";
 import BookSearch, { Book } from "../SearchBar/SearchBar";
 import NunitoText from "../Texts/NunitoText";
+import { getBookWithRegisteredId } from "@/app/screens/bookDetails";
 
 // Interface estendida para suportar ambos os formatos de livro
 interface ExtendedBook extends Book {
@@ -62,15 +62,12 @@ const SelectBook = forwardRef(
     };
 
     const handleSelectBook = async (book: ExtendedBook) => {
-      const registerdBook = await registerBookInDatabase(book as Book);
-      const bookWithRegisteredId = {
-        ...book,
-        id: registerdBook.book_id,
-      };
-      setSelectedBook(bookWithRegisteredId);
-      setButtonVisible(true);
-      bottomSheetRef.current?.close();
-      onSelectBook && onSelectBook(bookWithRegisteredId);
+      getBookWithRegisteredId(book, (bookWithRegisteredId) => {
+        setSelectedBook(bookWithRegisteredId);
+        setButtonVisible(true);
+        bottomSheetRef.current?.close();
+        onSelectBook && onSelectBook(bookWithRegisteredId);
+      });
     };
 
     const handleSearch = async (term: string) => {
