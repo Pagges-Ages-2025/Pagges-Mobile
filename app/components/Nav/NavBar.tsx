@@ -47,19 +47,29 @@ export default function NavBar() {
   };
 
   const navigationItems = [
-    { name: "Home", icon: "home-outline", route: "/screens/home", lib: "Ionicons" },
+    {
+      name: "Home",
+      icon: "home-outline",
+      route: "/screens/home",
+      lib: "Ionicons",
+    },
     {
       name: themeName === "dark" ? "Light" : "Dark",
       icon: themeName === "dark" ? "sunny" : "moon",
       action: toggleTheme,
       lib: "Ionicons"
     },
-    { name: "Add", icon: "add", route: "/screens/createReviewComment", lib: "Ionicons" },
+    {
+      name: "Add",
+      icon: "add",
+      route: "/screens/createReviewComment",
+      lib: "Ionicons",
+    },
     {
       name: "Desafios",
       icon: "bullseye-arrow",
       route: "/screens/challenges",
-      lib: 'MCI'
+      lib: "MCI",
     },
     {
       name: "Perfil",
@@ -67,13 +77,13 @@ export default function NavBar() {
       route: userEmail
         ? `/screens/profile?email=${encodeURIComponent(userEmail)}`
         : "/screens/profile",
-      lib: "Ionicons"
+      lib: "Ionicons",
     },
   ];
   const isCurrentRoute = (route: string | undefined) => {
     if (!route) return false;
-    const currentBasePath = pathname.split('?')[0];
-    const targetBasePath = route.split('?')[0];
+    const currentBasePath = pathname.split("?")[0];
+    const targetBasePath = route.split("?")[0];
     return currentBasePath === targetBasePath;
   };
 
@@ -81,10 +91,10 @@ export default function NavBar() {
     if (item.action) {
       item.action();
     } else if (item.route && !isCurrentRoute(item.route)) {
-      console.log('Navegando para nova página:', item.route);
+      console.log("Navegando para nova página:", item.route);
       router.replace(item.route as any);
     } else if (item.route) {
-      console.log('Usuário já está na página:', pathname);
+      console.log("Usuário já está na página:", pathname);
     }
   };
 
@@ -92,45 +102,46 @@ export default function NavBar() {
     <View style={[styles.container, { backgroundColor }]}>
       {navigationItems.map((item) => {
         const IconComp = iconSets[item.lib as keyof typeof iconSets];
-        return(
-        <TouchableOpacity
-          key={item.name}
-          style={[
-            styles.navItem,
-            item.name === "Add" && styles.addButton,
-            item.name === "Add" && { backgroundColor: theme.primary },
-            isCurrentRoute(item.route) && styles.activeNavItem,
-          ]}
-          onPress={() => handleNavigation(item)}
-        >
-          <IconComp
-            name={item.icon as any}
-            size={24}
-            color={
-              item.name === "Add"
-                ? theme.Background
-                : isCurrentRoute(item.route)
-                  ? theme.primary
-                  : theme.placeholder
-            }
-          />
-          <NunitoText
+        return (
+          <TouchableOpacity
+            key={item.name}
             style={[
-              styles.navText,
-              {
-                color:
-                  item.name === "Add"
-                    ? theme.Background
-                    : isCurrentRoute(item.route)
-                      ? theme.primary
-                      : theme.placeholder,
-              },
+              styles.navItem,
+              item.name === "Add" && styles.addButton,
+              item.name === "Add" && { backgroundColor: theme.primary },
+              isCurrentRoute(item.route) && styles.activeNavItem,
             ]}
+            onPress={() => handleNavigation(item)}
           >
-            {item.name}
-          </NunitoText>
-        </TouchableOpacity>
-      )})}
+            <IconComp
+              name={item.icon as any}
+              size={24}
+              color={
+                item.name === "Add"
+                  ? theme.Background
+                  : isCurrentRoute(item.route)
+                    ? theme.primary
+                    : theme.placeholder
+              }
+            />
+            <NunitoText
+              style={[
+                styles.navText,
+                {
+                  color:
+                    item.name === "Add"
+                      ? theme.Background
+                      : isCurrentRoute(item.route)
+                        ? theme.primary
+                        : theme.placeholder,
+                },
+              ]}
+            >
+              {item.name}
+            </NunitoText>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }

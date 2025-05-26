@@ -52,7 +52,6 @@ const CustomBook: React.FC<CustomBookProps> = ({
 
   // Se a imagem falhar ao carregar, usamos uma imagem placeholder
   const handleImageError = () => {
-    console.log("Error loading book cover:", optimizedPhotoPath);
     setImageError(true);
   };
 

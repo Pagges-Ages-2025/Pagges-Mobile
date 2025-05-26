@@ -8,26 +8,39 @@ import HomeCarouselSection from "../components/Home-Carousel/HomeCarousel";
 import NunitoText from "../components/Texts/NunitoText";
 import CustomCarousel from "../components/Carousel/CustomCarousel";
 import CustomBook from "../components/Book/CustomBook";
-import ModalBookDetails from "./bookDetails";
+import ModalBookDetails, { getBookWithRegisteredId } from "./bookDetails";
 import BooksService from "../services/booksService";
-
-export interface Book {
-  id: number;
-  title: string;
-  authors: string[];
-  coverUrl: string;
-  pages: number;
-  publicationYear: string;
-  genres: string[];
-  synopsis?: string;
-  avgRating?: number;
-}
+import CustomButton from "../components/Buttons/CustomButton";
+import { router } from "expo-router";
+import { Book } from "../components/SearchBar/SearchBar";
 
 const mockCards = [
   { id: "1", title: "Desafio Diário" },
   { id: "2", title: "Desafio Diário" },
   { id: "3", title: "Desafio Diário" },
 ];
+const gener = [
+  "Terror",
+  "Romance",
+  "Família",
+  "Noir",
+  "Ficção Científica",
+  "Histórico",
+];
+const genres = gener.map((item) => (
+  <CustomButton
+    key={item}
+    fontWeight={"semibold"}
+    size={"small"}
+    title={item}
+    onPress={() =>
+      router.push({
+        pathname: "/screens/genreLibrary",
+        params: { selectedGenre: item },
+      })
+    }
+  ></CustomButton>
+));
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
@@ -37,7 +50,7 @@ const Home: React.FC = () => {
     null
   );
   const [modalVisible, setModalVisible] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const handleCloseModal = () => {
     setModalVisible(false);
@@ -55,12 +68,11 @@ const Home: React.FC = () => {
       const results = await getTrendingBooks();
       const formattedResults = Array.isArray(results) ? results : [];
       setTradingBooks(formattedResults);
-
-      setLoading(false);
     } catch (error) {
       console.error("Erro ao buscar livros em alta:", error);
       setTradingBooks([]);
-      setLoading(false); 
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -78,6 +90,18 @@ const Home: React.FC = () => {
 
           <View style={styles.carouselContainer}>
             <HomeCarouselSection route={"/screens/home"} cards={mockCards} />
+          </View>
+
+          <NunitoText
+            style={[
+              styles.secondTitle,
+              { paddingBottom: 0, color: theme.primaryText },
+            ]}
+          >
+            Gêneros
+          </NunitoText>
+          <View style={styles.genreContent}>
+            <CustomCarousel isHorizontal data={genres} />
           </View>
 
           <NunitoText
@@ -101,17 +125,19 @@ const Home: React.FC = () => {
                   size="small"
                   key={book.id}
                   bookId={book.id}
-                  photoPath={book.coverUrl}
-                  title={book.title}
-                  author={book.authors.join(", ")}
+                  photoPath={book.capa}
+                  title={book.titulo}
+                  author={book.autores.join(", ")}
                   onPress={() => handleSelectTrendingBook(book)}
                 />
               ))}
             />
           ) : (
             <View style={styles.emptyContainer}>
-              <NunitoText style={{ color: theme.primaryText }}>
-                <ActivityIndicator size="large" color="#9D0F54" />
+              <NunitoText
+                style={[styles.emptyText, { color: theme.primaryText }]}
+              >
+                Nenhum livro em alta no momento
               </NunitoText>
             </View>
           )}
@@ -121,29 +147,29 @@ const Home: React.FC = () => {
           <ModalBookDetails
             visible={modalVisible}
             onClose={handleCloseModal}
-            rating={selectedTrendingBook.avgRating || 1}
-            title={selectedTrendingBook.title || "Título não disponível"}
-            pages={selectedTrendingBook.pages || 0}
-            synopsis={selectedTrendingBook.synopsis || "Sinopse não disponível"}
+            title={selectedTrendingBook.titulo || "Título não disponível"}
+            pages={selectedTrendingBook.paginas || 0}
+            synopsis={selectedTrendingBook.sinopse || "Sinopse não disponível"}
             review="Sem avaliações disponíveis ainda."
             authors={
-              selectedTrendingBook.authors?.join(", ") || "Autor desconhecido"
+              selectedTrendingBook.autores?.join(", ") || "Autor desconhecido"
             }
             year={
-              selectedTrendingBook.publicationYear?.substring(0, 4) ||
+              selectedTrendingBook.anoDePublicacao?.substring(0, 4) ||
               "Desconhecido"
             }
             id={selectedTrendingBook.id?.toString() || "0"}
             genre={
-              selectedTrendingBook.genres?.[0] || "Gênero não especificado"
+              selectedTrendingBook.generos?.[0] || "Gênero não especificado"
             }
-            google_image_url={selectedTrendingBook.coverUrl || ""}
+            google_image_url={selectedTrendingBook.capa || ""}
             onCreateReview={() =>
-              console.log("Criar resenha para:", selectedTrendingBook.title)
+              console.log("Criar resenha para:", selectedTrendingBook.titulo)
             }
             onShare={() =>
-              console.log("Compartilhar:", selectedTrendingBook.title)
+              console.log("Compartilhar:", selectedTrendingBook.titulo)
             }
+            bookId={selectedTrendingBook.id}
           />
         )}
       </ScrollView>
@@ -164,6 +190,9 @@ const styles = StyleSheet.create({
   carouselContainer: {
     paddingTop: 20,
   },
+  genreContent: {
+    paddingTop: 15,
+  },
   secondTitle: {
     fontSize: 20,
     fontWeight: "bold",
@@ -172,14 +201,18 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   loadingContainer: {
-    height: 150,
+    height: 200,
     justifyContent: "center",
     alignItems: "center",
   },
   emptyContainer: {
-    height: 150,
+    height: 200,
     justifyContent: "center",
     alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 16,
+    textAlign: "center",
   },
 });
 

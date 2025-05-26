@@ -25,12 +25,12 @@ export default function SearchAPI() {
     }
   };
 
-  const searchByGenre = async (genero: string) => {
+  const searchByGenre = async (genero: string[]) => {
     try {
-      const encodedGenre = encodeURIComponent(genero);
       // Corrigindo a URL para usar o formato que o backend espera
-      const response = await axiosInstance.get(
-        `google-integration/genre/${encodedGenre}`,
+      const response = await axiosInstance.post(
+        `google-integration/genres`,
+        genero,
         {
           validateStatus: (status) => status < 500,
         }
