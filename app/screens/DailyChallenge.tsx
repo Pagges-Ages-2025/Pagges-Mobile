@@ -109,7 +109,7 @@ const DailyChallenge: React.FC<DailyChallengeProps> = ({
                   { backgroundColor: theme.Background },
                 ]}
               >
-                <NunitoText style={[styles.header, { color: "black" }]}>
+                <NunitoText style={[styles.header, { color: theme.primaryText }]}>
                   Desafio {challengeId}
                 </NunitoText>
               </View>
