@@ -16,6 +16,7 @@ import {
   ImageBackground,
   Modal,
   Platform,
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -95,6 +96,8 @@ export default function ModalBookDetails({
   useEffect(() => {
     updateAverageRating();
   }, []);
+
+  const [isLoadingComments, setIsLoadingComments] = useState(true);
 
   const updateBookState = async (id: string, state: string) => {
     try {
@@ -211,6 +214,7 @@ export default function ModalBookDetails({
 
   const BookContent = () => {
     const [coverImageError, setCoverImageError] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const processGoogleImageUrl = (url: string | undefined) => {
       if (!url) return undefined;
@@ -242,6 +246,14 @@ export default function ModalBookDetails({
         ? { uri: optimizedImageUrl }
         : require("../assets/images/book-cover.png");
 
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setIsLoadingComments(false);
+      }, 2000); 
+
+      return () => clearTimeout(timer);
+    }, []);
+
     return (
       <View style={{ flex: 1 }}>
         <ImageBackground
@@ -249,9 +261,21 @@ export default function ModalBookDetails({
           style={styles.backgroundImage}
           onError={(e) => {
             setCoverImageError(true);
+            setIsLoading(false);
           }}
+          onLoad={() => setIsLoading(false)}
         >
-          <View style={styles.overlay} />
+          <View
+            style={[
+              styles.overlay,
+              isLoading && { backgroundColor: "rgba(125, 115, 115, 0.8)" },
+            ]}
+          />
+          {isLoading && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.white} />
+            </View>
+          )}
           <View
             style={{
               flex: 1,
@@ -458,25 +482,43 @@ export default function ModalBookDetails({
                 Principais Resenhas e Comentários
               </NunitoText>
 
-              <ReviewComment
-                comment={true}
-                byAuthor={true}
-                datePost={"30/01/2025"}
-                text={
-                  "Amei o livro, muito bom mesmo! Recomendo muito. A história é envolvente e os personagens são bem desenvolvidos."
-                }
-                fullNamePostAuthor={"Monica Alvarenga"}
-              />
+              {isLoadingComments ? (
+                <View style={styles.loadingCommentsContainer}>
+                  <View style={styles.loadingCommentCard}>
+                    <ActivityIndicator size="large" color={theme.primary} />
+                    <NunitoText
+                      style={[
+                        styles.loadingCommentText,
+                        { color: theme.primaryText },
+                      ]}
+                    >
+                      Carregando comentários...
+                    </NunitoText>
+                  </View>
+                </View>
+              ) : (
+                <>
+                  <ReviewComment
+                    comment={true}
+                    byAuthor={true}
+                    datePost={"30/01/2025"}
+                    text={
+                      "Amei o livro, muito bom mesmo! Recomendo muito. A história é envolvente e os personagens são bem desenvolvidos."
+                    }
+                    fullNamePostAuthor={"Monica Alvarenga"}
+                  />
 
-              <ReviewComment
-                comment={false}
-                byAuthor={false}
-                fullNamePostAuthor={"Monica Alvarenga"}
-                datePost={"22/08/2024"}
-                text={
-                  "Memórias da Meia-Noite é um romance de Sidney Sheldon que mistura mistério, drama e uma boa dose de suspense. A história gira em torno de Katherine, uma mulher marcada por tragédias pessoais e uma vida cheia de reviravoltas. Ela se vê envolvida em uma trama que desafia sua compreensão de confiança, vingança e sobrevivência, enquanto tenta descobrir os segredos obscuros de seu passado e lidar com as consequências de suas escolhas.Com o estilo característico de Sheldon, a narrativa é envolvente e cheia de surpresas, mantendo o leitor na expectativa até o final. A trama é recheada de personagens complexos e dilemas emocionais, explorando temas como o perdão, a vingança e os jogos de poder. A escrita é fluída, o ritmo é rápido e as reviravoltas são sempre inesperadas. É uma história que prende o leitor até a última página, com um final impactante."
-                }
-              />
+                  <ReviewComment
+                    comment={false}
+                    byAuthor={false}
+                    fullNamePostAuthor={"Monica Alvarenga"}
+                    datePost={"22/08/2024"}
+                    text={
+                      "Memórias da Meia-Noite é um romance de Sidney Sheldon que mistura mistério, drama e uma boa dose de suspense. A história gira em torno de Katherine, uma mulher marcada por tragédias pessoais e uma vida cheia de reviravoltas. Ela se vê envolvida em uma trama que desafia sua compreensão de confiança, vingança e sobrevivência, enquanto tenta descobrir os segredos obscuros de seu passado e lidar com as consequências de suas escolhas.Com o estilo característico de Sheldon, a narrativa é envolvente e cheia de surpresas, mantendo o leitor na expectativa até o final. A trama é recheada de personagens complexos e dilemas emocionais, explorando temas como o perdão, a vingança e os jogos de poder. A escrita é fluída, o ritmo é rápido e as reviravoltas são sempre inesperadas. É uma história que prende o leitor até a última página, com um final impactante."
+                    }
+                  />
+                </>
+              )}
             </View>
 
             <View style={{ alignItems: "center", justifyContent: "center" }}>
@@ -673,5 +715,28 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingTop: 30,
     paddingBottom: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingCommentsContainer: {
+    width: "100%",
+    paddingHorizontal: 15,
+    marginBottom: 20,
+  },
+  loadingCommentCard: {
+    backgroundColor: "rgba(125, 115, 115, 0.1)",
+    borderRadius: 15,
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 150,
+  },
+  loadingCommentText: {
+    marginTop: 10,
+    fontSize: 16,
+    textAlign: "center",
   },
 });

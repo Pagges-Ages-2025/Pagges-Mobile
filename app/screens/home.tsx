@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import StaticSearchBar from "../components/SearchBar/StaticSearchBar";
 import { useTheme } from "../context/ThemeContext";
@@ -19,21 +19,28 @@ const mockCards = [
   { id: "2", title: "Desafio Diário" },
   { id: "3", title: "Desafio Diário" },
 ];
-  const gener = [
-    "Terror",
-    "Romance",
-    "Família",
-    "Noir",
-    "Ficção Científica",
-    "Histórico",
-  ];
-  const genres = gener.map((item) => (
-    <CustomButton fontWeight={"semibold"} size={"small"} title={item} onPress={() => router.push({
-      pathname: "/screens/genreLibrary",
-      params: { selectedGenre: item },
-    })}></CustomButton>
-  ));
-
+const gener = [
+  "Terror",
+  "Romance",
+  "Família",
+  "Noir",
+  "Ficção Científica",
+  "Histórico",
+];
+const genres = gener.map((item) => (
+  <CustomButton
+    key={item}
+    fontWeight={"semibold"}
+    size={"small"}
+    title={item}
+    onPress={() =>
+      router.push({
+        pathname: "/screens/genreLibrary",
+        params: { selectedGenre: item },
+      })
+    }
+  ></CustomButton>
+));
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
@@ -84,18 +91,18 @@ const Home: React.FC = () => {
           <View style={styles.carouselContainer}>
             <HomeCarouselSection route={"/screens/home"} cards={mockCards} />
           </View>
-          
-        <NunitoText
-          style={[
-            styles.secondTitle,
-            { paddingBottom: 0, color: theme.primaryText },
-          ]}
-        >
-          Gêneros
-        </NunitoText>
-        <View style={styles.genreContent}>
-          <CustomCarousel isHorizontal data={genres} />
-        </View>
+
+          <NunitoText
+            style={[
+              styles.secondTitle,
+              { paddingBottom: 0, color: theme.primaryText },
+            ]}
+          >
+            Gêneros
+          </NunitoText>
+          <View style={styles.genreContent}>
+            <CustomCarousel isHorizontal data={genres} />
+          </View>
 
           <NunitoText
             style={[
@@ -106,24 +113,34 @@ const Home: React.FC = () => {
             Em alta
           </NunitoText>
 
-          <CustomCarousel
-            isHorizontal
-            data={
-              trendingBooks
-                ? trendingBooks.map((book) => (
-                    <CustomBook
-                      size="small"
-                      key={book.id}
-                      bookId={book.id}
-                      photoPath={book.capa}
-                      title={book.titulo}
-                      author={book.autores.join(", ")}
-                      onPress={() => handleSelectTrendingBook(book)}
-                    />
-                  ))
-                : []
-            }
-          />
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.primary} />
+            </View>
+          ) : trendingBooks && trendingBooks.length > 0 ? (
+            <CustomCarousel
+              isHorizontal
+              data={trendingBooks.map((book) => (
+                <CustomBook
+                  size="small"
+                  key={book.id}
+                  bookId={book.id}
+                  photoPath={book.capa}
+                  title={book.titulo}
+                  author={book.autores.join(", ")}
+                  onPress={() => handleSelectTrendingBook(book)}
+                />
+              ))}
+            />
+          ) : (
+            <View style={styles.emptyContainer}>
+              <NunitoText
+                style={[styles.emptyText, { color: theme.primaryText }]}
+              >
+                Nenhum livro em alta no momento
+              </NunitoText>
+            </View>
+          )}
         </View>
 
         {selectedTrendingBook && (
@@ -173,8 +190,8 @@ const styles = StyleSheet.create({
   carouselContainer: {
     paddingTop: 20,
   },
-  genreContent:{
-    paddingTop:15,
+  genreContent: {
+    paddingTop: 15,
   },
   secondTitle: {
     fontSize: 20,
@@ -182,6 +199,20 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     paddingLeft: 30,
     paddingBottom: 10,
+  },
+  loadingContainer: {
+    height: 200,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyContainer: {
+    height: 200,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 16,
+    textAlign: "center",
   },
 });
 
