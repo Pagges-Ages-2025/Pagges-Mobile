@@ -33,7 +33,7 @@ const mockCards = [
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
-  const { getTrendingBooks } = BooksService();
+  const { getTrendingBooks, getFavoriteBasedBooks } = BooksService();
   const [trendingBooks, setTradingBooks] = useState<Book[]>();
   const [favoriteBasedBook, setFavoriteBasedBook] = useState<Book[]>();
   const [selectedTrendingBook, setSelectedTrendingBook] = useState<Book | null>(null);
@@ -80,36 +80,11 @@ const Home: React.FC = () => {
     setModalVisible(true);
   };
 
-  const fetchFavoriteBasedBooks = useCallback(async () => {
+    const fetchFavoriteBasedBooks = useCallback(async () => {
     setLoading(true);
     try {
-      const genresResponse = await retriveUserGenres();
-      const genres = genresResponse.data.map((g) => g.genre_name);
-
-      const booksByGenre: Book[] = [];
-
-      const topGenres = genres.slice(0, 3);
-
-      for (const genre of topGenres) {
-        const books = await searchByGenre(genre);
-        const formattedBooks = Array.isArray(books)
-          ? books.map((data: any) => ({
-              id: data.book_id,
-              title: data.title,
-              authors: data.authors?.split(",").map((a: string) => a.trim()) || [],
-              coverUrl: data.google_image_url || data.cover || "",
-              pages: data.pages,
-              publicationYear: String(data.year),
-              genres: data.genre?.split(",").map((g: string) => g.trim()) || [],
-              synopsis: data.synopsis,
-              avgRating: data.averageRating || 1,
-            }))
-          : [];
-
-        booksByGenre.push(...formattedBooks);
-      }
-
-      setFavoriteBasedBook(booksByGenre);
+      const results = await getFavoriteBasedBooks();
+      setFavoriteBasedBook(results);
     } catch (error) {
       console.error("Erro ao buscar livros baseados nos favoritos:", error);
       setFavoriteBasedBook([]);
