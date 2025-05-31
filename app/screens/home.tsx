@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, View, ActivityIndicator } from "react-native";
+import { StyleSheet, View, ActivityIndicator, Button } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import StaticSearchBar from "../components/SearchBar/StaticSearchBar";
 import { useTheme } from "../context/ThemeContext";
@@ -87,6 +87,21 @@ const Home: React.FC = () => {
       <ScrollView>
         <View style={styles.content}>
           <StaticSearchBar />
+
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+            <Button
+              title="Ver Perfil"
+              onPress={() =>
+              router.push({
+                  pathname: "/screens/userProfile",
+                  params: {
+                    username: "alice123",
+                    userEmail: "alice@example.com",
+                  },
+              })
+            }
+          />
+          </View>
 
           <View style={styles.carouselContainer}>
             <HomeCarouselSection route={"/screens/home"} cards={mockCards} />

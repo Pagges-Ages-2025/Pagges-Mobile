@@ -104,6 +104,18 @@ export default function UserAPI() {
     }
   };
 
+  const getUserProfile = async (userEmail: string): Promise<User> => {
+    try {
+      const response = await axiosInstance.get(`${profileControllerUrl}/user-profile`, {
+        params: { userEmail },
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error("Erro ao buscar perfil:", error);
+      throw error;
+    }
+  };
+
   return {
     getProfile,
     getProfileImage,
@@ -111,5 +123,6 @@ export default function UserAPI() {
     updateBio,
     updateProfile,
     updateProfileImage,
+    getUserProfile,
   };
 }
