@@ -23,9 +23,11 @@ interface ProfileHeaderProps {
   isAuthor: boolean;
   bEdit?: boolean;
   bEditPicture?: boolean;
+  bConfig?: boolean;
   genres?: Genre[];
   isEditMode: boolean;
   onPressEdit?: () => void;
+  onPressConfig?: () => void;
   onPressCameraIcon?: () => void;
   onPressEditGenres: () => void;
 }
@@ -40,9 +42,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   isAuthor,
   bEdit = false,
   bEditPicture = false,
+  bConfig = false,
   genres,
   isEditMode = false,
   onPressEdit,
+  onPressConfig,
   onPressCameraIcon,
   onPressEditGenres,
 }) => {
@@ -102,6 +106,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             {bEdit && (
               <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
                 <Ionicons name="create-outline" size={32} />
+              </TouchableOpacity>
+            )}
+            
+            {bConfig && (
+              <TouchableOpacity style={styles.configIcon} onPress={onPressConfig}>
+                <Ionicons name="cog-outline" size={32} />
               </TouchableOpacity>
             )}
 
@@ -214,8 +224,14 @@ const styles = StyleSheet.create({
   },
   editIcon: {
     position: "absolute",
-    top: "42%",
-    right: "5%",
+    top: "12%",
+    right: "12%",
+  },
+  
+  configIcon: {
+    position: "absolute",
+    top: "12%",
+    right: "3%",
   },
   genresContainer: {
     flexDirection: "row",
