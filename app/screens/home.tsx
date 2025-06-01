@@ -93,10 +93,9 @@ const Home: React.FC = () => {
               title="Ver Perfil"
               onPress={() =>
               router.push({
-                  pathname: "/screens/userProfile",
+                  pathname: "/screens/thirdPersonProfile",
                   params: {
                     username: "alice123",
-                    userEmail: "alice@example.com",
                   },
               })
             }

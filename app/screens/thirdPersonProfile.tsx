@@ -13,30 +13,23 @@ import Achievement from "../components/Achievements/Achievement";
 import { Genre } from "../models/Genre";
 import SocialAPI from "../services/socialService";
 
-export default function UserProfileScreen() {
+export default function ThirdPersonProfileScreen() {
     const [ data, setData] = useState<User>();
     const { theme } = useTheme();
     const [isFollowing, setIsFollowing] = useState(false);
-    const [userGenres, setUserGenres] = useState<Genre[]>([
-        { genre_id: 1, genre_name: "Ficção" },
-        { genre_id: 2, genre_name: "Fantasia" },
-        { genre_id: 3, genre_name: "Romance" },
-    ]);
-
-    const { username, userEmail } = useLocalSearchParams();
-
+    const [userGenres, setUserGenres] = useState<Genre[]>([]);
+    const { username } = useLocalSearchParams();
     const [stats, setStats] = useState<{ readBooks: number; readKms: number }>({
         readBooks: 0,
         readKms: 0,
     });
 
     const onPressFollow = () => {
-        const followingUsername = Array.isArray(username) ? username[0] : username;
+        const thirdPersonUsername = Array.isArray(username) ? username[0] : username;
         if(isFollowing){
             SocialAPI()
-            .unfollowUser(followingUsername)
+            .unfollowUser(thirdPersonUsername)
             .then(() => {
-                console.log("Unfollowed user successfully");
                 setIsFollowing(!isFollowing);
             })
             .catch((error: any) => {
@@ -45,9 +38,8 @@ export default function UserProfileScreen() {
 
         } else{
             SocialAPI()
-            .followUser(followingUsername)
+            .followUser(thirdPersonUsername)
             .then(() => {
-                console.log("Followed user successfully");
                 setIsFollowing(!isFollowing);
             })
             .catch((error: any) => {
@@ -56,15 +48,18 @@ export default function UserProfileScreen() {
         }
     }
 
-    const fetchUserProfile = async () => {
-        if (!userEmail) return;
-
-        const email = Array.isArray(userEmail) ? userEmail[0] : userEmail;
+    const fetchThirdPersonProfile = async () => {
+        const thirdPersonUsername = Array.isArray(username) ? username[0] : username;
     
         UserAPI()
-        .getUserProfile(email)
+        .getThirdPersonProfile(thirdPersonUsername)
         .then((response: User) => {
             setData(response);
+            setUserGenres(response.favoriteGenres);
+            setStats({
+                readBooks: response.readBooks,
+                readKms: response.readKm
+              });
         })
         .catch((error: any) => {
             console.error("Erro ao buscar perfil:", error);
@@ -72,22 +67,18 @@ export default function UserProfileScreen() {
     }; 
 
     const fetchIsFollowingUser = async () => {
-        if(!username) return;
-
-        const followingUsername = Array.isArray(username) ? username[0] : username;
-
+        const thirdPersonUsername = Array.isArray(username) ? username[0] : username;
         SocialAPI()
-        .isFollowing(followingUsername)
+        .isFollowing(thirdPersonUsername)
         .then((response: boolean) => {
-            console.log("Is following response:", response);
-            setIsFollowing(!response);
+            setIsFollowing(response);
         })
     }
 
     useEffect(() => {
-        fetchUserProfile();
+        fetchThirdPersonProfile();
         fetchIsFollowingUser();
-    }, [userEmail]);
+    }, [username]);
 
     return (
         

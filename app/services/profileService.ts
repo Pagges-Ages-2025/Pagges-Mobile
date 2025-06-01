@@ -104,10 +104,10 @@ export default function UserAPI() {
     }
   };
 
-  const getUserProfile = async (userEmail: string): Promise<User> => {
+  const getThirdPersonProfile = async (username: string): Promise<User> => {
     try {
-      const response = await axiosInstance.get(`${profileControllerUrl}/user-profile`, {
-        params: { userEmail },
+      const response = await axiosInstance.get(`${profileControllerUrl}/third-person-profile`, {
+        params: { username },
       });
       return response.data.data;
     } catch (error) {
@@ -123,6 +123,6 @@ export default function UserAPI() {
     updateBio,
     updateProfile,
     updateProfileImage,
-    getUserProfile,
+    getThirdPersonProfile,
   };
 }

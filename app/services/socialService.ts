@@ -16,7 +16,7 @@ export default function SocialAPI() {
     async function unfollowUser(username: string): Promise<void> {
         try{
             const axiosResponse = await axiosInstance.delete("social/unfollow", {
-                data: { username },
+                data: { username }
             });
             return axiosResponse.data
         } catch (error) {
@@ -27,9 +27,7 @@ export default function SocialAPI() {
 
     async function followUser(username: string): Promise<void> {
         try{
-            const axiosResponse = await axiosInstance.post("social/follow", {
-                data: { username },
-            });
+            const axiosResponse = await axiosInstance.post("social/follow", { username });
             return axiosResponse.data
         } catch (error) {
             console.error("Erro ao seguir o usuário:", error);
