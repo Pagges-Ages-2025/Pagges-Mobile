@@ -47,7 +47,7 @@ const getFavoriteBasedBooks = async (): Promise<Book[]> => {
         const topGenres = genres.slice(0, 3);
 
         const response = await axiosInstance.post("books/genres", {
-            generos: topGenres,
+            genres: topGenres,
         });
 
         const books = response.data;
