@@ -29,6 +29,8 @@ import { useTheme } from "../context/ThemeContext";
 import BooksService from "../services/booksService";
 import { registerBookInDatabase } from "../services/handle-select-book.service";
 import PersonalLibraryService from "../services/personalLibraryService";
+import { Post } from "../models/Post";
+import PostService from "../services/postService";
 interface ModalBookDetailsProps {
   visible: boolean;
   onClose: () => void;
@@ -69,6 +71,34 @@ export default function ModalBookDetails({
   const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
+  const [bookPosts, setBookPosts] = useState<Post[]>([]);
+  const PostAPI = PostService();
+
+  useEffect(() => {
+    const fetchBookPosts = async () => {
+      PostAPI.fetchBookPosts(id)
+        .then((response: Post[]) => {
+          setBookPosts(response);
+        })
+      }
+    fetchBookPosts();
+  }, [id])
+
+  const childPost = (parentId: number) => {
+      return bookPosts
+        .filter((post) => post.parentId === parentId)
+        .map((post) => (
+          <ReviewComment
+            text={post.text}
+            photoPostAuthor={post.googleImageUrl}
+            fullNamePostAuthor={post.username}
+            likesNumber={post.likedBy}
+            datePost={typeof post.createdAt === "string" ? post.createdAt : new Date(post.createdAt).toLocaleDateString()}
+            repostNumber={0}
+            commentsNumber={0}
+          />
+        ))
+      };
 
   const updateAverageRating = () => {
     try {
@@ -449,26 +479,23 @@ export default function ModalBookDetails({
               >
                 Principais Resenhas e Comentários
               </NunitoText>
+               {bookPosts
+               .filter((post) => !post.parentId)
+               .map((post) => (
+                <View>
+                  <ReviewComment
+                    text={post.text}
+                    photoPostAuthor={post.profileImage}
+                    fullNamePostAuthor={post.username}
+                    likesNumber={post.likedBy}
+                    datePost={typeof post.createdAt === "string" ? post.createdAt : new Date(post.createdAt).toLocaleDateString()}
+                    repostNumber={0}
+                    commentsNumber={bookPosts.map((p) => p.parentId).length}
+                  />
+                  {childPost(post.postId)}
+                </View>
+               ))}
 
-              <ReviewComment
-                comment={true}
-                byAuthor={true}
-                datePost={"30/01/2025"}
-                text={
-                  "Amei o livro, muito bom mesmo! Recomendo muito. A história é envolvente e os personagens são bem desenvolvidos."
-                }
-                fullNamePostAuthor={"Monica Alvarenga"}
-              />
-
-              <ReviewComment
-                comment={false}
-                byAuthor={false}
-                fullNamePostAuthor={"Monica Alvarenga"}
-                datePost={"22/08/2024"}
-                text={
-                  "Memórias da Meia-Noite é um romance de Sidney Sheldon que mistura mistério, drama e uma boa dose de suspense. A história gira em torno de Katherine, uma mulher marcada por tragédias pessoais e uma vida cheia de reviravoltas. Ela se vê envolvida em uma trama que desafia sua compreensão de confiança, vingança e sobrevivência, enquanto tenta descobrir os segredos obscuros de seu passado e lidar com as consequências de suas escolhas.Com o estilo característico de Sheldon, a narrativa é envolvente e cheia de surpresas, mantendo o leitor na expectativa até o final. A trama é recheada de personagens complexos e dilemas emocionais, explorando temas como o perdão, a vingança e os jogos de poder. A escrita é fluída, o ritmo é rápido e as reviravoltas são sempre inesperadas. É uma história que prende o leitor até a última página, com um final impactante."
-                }
-              />
             </View>
 
             <View style={{ alignItems: "center", justifyContent: "center" }}>
