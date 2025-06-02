@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
-  Dimensions,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -13,11 +13,8 @@ import {
 import CustomBook from "../components/Book/CustomBook";
 import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
-//import { Book } from '../models/genreLibrary';
-import { Book } from "../components/SearchBar/SearchBar";
-import SearchAPI from "../services/googleAPIService";
-import { registerBookInDatabase } from "../services/handle-select-book.service";
-const { width } = Dimensions.get("window");
+import { DatabaseBookModel } from "../models/DatabaseBook.model";
+import BooksService from "../services/booksService";
 
 interface LibraryProps {
   onClose?: () => void;
@@ -31,26 +28,39 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
   const initialPageIndex = params.pageIndex
     ? Number(params.pageIndex)
     : pageIndex;
-  const selectedGenres = params.selectedGenre.toString();
-
+  const selectedGenreId = Number(params.selectedGenreId);
+  const selectedGenreName = params.genreName;
   const [actualPage] = useState(initialPageIndex);
-  const [toGenreBooks, setGenreBooks] = useState<Book[]>([]);
+  const [books, setBooks] = useState<DatabaseBookModel[]>([]);
   const [selectedBook, setSelectedBook] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const slideAnim = useRef(new Animated.Value(actualPage)).current;
-  const { searchBooks } = SearchAPI();
+  const slideOutAnim = useRef(new Animated.Value(0)).current;
+  const { getBooksByGenre } = BooksService();
 
   const handleClose = () => {
-    router.back();
+    Animated.timing(slideOutAnim, {
+      toValue: 1,
+      duration: 80,
+      useNativeDriver: true,
+    }).start(() => {
+      router.back();
+    });
   };
 
-  const fetchBooks = async (genres: string) => {
+  const fetchBooks = async (genreId: number) => {
     try {
-      const mappedBooks = await searchBooks(genres);
-      setGenreBooks(mappedBooks);
+      const databaseBooksBySelectedGenre = await getBooksByGenre(genreId);
+      setBooks(databaseBooksBySelectedGenre);
       setLoading(false);
     } catch (error) {
-      console.error(`Erro ao buscar livros do genero ${genres}:`, error);
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        setBooks([]);
+        setLoading(false);
+      } else {
+        console.error(`Erro ao buscar livros do genero ${genreId}:`, error);
+        setLoading(false);
+      }
     }
   };
 
@@ -59,10 +69,8 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
     slideAnim.setValue(initialPageIndex);
   }, []);
 
-  const handleSelectBook = (book: Book) => {
-    registerBookInDatabase(book);
+  const handleSelectBook = (book: DatabaseBookModel) => {
     setSelectedBook(book);
-    //onSelectBook && onSelectBook(book);
   };
 
   useEffect(() => {
@@ -72,14 +80,23 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
   }, [selectedBook]);
 
   useEffect(() => {
-    fetchBooks(selectedGenres);
+    fetchBooks(selectedGenreId);
   }, []);
 
   return (
-    <View
+    <Animated.View
       style={[
         styles.container,
-        { backgroundColor: theme.personalLibraryBackground },
+        {
+          transform: [
+            {
+              translateY: slideOutAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 1000],
+              }),
+            },
+          ],
+        },
       ]}
     >
       {/* header */}
@@ -101,7 +118,7 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
               color: theme.quinaryText,
             }}
           >
-            {selectedGenres}
+            {selectedGenreName}
           </NunitoText>
         </View>
       </View>
@@ -125,15 +142,15 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
                 color="#000"
                 style={{ marginLeft: 10, marginTop: 20 }}
               />
-            ) : toGenreBooks.length > 0 ? (
-              toGenreBooks.map((book) => (
-                <React.Fragment key={book.id}>
+            ) : books.length > 0 ? (
+              books.map((book) => (
+                <React.Fragment key={book.book_id}>
                   <View style={{ paddingHorizontal: 12, paddingVertical: 15 }}>
                     <CustomBook
                       size={"small"}
-                      photoPath={book.capa}
+                      photoPath={book.google_image_url}
                       onPress={() => handleSelectBook(book)}
-                      bookId={book.id}
+                      bookId={book.book_id}
                     />
                     <NunitoText
                       style={{
@@ -144,7 +161,7 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
                         fontWeight: "bold",
                       }}
                     >
-                      {book.titulo}
+                      {book.title}
                     </NunitoText>
                     <NunitoText
                       style={{
@@ -156,7 +173,7 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
                         fontWeight: "bold",
                       }}
                     >
-                      {book.autores}
+                      {book.authors}
                     </NunitoText>
                   </View>
                 </React.Fragment>
@@ -178,7 +195,7 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
                       color: theme.quinaryText,
                     }}
                   >
-                    Nenhum livro de {selectedGenres} encontrado...
+                    Nenhum livro de {selectedGenreName} encontrado...
                   </NunitoText>
                 </View>
               </View>
@@ -186,7 +203,7 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
           </View>
         </ScrollView>
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
