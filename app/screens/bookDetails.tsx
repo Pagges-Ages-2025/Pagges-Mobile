@@ -76,29 +76,32 @@ export default function ModalBookDetails({
 
   useEffect(() => {
     const fetchBookPosts = async () => {
-      PostAPI.fetchBookPosts(id)
-        .then((response: Post[]) => {
-          setBookPosts(response);
-        })
-      }
+      PostAPI.fetchBookPosts(id).then((response: Post[]) => {
+        setBookPosts(response);
+      });
+    };
     fetchBookPosts();
-  }, [id])
+  }, [id]);
 
   const childPost = (parentId: number) => {
-      return bookPosts
-        .filter((post) => post.parentId === parentId)
-        .map((post) => (
-          <ReviewComment
-            text={post.text}
-            photoPostAuthor={post.googleImageUrl}
-            fullNamePostAuthor={post.username}
-            likesNumber={post.likedBy}
-            datePost={typeof post.createdAt === "string" ? post.createdAt : new Date(post.createdAt).toLocaleDateString()}
-            repostNumber={0}
-            commentsNumber={0}
-          />
-        ))
-      };
+    return bookPosts
+      .filter((post) => post.parentId === parentId)
+      .map((post) => (
+        <ReviewComment
+          text={post.text}
+          photoPostAuthor={post.googleImageUrl}
+          fullNamePostAuthor={post.username}
+          likesNumber={post.likedBy}
+          datePost={
+            typeof post.createdAt === "string"
+              ? post.createdAt
+              : new Date(post.createdAt).toLocaleDateString()
+          }
+          repostNumber={0}
+          commentsNumber={0}
+        />
+      ));
+  };
 
   const updateAverageRating = () => {
     try {
@@ -479,42 +482,27 @@ export default function ModalBookDetails({
               >
                 Principais Resenhas e Comentários
               </NunitoText>
-               {bookPosts
-               .filter((post) => !post.parentId)
-               .map((post) => (
-                <View>
-                  <ReviewComment
-                    text={post.text}
-                    photoPostAuthor={post.profileImage}
-                    fullNamePostAuthor={post.username}
-                    likesNumber={post.likedBy}
-                    datePost={typeof post.createdAt === "string" ? post.createdAt : new Date(post.createdAt).toLocaleDateString()}
-                    repostNumber={0}
-                    commentsNumber={bookPosts.map((p) => p.parentId).length}
-                  />
-                  {childPost(post.postId)}
-                </View>
-               ))}
-
+              {bookPosts
+                .filter((post) => !post.parentId)
+                .map((post) => (
+                  <View style={{ backgroundColor: "#1a1919" }}>
+                    <ReviewComment
+                      text={post.text}
+                      photoPostAuthor={post.profileImage}
+                      fullNamePostAuthor={post.username}
+                      likesNumber={post.likedBy}
+                      datePost={
+                        typeof post.createdAt === "string"
+                          ? post.createdAt
+                          : new Date(post.createdAt).toLocaleDateString()
+                      }
+                      repostNumber={0}
+                      commentsNumber={bookPosts.map((p) => p.parentId).length}
+                    />
+                    {childPost(post.postId)}
+                  </View>
+                ))}
             </View>
-
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
-              <TouchableOpacity
-                onPress={undefined}
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: theme.primary,
-                  width: "87%",
-                  height: 25,
-                  borderRadius: 30,
-                }}
-              >
-                <Text style={{ color: theme.quinaryText }}>Acessar mais</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={{ marginBottom: 30 }}></View>
 
             <NunitoText
               style={[
@@ -651,13 +639,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     paddingTop: 30,
-    paddingLeft: 30,
     paddingBottom: 10,
   },
   sinopseText: {
     fontSize: 14,
     fontWeight: "regular",
-    paddingLeft: 30,
     paddingRight: 35,
     textAlign: "justify",
   },
