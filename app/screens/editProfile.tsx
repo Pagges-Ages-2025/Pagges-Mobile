@@ -48,13 +48,13 @@ export default function EditProfileScreen() {
   useEffect(() => {
     const fetchUserGenres = async () => {
       try {
-        const response = await axiosInstance.get('/user-genres/user');
+        const response = await axiosInstance.get("/user-genres/user");
         setUserGenres(response.data.data);
       } catch (error) {
         console.error("Erro ao buscar os gêneros do usuário:", error);
       }
     };
-  
+
     fetchUserGenres();
   }, []);
 
@@ -149,10 +149,14 @@ export default function EditProfileScreen() {
     }
   };
 
+  // <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+  //<Ionicons name="arrow-undo-circle" size={42} />
+  //</TouchableOpacity>
+
   return (
     <>
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Ionicons name="arrow-undo-circle" size={42} />
+        <Ionicons name="return-up-back-outline" size={30} color={theme.black} />
       </TouchableOpacity>
       <ScrollView
         style={[styles.container, { backgroundColor: theme.Background }]}
