@@ -16,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import profileUser from "../../assets/images/profile-user.png";
 import { Genre } from "@/app/models/Genre";
 import CustomButton from "../Buttons/CustomButton";
+import { SafeAreaView } from "react-native-safe-area-context";
 interface ProfileHeaderProps {
   marginStart: number;
   profileImageUrl?: string;
@@ -23,9 +24,11 @@ interface ProfileHeaderProps {
   isAuthor: boolean;
   bEdit?: boolean;
   bEditPicture?: boolean;
+  bConfig?: boolean;
   genres?: Genre[];
   isEditMode: boolean;
   onPressEdit?: () => void;
+  onPressConfig?: () => void;
   onPressCameraIcon?: () => void;
   onPressEditGenres: () => void;
 }
@@ -40,9 +43,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   isAuthor,
   bEdit = false,
   bEditPicture = false,
+  bConfig = false,
   genres,
   isEditMode = false,
   onPressEdit,
+  onPressConfig,
   onPressCameraIcon,
   onPressEditGenres,
 }) => {
@@ -55,7 +60,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={[]}>
       <View style={styles.profileImageContainer}>
         <ImageBackground
           source={DefaultProfileHeaderImage}
@@ -102,6 +107,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             {bEdit && (
               <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
                 <Ionicons name="create-outline" size={32} />
+              </TouchableOpacity>
+            )}
+            
+            {bConfig && (
+              <TouchableOpacity style={styles.configIcon} onPress={onPressConfig}>
+                <Ionicons name="cog-outline" size={32} />
               </TouchableOpacity>
             )}
 
@@ -189,7 +200,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           )}
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -210,12 +221,18 @@ const styles = StyleSheet.create({
   profileImageContainer: {
     flexDirection: "column",
     flex: 1,
-    height: headerImageHeight * 0.75 + profileImageSize,
+    height: headerImageHeight * 0.85 + profileImageSize,
   },
   editIcon: {
     position: "absolute",
-    top: "42%",
-    right: "5%",
+    top: "40%",
+    right: "12%",
+  },
+  
+  configIcon: {
+    position: "absolute",
+    top: "40%",
+    right: "3%",
   },
   genresContainer: {
     flexDirection: "row",
