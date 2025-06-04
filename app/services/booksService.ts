@@ -74,7 +74,7 @@ export default function BooksService() {
 
   const getFavoriteBasedBooks = async (): Promise<Book[]> => {
     try {
-      const response = await axiosInstance.get("books/favorites"); // nova rota
+      const response = await axiosInstance.get("books/favorites");
 
       const books = response.data;
 
