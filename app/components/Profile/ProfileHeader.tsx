@@ -16,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import profileUser from "../../assets/images/profile-user.png";
 import { Genre } from "@/app/models/Genre";
 import CustomButton from "../Buttons/CustomButton";
+import { SafeAreaView } from "react-native-safe-area-context";
 interface ProfileHeaderProps {
   marginStart: number;
   profileImageUrl?: string;
@@ -59,7 +60,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={[]}>
       <View style={styles.profileImageContainer}>
         <ImageBackground
           source={DefaultProfileHeaderImage}
@@ -199,7 +200,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           )}
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -220,17 +221,17 @@ const styles = StyleSheet.create({
   profileImageContainer: {
     flexDirection: "column",
     flex: 1,
-    height: headerImageHeight * 0.75 + profileImageSize,
+    height: headerImageHeight * 0.85 + profileImageSize,
   },
   editIcon: {
     position: "absolute",
-    top: "12%",
+    top: "40%",
     right: "12%",
   },
   
   configIcon: {
     position: "absolute",
-    top: "12%",
+    top: "40%",
     right: "3%",
   },
   genresContainer: {
