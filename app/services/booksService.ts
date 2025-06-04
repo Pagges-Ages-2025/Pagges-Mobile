@@ -39,33 +39,25 @@ export default function BooksService() {
         }
     }
 
-const getFavoriteBasedBooks = async (): Promise<Book[]> => {
-    try {
-        const genresResponse = await retriveUserGenres();
-        const genres = genresResponse.data.map((g) => g.genre_name);
+    const getFavoriteBasedBooks = async (): Promise<Book[]> => {
+        try {
+            const response = await axiosInstance.get("books/favorites"); // nova rota
 
-        const topGenres = genres.slice(0, 3);
+            const books = response.data;
 
-        const response = await axiosInstance.post("books/genres", {
-            genres: topGenres,
-        });
-
-        const books = response.data;
-
-        const formattedBooks = Array.isArray(books)
-            ? books.map((data: any) => ({
-                  id: data.book_id,
-                  title: data.title,
-                  authors: data.authors?.split(",").map((a: string) => a.trim()) || [],
-                  coverUrl: data.google_image_url || data.cover || "",
-                  pages: data.pages,
-                  publicationYear: String(data.year),
-                  genres:
-                      data.BookGenre?.map((g: any) => g.genre.genre_name) || [],
-                  synopsis: data.synopsis,
-                  avgRating: data.averageRating || 1,
-              }))
-            : [];
+            const formattedBooks = Array.isArray(books)
+                ? books.map((data: any) => ({
+                    id: data.book_id,
+                    title: data.title,
+                    authors: data.authors?.split(",").map((a: string) => a.trim()) || [],
+                    coverUrl: data.google_image_url || data.cover || "",
+                    pages: data.pages,
+                    publicationYear: String(data.year),
+                    genres: data.BookGenre?.map((g: any) => g.genre.genre_name) || [],
+                    synopsis: data.synopsis,
+                    avgRating: data.averageRating || 1,
+                }))
+                : [];
 
             return formattedBooks;
         } catch (error) {
@@ -80,3 +72,11 @@ const getFavoriteBasedBooks = async (): Promise<Book[]> => {
     }
     
 }
+
+// corrigir o getFavoriteBasedBooks. está completamente errado
+// 1. usar @user token info para pegar id do usuario
+// 2. com id do usuario, realizar busca com prisma para pegar o id dos generos favoritos
+// 3. com os ids dos generos favoritos, fazer a busca na tabela de livros pegando
+// somente os livros que correspondem ao id dos generos
+// colocar no prisma a configuração de take: 12
+// fazer isso no module de books
