@@ -2,39 +2,36 @@
 /* eslint-disable react-native/no-inline-styles */
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import BottomSheet, {
-  BottomSheetHandle,
-  BottomSheetScrollView,
-} from "@gorhom/bottom-sheet";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   ImageBackground,
   Modal,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CustomBook from "../components/Book/CustomBook";
 import { SinopseExpandable } from "../components/Book/sinopseExpandable";
 import CustomButton from "../components/Buttons/CustomButton";
 import CustomCarousel from "../components/Carousel/CustomHomeCarousel";
 import RatingModal from "../components/RatingModal/RatingModal";
 import { ReviewComment } from "../components/review-comments/review-comments";
+import { Book } from "../components/SearchBar/SearchBar";
 import StaticStars from "../components/StaticStars/StaticStars";
 import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
-
+import BooksService from "../services/booksService";
+import { registerBookInDatabase } from "../services/handle-select-book.service";
+import PersonalLibraryService from "../services/personalLibraryService";
 interface ModalBookDetailsProps {
   visible: boolean;
   onClose: () => void;
-  rating: number;
   title: string;
   pages?: number;
   readersNumber?: number;
@@ -48,12 +45,12 @@ interface ModalBookDetailsProps {
   google_image_url?: string;
   onCreateReview?: () => void;
   onShare?: () => void;
+  bookId: number; // ID Autogerado do banco de dados
 }
 
 export default function ModalBookDetails({
   visible,
   onClose,
-  rating,
   title,
   readersNumber = 1000,
   pages,
@@ -67,57 +64,38 @@ export default function ModalBookDetails({
   google_image_url,
   onCreateReview,
   onShare,
+  bookId,
 }: ModalBookDetailsProps) {
   const { theme } = useTheme();
-  const [isMaximized, setIsMaximized] = useState(false);
-  const [showMoreText, setShowMoreText] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [currentRating, setCurrentRating] = useState(rating);
-  const [ratingCount, setRatingCount] = useState(1);
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const roundedStars = Math.round(currentRating);
-  const snapPoints = useMemo(() => ["62%", "85%"], []);
+  const [averageRating, setAverageRating] = useState(0);
 
-  const MAX_SNAP_POINT_INDEX = 1;
-
-  const handleSheetChanges = useCallback(
-    (index: number) => {
-      if (index > MAX_SNAP_POINT_INDEX) {
-        bottomSheetRef.current?.snapToIndex(MAX_SNAP_POINT_INDEX);
-        return;
-      } else if (index === MAX_SNAP_POINT_INDEX) {
-        setIsMaximized(true);
-      } else {
-        setIsMaximized(false);
-      }
-    },
-    [bottomSheetRef, MAX_SNAP_POINT_INDEX]
-  );
-
-  const updateBookState = async (id: string, state: string) => {
+  const updateAverageRating = () => {
     try {
-      // For testing, use this hardcoded token that works in personalLibrary.tsx
-      const token =
-        (await AsyncStorage.getItem("userToken")) ||
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWxpY2VAZXhhbXBsZS5jb20iLCJpZCI6MSwiaWF0IjoxNzQ2Mzc2MzQwLCJleHAiOjE3NDY0NjI3NDB9.qHYM2FNTzv-2jYFZS3Vd3h9VzynXAe8ItFog0yLrlrs";
+      console.log("updateAverageRating:", bookId);
+      BooksService()
+        .getAverageRating(bookId)
+        .then((response) => {
+          console.log("Média de avaliação:", response);
+          setAverageRating(response);
+        });
+    } catch (error) {
+      console.error("Erro ao buscar média de avaliação:", error);
+    }
+  };
 
-      console.log(`Adding book ${id} to ${state} library`);
+  useEffect(() => {
+    updateAverageRating();
+  }, []);
 
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}/personal-library/addBook/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            state: state,
-          }),
-        }
+  const updateBookState = async (bookId: number, state: string) => {
+    try {
+      const response = await PersonalLibraryService().addBookToLibrary(
+        bookId,
+        state
       );
 
-      if (response.ok) {
+      if (response.status === 200) {
         console.log(`Adicionado a ${state} da biblioteca pessoal`);
         if (Platform.OS === "android") {
           ToastAndroid.show(
@@ -131,11 +109,7 @@ export default function ModalBookDetails({
           );
         }
       } else {
-        const errorText = await response.text();
-        console.error(
-          `Erro ao adicionar livro com estado ${state}:`,
-          errorText
-        );
+        console.error(`Erro ao adicionar livro com estado ${state}:`);
         if (Platform.OS === "android") {
           ToastAndroid.show(
             "Erro ao adicionar livro à biblioteca",
@@ -161,15 +135,6 @@ export default function ModalBookDetails({
     }
   };
 
-  const handleNewRating = (newRating: number) => {
-    const total = currentRating * ratingCount;
-    const updatedCount = ratingCount + 1;
-    const newAverage = (total + newRating) / updatedCount;
-
-    setCurrentRating(newAverage);
-    setRatingCount(updatedCount);
-  };
-
   const handleBackPress = () => {
     onClose();
   };
@@ -178,7 +143,22 @@ export default function ModalBookDetails({
     if (onCreateReview) {
       onCreateReview();
     } else {
-      setModalVisible(true);
+      console.log("Tentando abrir tela de criação de resenha");
+      // Fechar o modal e liberar recursos imediatamente
+      onClose();
+
+      // Tentar navegação direta depois de um delay para garantir que o modal foi fechado
+      setTimeout(() => {
+        try {
+          console.log("Navegando para tela de criação de resenha");
+          // Usar router.navigate porque o push pode estar preservando o histórico de navegação
+          router.push("/screens/createReviewComment");
+        } catch (error) {
+          console.error("Falha na navegação:", error);
+          // Alternativa de navegação em caso de falha
+          router.replace("/screens/home");
+        }
+      }, 700); // Aumentar o delay para dar mais tempo para o modal fechar
     }
   };
 
@@ -193,7 +173,7 @@ export default function ModalBookDetails({
   const bookStats = [
     { value: readersNumber, label: "Leitores" },
     { value: pages, label: "Páginas" },
-    { value: currentRating?.toFixed(1), label: "Avaliação" },
+    { value: averageRating?.toFixed(1), label: "Avaliação" },
     { value: `#${rankingNumber}`, label: "Ranking" },
   ];
 
@@ -202,21 +182,21 @@ export default function ModalBookDetails({
       label: "Já li",
       onPress: async () => {
         console.log("Ação: Já li");
-        await updateBookState(id, "READ");
+        await updateBookState(bookId, "READ");
       },
     },
     {
-      label: "Estou lendo",
+      label: "Lendo",
       onPress: async () => {
         console.log("Ação: Estou lendo");
-        await updateBookState(id, "READING");
+        await updateBookState(bookId, "READING");
       },
     },
     {
       label: "Quero ler",
       onPress: async () => {
         console.log("Ação: Quero ler");
-        await updateBookState(id, "TO_BE_READ");
+        await updateBookState(bookId, "TO_BE_READ");
       },
     },
   ];
@@ -241,7 +221,6 @@ export default function ModalBookDetails({
           processedUrl = processedUrl.replace("http:", "https:");
         }
 
-        console.log("URL de imagem processada:", processedUrl);
         return processedUrl;
       } catch (error) {
         console.error("Erro ao processar URL da imagem:", error);
@@ -261,46 +240,19 @@ export default function ModalBookDetails({
           source={coverImage}
           style={styles.backgroundImage}
           onError={(e) => {
-            console.log("Error loading book cover:", e.nativeEvent.error);
             setCoverImageError(true);
           }}
         >
           <View style={styles.overlay} />
-
-          <View style={styles.bookContentContainer}>
-            {isMaximized ? (
-              <View style={{ flexDirection: "row", marginBottom: 0 }}>
-                <TouchableOpacity onPress={handleBackPress}>
-                  <Ionicons
-                    name="return-up-back-outline"
-                    size={30}
-                    color={theme.white}
-                    style={{ paddingRight: 20 }}
-                  />
-                </TouchableOpacity>
-                <View
-                  style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    paddingRight: 10,
-                    paddingLeft: 10,
-                    width: "85%",
-                  }}
-                >
-                  <NunitoText
-                    style={{
-                      color: theme.quinaryText,
-                      fontSize: 20,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {title.length > 23
-                      ? title?.substring(0, 23) + "..."
-                      : title}
-                  </NunitoText>
-                </View>
-              </View>
-            ) : (
+          <View
+            style={{
+              flex: 1,
+              paddingTop: 24,
+              paddingStart: 24,
+              paddingEnd: 24,
+            }}
+          >
+            <View style={styles.bookContentContainer}>
               <View
                 style={{
                   flexDirection: "row",
@@ -344,246 +296,241 @@ export default function ModalBookDetails({
                   <AntDesign name="export" size={24} color={theme.white} />
                 </TouchableOpacity>
               </View>
-            )}
 
-            <NunitoText style={[styles.title, { color: theme.white }]}>
-              {title.length > 40 ?
-                title.substring(0, 40).trim() + "..."
-                : title}
-            </NunitoText>
-            <NunitoText style={[styles.subtitle, { color: theme.white }]}>
-              {authors ? 
-                authors.length > 30 ?
-                  authors.substring(0, 30).trim + "..."
-                  : authors
-                : "Autor desconhecido"
-              }
-            </NunitoText>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 8,
-              }}
-            >
-              <NunitoText style={[styles.date, { color: theme.white }]}>
-                {year}
+              <NunitoText style={[styles.title, { color: theme.white }]}>
+                {title.length > 40
+                  ? title.substring(0, 40).trim() + "..."
+                  : title}
               </NunitoText>
-              <NunitoText style={{ color: theme.white, paddingHorizontal: 10 }}>
-                {" "}
-                -{" "}
+              <NunitoText style={[styles.subtitle, { color: theme.white }]}>
+                {authors
+                  ? authors.length > 30
+                    ? authors.substring(0, 30).trim + "..."
+                    : authors
+                  : "Autor desconhecido"}
               </NunitoText>
-              <NunitoText style={[styles.gender, { color: theme.white }]}>
-                {genre}
-              </NunitoText>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "flex-start",
-              }}
-            >
-              <View style={styles.starsContainer}>
-                <StaticStars
-                  rating={rating}
-                  onPress={() => {
-                    setModalVisible(true);
-                  }}
-                />
-                <RatingModal
-                  visible={modalVisible}
-                  onClose={() => setModalVisible(false)}
-                  onRate={() => {
-                    setModalVisible(false);
-                  }}
-                  book={title}
-                />
-              </View>
-
-              <TouchableOpacity
-                onPress={handleCreateReview}
+              <View
                 style={{
-                  borderRadius: 15,
-                  backgroundColor: theme.quinaryText,
-                  width: "35%",
-                  height: 20,
-                  alignItems: "center",
-                  justifyContent: "center",
                   flexDirection: "row",
-                  marginRight: 10,
+                  alignItems: "center",
+                  marginBottom: 8,
                 }}
               >
+                <NunitoText style={[styles.date, { color: theme.white }]}>
+                  {year}
+                </NunitoText>
                 <NunitoText
+                  style={{ color: theme.white, paddingHorizontal: 10 }}
+                >
+                  {" "}
+                  -{" "}
+                </NunitoText>
+                <NunitoText style={[styles.gender, { color: theme.white }]}>
+                  {genre}
+                </NunitoText>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "flex-start",
+                }}
+              >
+                <View style={styles.starsContainer}>
+                  <StaticStars
+                    rating={Math.round(averageRating)}
+                    onPress={() => {
+                      setModalVisible(true);
+                    }}
+                  />
+                  <RatingModal
+                    visible={modalVisible}
+                    onClose={() => setModalVisible(false)}
+                    onRate={() => {
+                      updateAverageRating();
+                      setModalVisible(false);
+                    }}
+                    book={title}
+                    bookId={Number(id)}
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={() => setModalVisible(true)}
                   style={{
-                    fontSize: 15,
-                    fontWeight: "bold",
-                    color: theme.quaternaryText,
+                    borderRadius: 15,
+                    backgroundColor: theme.primary,
+                    width: "35%",
+                    height: 25,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "row",
+                    marginRight: 10,
                   }}
                 >
-                  Criar Resenha
-                </NunitoText>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <GestureHandlerRootView style={styles.container}>
-            <BottomSheet
-              backgroundStyle={{ backgroundColor: theme.Background }}
-              ref={bottomSheetRef}
-              snapPoints={snapPoints}
-              index={0}
-              onChange={handleSheetChanges}
-              enablePanDownToClose={false}
-              enableOverDrag={false}
-              handleComponent={BottomSheetHandle}
-              enableContentPanningGesture={false}
-            >
-              <BottomSheetScrollView>
-                <View style={styles.bookNumbersContainer}>
-                  {bookStats.map((stat, index) => (
-                    <View
-                      key={index}
-                      style={{
-                        paddingHorizontal: 18,
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <NunitoText
-                        style={[
-                          styles.bookNumbers,
-                          { color: theme.primaryText },
-                        ]}
-                      >
-                        {stat.value}
-                      </NunitoText>
-                      <NunitoText
-                        style={[
-                          styles.bookNumbersTitle,
-                          { color: theme.primaryText },
-                        ]}
-                      >
-                        {stat.label}
-                      </NunitoText>
-                    </View>
-                  ))}
-                </View>
-
-                <View style={styles.statusBookContainer}>
-                  {bookActions.map((action, index) => (
-                    <CustomButton
-                      width={150}
-                      height={30}
-                      key={index}
-                      title={action.label}
-                      onPress={action.onPress}
-                    />
-                  ))}
-                </View>
-
-                <SinopseExpandable synopsis={synopsis} />
-
-                <View
-                  style={{ alignItems: "flex-start", justifyContent: "center" }}
-                >
                   <NunitoText
-                    style={[
-                      styles.secondTitle,
-                      { paddingBottom: 25, color: theme.primaryText },
-                    ]}
-                  >
-                    Principais Resenhas e Comentários
-                  </NunitoText>
-
-                  <ReviewComment
-                    comment={true}
-                    byAuthor={true}
-                    datePost={"30/01/2025"}
-                    text={
-                      "Amei o livro, muito bom mesmo! Recomendo muito. A história é envolvente e os personagens são bem desenvolvidos."
-                    }
-                    fullNamePostAuthor={"Monica Alvarenga"}
-                  />
-
-                  <ReviewComment
-                    comment={false}
-                    byAuthor={false}
-                    fullNamePostAuthor={"Monica Alvarenga"}
-                    datePost={"22/08/2024"}
-                    text={
-                      "Memórias da Meia-Noite é um romance de Sidney Sheldon que mistura mistério, drama e uma boa dose de suspense. A história gira em torno de Katherine, uma mulher marcada por tragédias pessoais e uma vida cheia de reviravoltas. Ela se vê envolvida em uma trama que desafia sua compreensão de confiança, vingança e sobrevivência, enquanto tenta descobrir os segredos obscuros de seu passado e lidar com as consequências de suas escolhas.Com o estilo característico de Sheldon, a narrativa é envolvente e cheia de surpresas, mantendo o leitor na expectativa até o final. A trama é recheada de personagens complexos e dilemas emocionais, explorando temas como o perdão, a vingança e os jogos de poder. A escrita é fluída, o ritmo é rápido e as reviravoltas são sempre inesperadas. É uma história que prende o leitor até a última página, com um final impactante."
-                    }
-                  />
-                </View>
-
-                <View
-                  style={{ alignItems: "center", justifyContent: "center" }}
-                >
-                  <TouchableOpacity
-                    onPress={undefined}
                     style={{
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: theme.primary,
-                      width: "87%",
-                      height: 25,
-                      borderRadius: 30,
+                      fontSize: 15,
+                      fontWeight: "bold",
+                      color: theme.white,
                     }}
                   >
-                    <Text style={{ color: theme.quinaryText }}>
-                      Acessar mais
-                    </Text>
-                  </TouchableOpacity>
+                    Avaliar
+                  </NunitoText>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+          <ScrollView
+            style={{
+              flex: 2,
+              flexGrow: 2,
+              backgroundColor: theme.Background,
+              paddingStart: 24,
+              paddingEnd: 24,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+            }}
+          >
+            <View style={styles.bookNumbersContainer}>
+              {bookStats.map((stat, index) => (
+                <View
+                  key={index}
+                  style={{
+                    paddingHorizontal: 18,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <NunitoText
+                    style={[styles.bookNumbers, { color: theme.primaryText }]}
+                  >
+                    {stat.value}
+                  </NunitoText>
+                  <NunitoText
+                    style={[
+                      styles.bookNumbersTitle,
+                      { color: theme.primaryText },
+                    ]}
+                  >
+                    {stat.label}
+                  </NunitoText>
                 </View>
+              ))}
+            </View>
 
-                <View style={{ marginBottom: 30 }}></View>
+            <View style={styles.statusBookContainer}>
+              {bookActions.map((action, index) => (
+                <View style={{ flex: 1 }}>
+                  <CustomButton
+                    size="small"
+                    containerStyle={{ flex: 1 }}
+                    key={index}
+                    title={action.label}
+                    onPress={action.onPress}
+                  />
+                </View>
+              ))}
+            </View>
 
-                <NunitoText
-                  style={[
-                    styles.secondTitle,
-                    { paddingBottom: 15, color: theme.primaryText },
-                  ]}
-                >
-                  Livros do mesmo autor
-                </NunitoText>
-                <CustomCarousel
-                  isHorizontal
-                  data={[
-                    <CustomBook
-                      key={1}
-                      bookId={0}
-                      photoPath={require("../assets/images/book-cover.png")}
-                    />,
-                  ]}
-                />
+            <SinopseExpandable synopsis={synopsis} />
 
-                <View style={{ marginBottom: 15 }}></View>
+            <View
+              style={{
+                alignItems: "flex-start",
+                justifyContent: "center",
+              }}
+            >
+              <NunitoText
+                style={[
+                  styles.secondTitle,
+                  { paddingBottom: 25, color: theme.primaryText },
+                ]}
+              >
+                Principais Resenhas e Comentários
+              </NunitoText>
 
-                <NunitoText
-                  style={[
-                    styles.secondTitle,
-                    { paddingBottom: 15, color: theme.primaryText },
-                  ]}
-                >
-                  Livros semelhantes
-                </NunitoText>
-                <CustomCarousel
-                  isHorizontal
-                  data={[
-                    <CustomBook
-                      key={1}
-                      bookId={0}
-                      photoPath={require("../assets/images/book-cover.png")}
-                    />,
-                  ]}
-                />
+              <ReviewComment
+                comment={true}
+                byAuthor={true}
+                datePost={"30/01/2025"}
+                text={
+                  "Amei o livro, muito bom mesmo! Recomendo muito. A história é envolvente e os personagens são bem desenvolvidos."
+                }
+                fullNamePostAuthor={"Monica Alvarenga"}
+              />
 
-                <View style={{ marginBottom: 500 }}></View>
-              </BottomSheetScrollView>
-            </BottomSheet>
-          </GestureHandlerRootView>
+              <ReviewComment
+                comment={false}
+                byAuthor={false}
+                fullNamePostAuthor={"Monica Alvarenga"}
+                datePost={"22/08/2024"}
+                text={
+                  "Memórias da Meia-Noite é um romance de Sidney Sheldon que mistura mistério, drama e uma boa dose de suspense. A história gira em torno de Katherine, uma mulher marcada por tragédias pessoais e uma vida cheia de reviravoltas. Ela se vê envolvida em uma trama que desafia sua compreensão de confiança, vingança e sobrevivência, enquanto tenta descobrir os segredos obscuros de seu passado e lidar com as consequências de suas escolhas.Com o estilo característico de Sheldon, a narrativa é envolvente e cheia de surpresas, mantendo o leitor na expectativa até o final. A trama é recheada de personagens complexos e dilemas emocionais, explorando temas como o perdão, a vingança e os jogos de poder. A escrita é fluída, o ritmo é rápido e as reviravoltas são sempre inesperadas. É uma história que prende o leitor até a última página, com um final impactante."
+                }
+              />
+            </View>
+
+            <View style={{ alignItems: "center", justifyContent: "center" }}>
+              <TouchableOpacity
+                onPress={undefined}
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: theme.primary,
+                  width: "87%",
+                  height: 25,
+                  borderRadius: 30,
+                }}
+              >
+                <Text style={{ color: theme.quinaryText }}>Acessar mais</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ marginBottom: 30 }}></View>
+
+            <NunitoText
+              style={[
+                styles.secondTitle,
+                { paddingBottom: 15, color: theme.primaryText },
+              ]}
+            >
+              Livros do mesmo autor
+            </NunitoText>
+            <CustomCarousel
+              isHorizontal
+              data={[
+                <CustomBook
+                  key={1}
+                  bookId={0}
+                  photoPath={require("../assets/images/book-cover.png")}
+                />,
+              ]}
+            />
+
+            <View style={{ marginBottom: 15 }}></View>
+
+            <NunitoText
+              style={[
+                styles.secondTitle,
+                { paddingBottom: 15, color: theme.primaryText },
+              ]}
+            >
+              Livros semelhantes
+            </NunitoText>
+            <CustomCarousel
+              isHorizontal
+              data={[
+                <CustomBook
+                  key={1}
+                  bookId={0}
+                  photoPath={require("../assets/images/book-cover.png")}
+                />,
+              ]}
+            />
+
+            <View style={{ marginBottom: 500 }}></View>
+          </ScrollView>
         </ImageBackground>
       </View>
     );
@@ -599,6 +546,20 @@ export default function ModalBookDetails({
       <BookContent />
     </Modal>
   );
+}
+
+export async function getBookWithRegisteredId(
+  book: Book,
+  callback: (book: Book) => void
+) {
+  const registerdBook = await registerBookInDatabase(book);
+
+  const bookWithRegisteredId = {
+    ...book,
+    id: registerdBook.book_id,
+  };
+
+  callback(bookWithRegisteredId);
 }
 
 const styles = StyleSheet.create({
@@ -643,12 +604,7 @@ const styles = StyleSheet.create({
     paddingRight: 5,
   },
   bookContentContainer: {
-    position: "absolute",
-    top: "5%",
-    left: "5%",
-    right: "5%",
-    paddingHorizontal: 10,
-    marginBottom: 10,
+    flex: 1,
   },
   bookNumbers: {
     fontSize: 19,
@@ -662,7 +618,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 10,
+    paddingTop: 44,
   },
   secondTitle: {
     fontSize: 20,
@@ -702,8 +658,8 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   statusBookContainer: {
+    flex: 1,
     gap: 10,
-    transform: "scale(0.8)",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

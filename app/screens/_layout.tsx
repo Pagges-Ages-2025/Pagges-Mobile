@@ -15,16 +15,25 @@ export default function ScreensLayout() {
   const pathname = usePathname();
 
 
-  // NÃO MEXER AQUI (ASS: OTAVIO - AGES III)
+  // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
   const handleLongPress = ({ nativeEvent }: any) => {
+    // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
     if (nativeEvent.state === 4) {
+      // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
       if (pathname !== "screens/tests/teste") {
-        router.push("screens/profile" as any);
+        // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
+        router.push("screens/tests/teste" as any);
+        // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)  
       } else {
+        // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
         router.back();
+        // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
       }
+      // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
     }
+    // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
   };
+  // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -44,7 +53,8 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
     "/screens/splash",
     "/screens/welcome",
     "/screens/book",
-    "/screens/favoriteGenre"
+    "/screens/favoriteGenre",
+    "/screens/createReviewComment"
   ];
 
   const { themeName } = useTheme();
@@ -85,8 +95,17 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
               
               gestureDirection: "vertical",
             }} />
+            <Stack.Screen name="genreLibrary"
+            options={{
+              animation: "slide_from_bottom",
+              animationDuration: 300,
+              
+              gestureDirection: "vertical",
+            }} />
             <Stack.Screen name="profile" />
-            <Stack.Screen name="createreReviewComment" />
+            <Stack.Screen name="createReviewComment" />
+            <Stack.Screen name="configuration"/>
+            <Stack.Screen name="social" />
           </Stack>
           {!removeNavbarFromPageList.includes(pathname) && <NavBar />}
         </View>

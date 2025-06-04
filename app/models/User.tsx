@@ -10,6 +10,7 @@ export class User {
   isAuthor: boolean;
   email: string;
   profileImage?: string;
+  points: number
 
   constructor() {
     this.id = 0;
@@ -22,5 +23,6 @@ export class User {
     this.friendsNumber = 0;
     this.isAuthor = false;
     this.email = "";
+    this.points = 0;
   }
 }

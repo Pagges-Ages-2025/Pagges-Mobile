@@ -52,22 +52,24 @@ const CustomBook: React.FC<CustomBookProps> = ({
 
   // Se a imagem falhar ao carregar, usamos uma imagem placeholder
   const handleImageError = () => {
-    console.log("Error loading book cover:", optimizedPhotoPath);
     setImageError(true);
   };
 
   const sizeStyles = {
     small: {
-      height: 150,
+      height: 155,
       width: 100,
+      borderRadius: 10,
     },
     medium: {
       height: 200,
       width: 140,
+      borderRadius: 10,
     },
     large: {
       height: 260,
       width: 180,
+      borderRadius: 20,
     },
     search: {
       height: 80,
@@ -129,7 +131,6 @@ const CustomBook: React.FC<CustomBookProps> = ({
 
 const styles = StyleSheet.create({
   baseBook: {
-    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",

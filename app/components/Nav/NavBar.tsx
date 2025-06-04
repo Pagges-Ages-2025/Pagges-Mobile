@@ -1,5 +1,5 @@
 import { useTheme } from "@/app/context/ThemeContext";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usePathname, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -13,6 +13,11 @@ export default function NavBar() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const backgroundColor = theme.Background;
+
+  const iconSets = {
+    Ionicons,
+    MCI: MaterialCommunityIcons,
+  };
 
   useEffect(() => {
     loadUserEmail();
@@ -42,17 +47,35 @@ export default function NavBar() {
   };
 
   const navigationItems = [
-    { name: "Home", icon: "home-outline", route: "/screens/home" },
+    {
+      name: "Home",
+      icon: "home-outline",
+      route: "/screens/home",
+      lib: "Ionicons",
+    },
     {
       name: themeName === "dark" ? "Light" : "Dark",
       icon: themeName === "dark" ? "sunny" : "moon",
       action: toggleTheme,
+      lib: "Ionicons"
     },
-    { name: "Add", icon: "add", route: "/screens/createReviewComment" },
     {
-      name: "Sair",
-      icon: "log-out-outline",
-      action: handleLogout,
+      name: "Social",
+      icon: "people-outline",
+      route: "/screens/social",
+      lib: "Ionicons",
+    },
+    {
+      name: "Add",
+      icon: "add",
+      route: "/screens/createReviewComment",
+      lib: "Ionicons",
+    },
+    {
+      name: "Desafios",
+      icon: "bullseye-arrow",
+      route: "/screens/challenges",
+      lib: "MCI",
     },
     {
       name: "Perfil",
@@ -60,13 +83,13 @@ export default function NavBar() {
       route: userEmail
         ? `/screens/profile?email=${encodeURIComponent(userEmail)}`
         : "/screens/profile",
+      lib: "Ionicons",
     },
   ];
-
   const isCurrentRoute = (route: string | undefined) => {
     if (!route) return false;
-    const currentBasePath = pathname.split('?')[0];
-    const targetBasePath = route.split('?')[0];
+    const currentBasePath = pathname.split("?")[0];
+    const targetBasePath = route.split("?")[0];
     return currentBasePath === targetBasePath;
   };
 
@@ -74,81 +97,84 @@ export default function NavBar() {
     if (item.action) {
       item.action();
     } else if (item.route && !isCurrentRoute(item.route)) {
-      console.log('Navegando para nova página:', item.route);
+      console.log("Navegando para nova página:", item.route);
       router.replace(item.route as any);
     } else if (item.route) {
-      console.log('Usuário já está na página:', pathname);
+      console.log("Usuário já está na página:", pathname);
     }
   };
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      {navigationItems.map((item) => (
-        <TouchableOpacity
-          key={item.name}
-          style={[
-            styles.navItem,
-            item.name === "Add" && styles.addButton,
-            item.name === "Add" && { backgroundColor: theme.primary },
-            isCurrentRoute(item.route) && styles.activeNavItem,
-          ]}
-          onPress={() => handleNavigation(item)}
-        >
-          <Ionicons
-            name={item.icon as any}
-            size={24}
-            color={
-              item.name === "Add"
-                ? theme.Background
-                : isCurrentRoute(item.route)
-                  ? theme.primary
-                  : theme.placeholder
-            }
-          />
-          <NunitoText
+      {navigationItems.map((item) => {
+        const IconComp = iconSets[item.lib as keyof typeof iconSets];
+        return (
+          <TouchableOpacity
+            key={item.name}
             style={[
-              styles.navText,
-              {
-                color:
-                  item.name === "Add"
-                    ? theme.Background
-                    : isCurrentRoute(item.route)
-                      ? theme.primary
-                      : theme.placeholder,
-              },
+              styles.navItem,
+              item.name === "Add" && styles.addButton,
+              item.name === "Add" && { backgroundColor: theme.primary },
+              isCurrentRoute(item.route) && styles.activeNavItem,
             ]}
+            onPress={() => handleNavigation(item)}
           >
-            {item.name}
-          </NunitoText>
-        </TouchableOpacity>
-      ))}
+            <IconComp
+              name={item.icon as any}
+              size={24}
+              color={
+                item.name === "Add"
+                  ? theme.Background
+                  : isCurrentRoute(item.route)
+                    ? theme.primary
+                    : theme.placeholder
+              }
+            />
+            <NunitoText
+              style={[
+                styles.navText,
+                {
+                  color:
+                    item.name === "Add"
+                      ? theme.Background
+                      : isCurrentRoute(item.route)
+                        ? theme.primary
+                        : theme.placeholder,
+                },
+              ]}
+            >
+              {item.name}
+            </NunitoText>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0, 0, 0, 0.1)",
-    paddingBottom: Platform.OS === "ios" ? 25 : 10,
-  },
-  navItem: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 8,
-  },
   activeNavItem: {
     borderRadius: 8,
   },
   addButton: {
     borderRadius: 50,
-    width: 56,
     height: 56,
     marginTop: -20,
+    width: 56,
+  },
+  container: {
+    alignItems: "center",
+    borderTopColor: "rgba(0, 0, 0, 0.1)",
+    borderTopWidth: 1,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingBottom: Platform.OS === "ios" ? 25 : 10,
+    paddingVertical: 10,
+  },
+  navItem: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 8,
   },
   navText: {
     fontSize: 12,

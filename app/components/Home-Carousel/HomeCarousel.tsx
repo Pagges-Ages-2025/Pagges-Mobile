@@ -44,7 +44,7 @@ const HomeCarouselSection = ({ cards, route, onIndexChange }: Props) => {
               onPress={() => handlePress(route)}
               style={[
                 styles.card, 
-                {backgroundColor: theme.tertiaryText},
+                {backgroundColor: theme.primary},
               ]}
             >
               <Text style={[styles.cardText, {color: theme.white}]}>{item.title}</Text>
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     flex: 1, 
   },
   card: {
-    width: width * 0.9,
+    width: width * 0.8,
     height: 172,
     borderRadius: 10,
     justifyContent: "center",

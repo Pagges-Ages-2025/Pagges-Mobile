@@ -1,29 +1,22 @@
+import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import StaticSearchBar from "../components/SearchBar/StaticSearchBar";
-import { useTheme } from "../context/ThemeContext";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import HomeCarouselSection from "../components/Home-Carousel/HomeCarousel";
-import NunitoText from "../components/Texts/NunitoText";
-import CustomCarousel from "../components/Carousel/CustomCarousel";
+import { SafeAreaView } from "react-native-safe-area-context";
 import CustomBook from "../components/Book/CustomBook";
-import ModalBookDetails from "./bookDetails";
+import CustomButton from "../components/Buttons/CustomButton";
+import CustomCarousel from "../components/Carousel/CustomCarousel";
+import HomeCarouselSection from "../components/Home-Carousel/HomeCarousel";
+import { Book } from "../components/SearchBar/SearchBar";
+import StaticSearchBar from "../components/SearchBar/StaticSearchBar";
+import NunitoText from "../components/Texts/NunitoText";
+import { useTheme } from "../context/ThemeContext";
+import { Genre } from "../models/Genre";
 import BooksService from "../services/booksService";
 import { retriveUserGenres } from "../services/genres.service";
 import SearchAPI from "../services/googleAPIService";
-
-export interface Book {
-  id: number;
-  title: string;
-  authors: string[];
-  coverUrl: string;
-  pages: number;
-  publicationYear: string;
-  genres: string[];
-  synopsis?: string;
-  avgRating?: number;
-}
+import { retriveAllGenres } from "../services/genres.service";
+import ModalBookDetails from "./bookDetails";
 
 const mockCards = [
   { id: "1", title: "Desafio Diário" },
@@ -36,11 +29,16 @@ const Home: React.FC = () => {
   const { getTrendingBooks, getFavoriteBasedBooks } = BooksService();
   const [trendingBooks, setTradingBooks] = useState<Book[]>();
   const [favoriteBasedBook, setFavoriteBasedBook] = useState<Book[]>();
-  const [selectedTrendingBook, setSelectedTrendingBook] = useState<Book | null>(null);
+  const [selectedTrendingBook, setSelectedTrendingBook] = useState<Book | null>(
+    null
+  );
   const [selectedFavoriteBasedBook, setSelectedFavoriteBasedBook] = useState<Book | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const { searchByGenre } = SearchAPI();
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [loadingGenres, setLoadingGenres] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const handleCloseModal = () => {
     setModalVisible(false);
@@ -57,6 +55,18 @@ const Home: React.FC = () => {
     setModalVisible(true);
   };
 
+  const handleGenrePressButton = useCallback(
+    (genreId: number, genreName: string) => {
+      if (isMounted) {
+        router.push({
+          pathname: "/screens/genreLibrary",
+          params: { selectedGenreId: genreId, genreName: genreName },
+        });
+      }
+    },
+    [isMounted]
+  );
+
   const fetchTrendingBooks = useCallback(async () => {
     setLoading(true);
     try {
@@ -71,9 +81,29 @@ const Home: React.FC = () => {
     }
   }, []);
 
+  const fetchGenres = useCallback(async () => {
+    setLoadingGenres(true);
+    try {
+      const response = await retriveAllGenres();
+      console.log("response.data genres", response.data);
+      setGenres(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar gêneros:", error);
+      setGenres([]);
+    } finally {
+      setLoadingGenres(false);
+    }
+  }, []);
+
   useEffect(() => {
+    setIsMounted(true);
     fetchTrendingBooks();
-  }, [fetchTrendingBooks]);
+    fetchGenres();
+
+    return () => {
+      setIsMounted(false);
+    };
+  }, [fetchTrendingBooks, fetchGenres]);
 
     const handleSelectFavoriteBasedBook = (book: Book) => {
     setSelectedFavoriteBasedBook(book);
@@ -99,7 +129,9 @@ const Home: React.FC = () => {
   }, [fetchTrendingBooks, fetchFavoriteBasedBooks]);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.Background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.Background }]}
+    >
       <ScrollView>
         <View style={styles.content}>
           <StaticSearchBar />
@@ -111,30 +143,69 @@ const Home: React.FC = () => {
           <NunitoText
             style={[
               styles.secondTitle,
+              { paddingBottom: 0, color: theme.primaryText },
+            ]}
+          >
+            Gêneros
+          </NunitoText>
+          <View style={styles.genreContent}>
+            {loadingGenres ? (
+              <ActivityIndicator size="small" color={theme.primary} />
+            ) : (
+              <CustomCarousel
+                isHorizontal
+                data={genres.map((genre) => (
+                  <CustomButton
+                    key={genre.genre_id}
+                    fontWeight={"semibold"}
+                    size={"small"}
+                    title={genre.genre_name}
+                    onPress={() =>
+                      handleGenrePressButton(genre.genre_id, genre.genre_name)
+                    }
+                  />
+                ))}
+              />
+            )}
+          </View>
+
+          <NunitoText
+            style={[
+              styles.secondTitle,
               { paddingBottom: 15, color: theme.primaryText },
             ]}
           >
             Em alta
           </NunitoText>
 
-          <CustomCarousel
-            isHorizontal
-            data={
-              trendingBooks
-                ? trendingBooks.map((book) => (
-                    <CustomBook
-                      size="small"
-                      key={book.id}
-                      bookId={book.id}
-                      photoPath={book.coverUrl}
-                      title={book.title}
-                      author={book.authors.join(", ")}
-                      onPress={() => handleSelectTrendingBook(book)}
-                    />
-                  ))
-                : []
-            }
-          />
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.primary} />
+            </View>
+          ) : trendingBooks && trendingBooks.length > 0 ? (
+            <CustomCarousel
+              isHorizontal
+              data={trendingBooks.map((book) => (
+                <CustomBook
+                  size="small"
+                  key={book.id}
+                  bookId={book.id}
+                  photoPath={book.capa}
+                  title={book.titulo}
+                  author={book.autores.join(", ")}
+                  onPress={() => handleSelectTrendingBook(book)}
+                />
+              ))}
+            />
+          ) : (
+            <View style={styles.emptyContainer}>
+              <NunitoText
+                style={[styles.emptyText, { color: theme.primaryText }]}
+              >
+                Nenhum livro em alta no momento
+              </NunitoText>
+            </View>
+          )}
 
           <NunitoText
             style={[
@@ -154,9 +225,9 @@ const Home: React.FC = () => {
                       size="medium"
                       key={book.id}
                       bookId={book.id}
-                      photoPath={book.coverUrl}
-                      title={book.title}
-                      author={book.authors.join(", ")}
+                      photoPath={book.capa}
+                      title={book.titulo}
+                      author={book.autores.join(", ")}
                       onPress={() => handleSelectFavoriteBasedBook(book)}
                     />
                   ))
@@ -170,20 +241,29 @@ const Home: React.FC = () => {
           <ModalBookDetails
             visible={modalVisible}
             onClose={handleCloseModal}
-            rating={selectedTrendingBook.avgRating || 1}
-            title={selectedTrendingBook.title || "Título não disponível"}
-            pages={selectedTrendingBook.pages || 0}
-            synopsis={selectedTrendingBook.synopsis || "Sinopse não disponível"}
+            title={selectedTrendingBook.titulo || "Título não disponível"}
+            pages={selectedTrendingBook.paginas || 0}
+            synopsis={selectedTrendingBook.sinopse || "Sinopse não disponível"}
             review="Sem avaliações disponíveis ainda."
-            authors={selectedTrendingBook.authors?.join(", ") || "Autor desconhecido"}
-            year={selectedTrendingBook.publicationYear?.substring(0, 4) || "Desconhecido"}
-            id={selectedTrendingBook.id?.toString() || "0"}
-            genre={selectedTrendingBook.genres?.[0] || "Gênero não especificado"}
-            google_image_url={selectedTrendingBook.coverUrl || ""}
-            onCreateReview={() =>
-              console.log("Criar resenha para:", selectedTrendingBook.title)
+            authors={
+              selectedTrendingBook.autores?.join(", ") || "Autor desconhecido"
             }
-            onShare={() => console.log("Compartilhar:", selectedTrendingBook.title)}
+            year={
+              selectedTrendingBook.anoDePublicacao?.substring(0, 4) ||
+              "Desconhecido"
+            }
+            id={selectedTrendingBook.id?.toString() || "0"}
+            genre={
+              selectedTrendingBook.generos?.[0] || "Gênero não especificado"
+            }
+            google_image_url={selectedTrendingBook.capa || ""}
+            onCreateReview={() =>
+              console.log("Criar resenha para:", selectedTrendingBook.titulo)
+            }
+            onShare={() =>
+              console.log("Compartilhar:", selectedTrendingBook.titulo)
+            }
+            bookId={selectedTrendingBook.id}
           />
         )}
 
@@ -206,12 +286,29 @@ const styles = StyleSheet.create({
   carouselContainer: {
     paddingTop: 20,
   },
+  genreContent: {
+    paddingTop: 15,
+  },
   secondTitle: {
     fontSize: 20,
     fontWeight: "bold",
     paddingTop: 30,
     paddingLeft: 30,
     paddingBottom: 10,
+  },
+  loadingContainer: {
+    height: 200,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyContainer: {
+    height: 200,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 16,
+    textAlign: "center",
   },
 });
 

@@ -17,6 +17,7 @@ import NunitoText from "../components/Texts/NunitoText";
 import { PaggesTextInput } from "../components/Inputs/TextInput";
 import Strings from "../constants/Strings";
 import AuthAPI from "../services/auth";
+import { useTheme } from "../context/ThemeContext";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export default function LoginScreen() {
   const lottieRef = useRef<LottieView>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { theme } = useTheme();
 
   const handleSubmitLoginButton = async () => {
     if (!email || !password) {
@@ -99,7 +101,7 @@ export default function LoginScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerStyle={[styles.scrollContainer, { backgroundColor: theme.Background }]}
         scrollEnabled={false}
       >
         <View style={styles.container}>
@@ -181,55 +183,31 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
+  button: {
+    alignItems: "center",
+    backgroundColor: "#9C0F5F",
+    borderRadius: 30,
+    height: 56,
+    justifyContent: "center",
+    marginBottom: 16,
+    width: "100%",
   },
-  lottie: {
-    width: 300,
-    height: 300,
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
   container: {
-    flex: 1,
-    backgroundColor: "white",
-    justifyContent: "center",
     alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
     padding: 20,
   },
   content: {
-    width: "100%",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 40,
-  },
-  title: {
-    fontSize: 48,
-    fontWeight: "bold",
-    color: "#9C0F5F",
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: "#333",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  illustration: {
-    width: 200,
-    height: 150,
-    marginBottom: 30,
-  },
-  inputContainer: {
-    marginBottom: 16,
-  },
-  inputIcon: {
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
-    height: "100%",
-    color: "#333",
-    fontSize: 16,
-    fontFamily: "Nunito",
+    width: "100%",
   },
   eyeIcon: {
     padding: 10,
@@ -242,19 +220,27 @@ const styles = StyleSheet.create({
     color: "#666",
     fontSize: 14,
   },
-  button: {
-    backgroundColor: "#9C0F5F",
-    borderRadius: 30,
-    height: 56,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
+  illustration: {
+    height: 150,
+    marginBottom: 30,
+    width: 200,
+  },
+  input: {
+    color: "#333",
+    flex: 1,
+    fontFamily: "Nunito",
+    fontSize: 16,
+    height: "100%",
+  },
+  inputContainer: {
     marginBottom: 16,
   },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
+  inputIcon: {
+    marginRight: 10,
+  },
+  lottie: {
+    height: 300,
+    width: 300,
   },
   registerLink: {
     marginTop: 10,
@@ -262,5 +248,20 @@ const styles = StyleSheet.create({
   registerLinkText: {
     color: "#666",
     fontSize: 14,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+  },
+  subtitle: {
+    color: "#333",
+    fontSize: 18,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  title: {
+    color: "#9C0F5F",
+    fontSize: 48,
+    fontWeight: "bold",
+    marginBottom: 10,
   },
 });

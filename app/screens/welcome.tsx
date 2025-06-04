@@ -12,12 +12,14 @@ import LottieView from "lottie-react-native";
 import CustomButton from "../components/Buttons/CustomButton";
 import ImageCartoon from "../assets/images/backgroundWelcome.png";
 import NunitoText from "../components/Texts/NunitoText";
+import { useTheme } from "../context/ThemeContext";
 
 export default function WelcomeScreen() {
   const router = useRouter();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const lottieRef = useRef<LottieView>(null);
+  const { theme } = useTheme();
 
   useFocusEffect(
     useCallback(() => {
@@ -64,7 +66,7 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.Background }]}>
       <Animated.View
         style={[
           styles.content,
@@ -73,10 +75,10 @@ export default function WelcomeScreen() {
       >
         <NunitoText style={styles.logotitle}>Pagges</NunitoText>
         <Image source={ImageCartoon} style={styles.logo} />
-        <NunitoText style={styles.title}>
+        <NunitoText style={[styles.title, { color: theme.primaryText }]}>
           Sua nova comunidade de leitura
         </NunitoText>
-        <NunitoText style={styles.subtitle}>
+        <NunitoText style={[styles.subtitle, { color: theme.primaryText }]}>
           Leia, escreva, comente e interaja sempre que desejar
         </NunitoText>
 
@@ -108,7 +110,6 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
@@ -133,13 +134,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#474545",
     textAlign: "center",
     marginBottom: 20,
   },
   subtitle: {
     fontSize: 16,
-    color: "#474545",
     textAlign: "center",
     marginBottom: 40,
     lineHeight: 24,

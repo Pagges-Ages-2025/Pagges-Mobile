@@ -147,17 +147,6 @@ const PaggesTextInputCustomIcons: React.FC<PaggesTextInputCustomIconsProps> = ({
 };
 
 const styles = StyleSheet.create({
-  inputContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderRadius: 15,
-  },
-  multilineContainer: {
-    alignItems: "flex-start",
-    paddingVertical: 5,
-  },
   icon: {
     margin: 12,
   },
@@ -167,10 +156,21 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
   },
+  inputContainer: {
+    alignItems: "center",
+    borderRadius: 15,
+    borderWidth: 1,
+    flex: 1,
+    flexDirection: "row",
+  },
+  multilineContainer: {
+    alignItems: "flex-start",
+    paddingVertical: 5,
+  },
   multilineInput: {
-    paddingTop: 12,
-    paddingBottom: 12,
     height: "100%",
+    paddingBottom: 12,
+    paddingTop: 12,
   },
 });
 
