@@ -1,6 +1,7 @@
 import axios from "axios";
-import axiosInstance from "./axios-instance-singleton";
 import { Book } from "../components/SearchBar/SearchBar";
+import { DatabaseBookModel } from "../models/DatabaseBook.model";
+import axiosInstance from "./axios-instance-singleton";
 
 export default function BooksService() {
   const getTrendingBooks = async () => {
@@ -49,7 +50,7 @@ export default function BooksService() {
     }
   };
 
-  const RateBook = async (bookId: number, rating: number): Promise<void> => {
+  const rateBook = async (bookId: number, rating: number): Promise<void> => {
     try {
       console.log("Avaliando livro:", bookId, rating);
       await axiosInstance.post(`/books/rate-book`, {
@@ -62,9 +63,18 @@ export default function BooksService() {
     }
   };
 
+  const getBooksByGenre = async (
+    genreId: number
+  ): Promise<DatabaseBookModel[]> => {
+    const response = await axiosInstance.get(`/books/genre/${genreId}`);
+    const dabataseBooks: DatabaseBookModel[] = response.data;
+    return dabataseBooks;
+  };
+
   return {
     getTrendingBooks,
     getAverageRating,
-    RateBook,
+    RateBook: rateBook,
+    getBooksByGenre,
   };
 }

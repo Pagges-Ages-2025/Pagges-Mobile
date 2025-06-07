@@ -1,46 +1,26 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, View, ActivityIndicator, Button } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import StaticSearchBar from "../components/SearchBar/StaticSearchBar";
-import { useTheme } from "../context/ThemeContext";
-import { ScrollView } from "react-native-gesture-handler";
-import HomeCarouselSection from "../components/Home-Carousel/HomeCarousel";
-import NunitoText from "../components/Texts/NunitoText";
-import CustomCarousel from "../components/Carousel/CustomCarousel";
-import CustomBook from "../components/Book/CustomBook";
-import ModalBookDetails, { getBookWithRegisteredId } from "./bookDetails";
-import BooksService from "../services/booksService";
-import CustomButton from "../components/Buttons/CustomButton";
 import { router } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
+import CustomBook from "../components/Book/CustomBook";
+import CustomButton from "../components/Buttons/CustomButton";
+import CustomCarousel from "../components/Carousel/CustomCarousel";
+import HomeCarouselSection from "../components/Home-Carousel/HomeCarousel";
 import { Book } from "../components/SearchBar/SearchBar";
+import StaticSearchBar from "../components/SearchBar/StaticSearchBar";
+import NunitoText from "../components/Texts/NunitoText";
+import { useTheme } from "../context/ThemeContext";
+import { Genre } from "../models/Genre";
+import BooksService from "../services/booksService";
+import { retriveAllGenres } from "../services/genres.service";
+import ModalBookDetails from "./bookDetails";
 
 const mockCards = [
   { id: "1", title: "Desafio Diário" },
   { id: "2", title: "Desafio Diário" },
   { id: "3", title: "Desafio Diário" },
 ];
-const gener = [
-  "Terror",
-  "Romance",
-  "Família",
-  "Noir",
-  "Ficção Científica",
-  "Histórico",
-];
-const genres = gener.map((item) => (
-  <CustomButton
-    key={item}
-    fontWeight={"semibold"}
-    size={"small"}
-    title={item}
-    onPress={() =>
-      router.push({
-        pathname: "/screens/genreLibrary",
-        params: { selectedGenre: item },
-      })
-    }
-  ></CustomButton>
-));
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
@@ -51,6 +31,9 @@ const Home: React.FC = () => {
   );
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [loadingGenres, setLoadingGenres] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const handleCloseModal = () => {
     setModalVisible(false);
@@ -61,6 +44,18 @@ const Home: React.FC = () => {
     setSelectedTrendingBook(book);
     setModalVisible(true);
   };
+
+  const handleGenrePressButton = useCallback(
+    (genreId: number, genreName: string) => {
+      if (isMounted) {
+        router.push({
+          pathname: "/screens/genreLibrary",
+          params: { selectedGenreId: genreId, genreName: genreName },
+        });
+      }
+    },
+    [isMounted]
+  );
 
   const fetchTrendingBooks = useCallback(async () => {
     setLoading(true);
@@ -76,9 +71,29 @@ const Home: React.FC = () => {
     }
   }, []);
 
+  const fetchGenres = useCallback(async () => {
+    setLoadingGenres(true);
+    try {
+      const response = await retriveAllGenres();
+      console.log("response.data", response.data);
+      setGenres(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar gêneros:", error);
+      setGenres([]);
+    } finally {
+      setLoadingGenres(false);
+    }
+  }, []);
+
   useEffect(() => {
+    setIsMounted(true);
     fetchTrendingBooks();
-  }, [fetchTrendingBooks]);
+    fetchGenres();
+
+    return () => {
+      setIsMounted(false);
+    };
+  }, [fetchTrendingBooks, fetchGenres]);
 
   return (
     <SafeAreaView
@@ -115,7 +130,24 @@ const Home: React.FC = () => {
             Gêneros
           </NunitoText>
           <View style={styles.genreContent}>
-            <CustomCarousel isHorizontal data={genres} />
+            {loadingGenres ? (
+              <ActivityIndicator size="small" color={theme.primary} />
+            ) : (
+              <CustomCarousel
+                isHorizontal
+                data={genres.map((genre) => (
+                  <CustomButton
+                    key={genre.genre_id}
+                    fontWeight={"semibold"}
+                    size={"small"}
+                    title={genre.genre_name}
+                    onPress={() =>
+                      handleGenrePressButton(genre.genre_id, genre.genre_name)
+                    }
+                  />
+                ))}
+              />
+            )}
           </View>
 
           <NunitoText

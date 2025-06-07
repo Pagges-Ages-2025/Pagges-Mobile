@@ -60,6 +60,12 @@ export default function NavBar() {
       lib: "Ionicons"
     },
     {
+      name: "Social",
+      icon: "people-outline",
+      route: "/screens/social",
+      lib: "Ionicons",
+    },
+    {
       name: "Add",
       icon: "add",
       route: "/screens/createReviewComment",
