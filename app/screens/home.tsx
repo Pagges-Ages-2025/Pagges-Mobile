@@ -103,20 +103,6 @@ const Home: React.FC = () => {
         <View style={styles.content}>
           <StaticSearchBar />
 
-          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <Button
-              title="Ver Perfil"
-              onPress={() =>
-              router.push({
-                  pathname: "/screens/thirdPersonProfile",
-                  params: {
-                    username: "alice123",
-                  },
-              })
-            }
-          />
-          </View>
-
           <View style={styles.carouselContainer}>
             <HomeCarouselSection route={"/screens/home"} cards={mockCards} />
           </View>
