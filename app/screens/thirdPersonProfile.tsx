@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import UserAPI from "../services/profileService";
 import { User } from "../models/User";
 import { useTheme } from "../context/ThemeContext";
@@ -19,13 +19,13 @@ export default function ThirdPersonProfileScreen() {
     const [isFollowing, setIsFollowing] = useState(false);
     const [userGenres, setUserGenres] = useState<Genre[]>([]);
     const { username } = useLocalSearchParams();
+    const thirdPersonUsername = useMemo(() =>Array.isArray(username) ? username[0] : username, [username]);
     const [stats, setStats] = useState<{ readBooks: number; readKms: number }>({
         readBooks: 0,
         readKms: 0,
     });
 
     const onPressFollow = () => {
-        const thirdPersonUsername = Array.isArray(username) ? username[0] : username;
         if(isFollowing){
             SocialAPI()
             .unfollowUser(thirdPersonUsername)
@@ -49,8 +49,6 @@ export default function ThirdPersonProfileScreen() {
     }
 
     const fetchThirdPersonProfile = async () => {
-        const thirdPersonUsername = Array.isArray(username) ? username[0] : username;
-    
         UserAPI()
         .getThirdPersonProfile(thirdPersonUsername)
         .then((response: User) => {
@@ -67,7 +65,6 @@ export default function ThirdPersonProfileScreen() {
     }; 
 
     const fetchIsFollowingUser = async () => {
-        const thirdPersonUsername = Array.isArray(username) ? username[0] : username;
         SocialAPI()
         .isFollowing(thirdPersonUsername)
         .then((response: boolean) => {
@@ -141,26 +138,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  libraryButtonsContainer: {
-    marginBottom: 30,
-    marginHorizontal: 30,
-    marginTop: 10,
-  },
-  libraryTab: {
-    alignItems: "center",
-    borderRadius: 20,
-    flex: 1,
-    justifyContent: "center",
-    paddingVertical: 8,
-  },
   libraryTabText: {
     fontSize: 14,
     fontWeight: "500",
-  },
-  libraryTabsContainer: {
-    borderRadius: 20,
-    flexDirection: "row",
-    justifyContent: "space-around",
   },
   libraryTitle: {
     fontSize: 18,
