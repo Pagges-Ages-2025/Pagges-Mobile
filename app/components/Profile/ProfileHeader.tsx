@@ -23,10 +23,12 @@ interface ProfileHeaderProps {
   name: string;
   isAuthor: boolean;
   bEdit?: boolean;
+  following?: boolean;
   bEditPicture?: boolean;
   bConfig?: boolean;
   genres?: Genre[];
   isEditMode: boolean;
+  onPressFollow?:() => void;
   onPressEdit?: () => void;
   onPressConfig?: () => void;
   onPressCameraIcon?: () => void;
@@ -42,10 +44,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   name,
   isAuthor,
   bEdit = false,
+  following = undefined,
   bEditPicture = false,
   bConfig = false,
   genres,
   isEditMode = false,
+  onPressFollow,
   onPressEdit,
   onPressConfig,
   onPressCameraIcon,
@@ -186,7 +190,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </ImageBackground>
       </View>
       <View style={{ marginStart: marginStart }}>
-        <View style={styles.nameContainer}>
+      <View style={styles.nameRow}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <NunitoText style={[styles.name, dynamicTextStyle]}>
             {name}
           </NunitoText>
@@ -197,6 +202,33 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 {Strings.author}
               </NunitoText>
             </View>
+          )}
+        </View>
+
+        {following != undefined && (
+          <TouchableOpacity onPress={onPressFollow}>
+            <View
+              style={{
+                backgroundColor: following ? theme.white : theme.primary,
+                borderRadius: 30,
+                height: 25,
+                width: 80,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingHorizontal: 8,
+              }}
+            >
+              <NunitoText
+                style={{
+                  color: following ? theme.primary : theme.white,
+                  fontSize: 14,
+                  textAlign: "center",
+                }}
+              >
+                {following ? "Seguindo" : "Seguir"}
+              </NunitoText>
+            </View>
+          </TouchableOpacity>
           )}
         </View>
       </View>
@@ -253,6 +285,12 @@ const styles = StyleSheet.create({
   nameContainer: {
     flex: 1,
     flexDirection: "row",
+  },
+  nameRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingRight: 16, 
   },
   genreLabel: {
     marginEnd: 8,
