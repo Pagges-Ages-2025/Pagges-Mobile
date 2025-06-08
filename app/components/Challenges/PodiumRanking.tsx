@@ -1,51 +1,83 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Dimensions, TouchableOpacity, Text } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import CustomHomeCarousel from "../Carousel/CustomHomeCarousel"; // seu componente
+import { View, StyleSheet, Dimensions, Image } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
-import { useRouter } from "expo-router";
+import NunitoText from "../Texts/NunitoText";
 
 const { width } = Dimensions.get("window");
 
 type Props = {
   // cards: CardItem[];
   route: string;
-  onIndexChange?: (index: number) => void;
 };
 
-const PodiumRanking = ({ route, onIndexChange }: Props) => {
+const PodiumRanking = ({ route }: Props) => {
   const { theme } = useTheme();
-  const router = useRouter();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const navigation = useNavigation<any>();
-
-  const handlePress = (route?: string) => {
-    if (route) {
-      console.log("clicado", route);
-      router.push(route as any); 
-    }
-  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.thirdContainer}>
-        <View style={styles.thirdTop} />
-        <View style={styles.thirdTopLeft} />
-        <View style={styles.thirdTopRight} />
-        <View style={styles.thirdColumn} />
+          
+      <View style={styles.secondContainer}>
+        <View style={styles.imageCircle} >
+          {/* <Image
+            source={
+              profileImageUrl ? { uri: profileImageUrl } : profileUser
+            }
+            style={{ flex: 1, borderRadius: 50 }}
+          /> */}
+        </View>
+        <View style={styles.personName}>
+          <NunitoText style={{
+              color:theme.primaryText, 
+              textAlign:"center",
+              fontSize:12,
+              fontWeight:'bold'
+            }}>
+            Luiza Maria
+          </NunitoText>
+        </View>
+        <View style={styles.secondTop} />
+        <View style={styles.secondTopLeft} />
+        <View style={styles.secondTopRight} />
+        <View style={styles.secondColumn} />
       </View>
+
       <View style={styles.firstContainer}>
+        
+        <View style={styles.imageCircle}>
+          <View style={styles.crown} />
+        </View>
+        <View style={styles.personName}>
+          <NunitoText style={{
+              color:theme.primaryText, 
+              textAlign:"center",
+              fontSize:12,
+              fontWeight:'bold'
+            }}>
+            Carlos Antonio
+          </NunitoText>
+        </View>
         <View style={styles.firstTop} />
         <View style={styles.firstTopLeft} />
         <View style={styles.firstTopRight} />
         <View style={styles.firstColumn} />
       </View>
       
-      <View style={styles.secondContainer}>
-        <View style={styles.secondTop} />
-        <View style={styles.secondTopLeft} />
-        <View style={styles.secondTopRight} />
-        <View style={styles.secondColumn} />
+      <View style={styles.thirdContainer}>
+        <View style={styles.imageCircle} />
+        <View style={styles.personName}>
+          <NunitoText style={{
+              color:theme.primaryText, 
+              textAlign:"center",
+              fontSize:12,
+              fontWeight:'bold'
+            }}>
+            Luiza da Silva
+          </NunitoText>
+        </View>
+        <View style={styles.thirdTop} />
+        <View style={styles.thirdTopLeft} />
+        <View style={styles.thirdTopRight} />
+        <View style={styles.thirdColumn} />
       </View>
       
     </View>
@@ -54,14 +86,16 @@ const PodiumRanking = ({ route, onIndexChange }: Props) => {
 };
 
 export default PodiumRanking;
-const blockWidth = 120;
-const firstBlockHeight = 190;
+const blockWidth = 90;
+const firstBlockHeight = 130;
 const secondBlockHeight = 90;
-const thirdBlockHeight = 130;
+const thirdBlockHeight = 50;
 const topHeight = 20;
 
 const styles = StyleSheet.create({
   container: {
+    height: 280,
+    // backgroundColor:"red",
     flexDirection: 'row',
     justifyContent: 'center', 
     alignItems: 'flex-end',   
@@ -76,21 +110,15 @@ const styles = StyleSheet.create({
   firstColumn: {
     width: blockWidth,
     height: firstBlockHeight,
-    backgroundColor: '#2e8b8b',
-    // shadowColor: '#000',
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.3,
-    // shadowRadius: 4,
-    // elevation: 7
-
+    backgroundColor: '#3d8181',
   },
   firstTop: {
     position: 'absolute',
-    top: 6.1,
+    top: 5,
     zIndex: 1,
     backgroundColor: "#3ba9a9",
-    width: blockWidth - 31,
-    height: 14,  
+    width: blockWidth - 30,
+    height: 15,  
   },
   
   firstTopRight: {
@@ -137,94 +165,23 @@ const styles = StyleSheet.create({
   secondColumn: {
     width: blockWidth,
     height: secondBlockHeight,
-    backgroundColor: '#2e8b8b',
+    backgroundColor: '#366c6c',
   },
   secondTop: {
     position: 'absolute',
     top: 6.2,
-    left: 0,
+    right: 0,
     zIndex: 1,
-    backgroundColor: "#3ba9a9",
-    width: blockWidth - 25,
-    height: 14,  
+    backgroundColor: "#3e9292",
+    width: blockWidth - 24,
+    height: 15,  
   },
   
   secondTopRight: {
-   position: 'absolute',
-    top: 5,
-    right: 0,
-    width: 0,
-    height: 0,
-    
-    borderLeftWidth: 0,
-    borderRightWidth: 25,
-    borderBottomWidth: 15,
-    
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: '#3ba9a9',
-
-    zIndex: 3,  
   },
   secondTopLeft: {
-    // position: 'absolute',
-    // top: 5,
-    // left: 0,
-    // width: 0,
-    // height: 0,
-    
-    // borderLeftWidth: 20,
-    // borderRightWidth: 0,
-    // borderBottomWidth: 15,
-    
-    // borderLeftColor: 'transparent',
-    // borderRightColor: 'transparent',
-    // borderBottomColor: '#3ba9a9',
-
-    zIndex: 3, 
-  },
-  
-  thirdContainer: {
-    width: blockWidth,
-    height: thirdBlockHeight + topHeight,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
-  thirdColumn: {
-    width: blockWidth,
-    height: thirdBlockHeight,
-    backgroundColor: '#2e8b8b',
-  },
-  thirdTop: {
     position: 'absolute',
-    top: 6.2,
-    right: 0,
-    zIndex: 1,
-    backgroundColor: "#3ba9a9",
-    width: blockWidth - 25,
-    height: 14,  
-  },
-  
-  thirdTopRight: {
-  //  position: 'absolute',
-  //   top: 5,
-  //   right: 0,
-  //   width: 0,
-  //   height: 0,
-    
-  //   borderLeftWidth: 0,
-  //   borderRightWidth: 25,
-  //   borderBottomWidth: 15,
-    
-  //   borderLeftColor: 'transparent',
-  //   borderRightColor: 'transparent',
-  //   borderBottomColor: '#3ba9a9',
-
-  //   zIndex: 3,  
-  },
-  thirdTopLeft: {
-    position: 'absolute',
-    top: 5,
+    top: 6,
     left: 0,
     width: 0,
     height: 0,
@@ -235,9 +192,78 @@ const styles = StyleSheet.create({
     
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderBottomColor: '#3ba9a9',
+    borderBottomColor: '#3e9292',
 
     zIndex: 3, 
+  },
+  thirdContainer: {
+    width: blockWidth,
+    height: thirdBlockHeight + topHeight,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  thirdColumn: {
+    width: blockWidth,
+    height: thirdBlockHeight,
+    backgroundColor: '#356a6a',
+  },
+  thirdTop: {
+    position: 'absolute',
+    top: 6.2,
+    left: 0,
+    zIndex: 1,
+    backgroundColor: "#3d8f8f",
+    width: blockWidth - 25,
+    height: 15,  
+  },
+  
+  thirdTopRight: {
+   position: 'absolute',
+    top: 6,
+    right: 0,
+    width: 0,
+    height: 0,
+    
+    borderLeftWidth: 0,
+    borderRightWidth: 25,
+    borderBottomWidth: 15,
+    
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#3d8f8f',
+
+    zIndex: 3,  
+  },
+  thirdTopLeft: {
+    zIndex: 3, 
+  },
+  
+  imageCircle: {
+    width: 70,
+    height: 70,
+    borderWidth: 2,
+    borderRadius: 50, 
+    backgroundColor: "white",
+    borderColor: "white",
+    marginBottom: 5,
+  },
+  personName:{
+    marginBottom: 20,
+    paddingRight:5,
+    paddingLeft:5
+  },
+  crown:{
+   position: 'absolute',
+    top: -20,
+    left: 10,
+    width: 30,
+    height: 30,
+    backgroundColor: "yellow",
+  },
+    searchBookPhoto: {
+    width: 45,
+    height: 70,
+    borderRadius: 5,
   },
   
 });
