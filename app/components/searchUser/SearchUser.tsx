@@ -12,13 +12,14 @@ import {
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
-import Strings from "@/app/constants/Strings";
 import CustomUser from "./customUser";
 import axiosInstance from "@/app/services/axios-instance-singleton";
 
 export interface User {
-    username: string;
-    id: number;
+  name: string;
+  user_id: number;
+  username: string;
+  profile_image: string | null;
 }
 
 type SearchIconPosition = "right" | "left";
@@ -32,8 +33,8 @@ interface UserSearchProps {
   border?: boolean;
   placeholder?: string;
   isBottomSheet?: boolean;
-  // callback que terceiriza a ação de selecionar um usuário na lista
   onSelectUser: (user: User) => void;
+  onShowSuggestionsChange?: (show: boolean) => void;
 }
 
 export default function UserSearch({
@@ -41,9 +42,10 @@ export default function UserSearch({
   iconColor = "primary",
   color = "primary",
   border = true,
-  placeholder = "Buscar usuário...",
+  placeholder = "Pesquisar leitores...",
   isBottomSheet = false,
   onSelectUser,
+  onShowSuggestionsChange = () => {},
 }: UserSearchProps) {
   const { theme } = useTheme();
   const inputRef = useRef<TextInput>(null);
@@ -63,8 +65,8 @@ export default function UserSearch({
       iconColor === "primary"
         ? theme.primary
         : iconColor === "secondary"
-          ? theme.secondary
-          : "#666",
+        ? theme.secondary
+        : "#666",
     iconPositionStyle: iconPosition === "left" ? { left: 18 } : { right: 18 },
     inputPaddingStyle:
       iconPosition === "left"
@@ -81,28 +83,40 @@ export default function UserSearch({
     }
   }, [isBottomSheet]);
 
-  const handleSearch = useCallback(
-    (text: string) => {
-      setQuery(text);
-      setShowSuggestions(text.trim().length > 0);
+  const handleSearch = useCallback((text: string) => {
+    setQuery(text);
+    const shouldShow = text.trim().length > 0;
+    setShowSuggestions(shouldShow);
+    onShowSuggestionsChange(shouldShow);
+    console.log(
+      "▶ handleSearch → showSuggestions =",
+      shouldShow,
+      " | query='",
+      text,
+      "'"
+    );
 
-      if (text.trim().length === 0) {
-        setUsers([]);
-        return;
-      }
-
-      fetchUsers(text.trim());
-    },
-    []
-  );
+    if (!shouldShow) {
+      setUsers([]);
+      return;
+    }
+    fetchUsers(text.trim());
+  }, []);
 
   const fetchUsers = async (term: string) => {
     setIsLoading(true);
-      try {
-        const response = await axiosInstance.get(`/user-search/user`);
-        console.log("response.data", response.data.data);
-        const array = response.data.data as User[];
-        setUsers(array);
+    try {
+      const response = await axiosInstance.get(`/user-search/user`, {
+        params: { name: term },
+      });
+      const array = response.data as User[];
+      const simplified = array.map((aux) => ({
+        user_id: aux.user_id,
+        name: aux.name,
+        username: aux.username,
+        profile_image: aux.profile_image ?? null,
+      }));
+      setUsers(simplified);
     } catch (error) {
       console.error("Erro ao buscar usuários:", error);
       setUsers([]);
@@ -111,24 +125,17 @@ export default function UserSearch({
     }
   };
 
-  const handleSelectUser = useCallback(
-    (user: User) => {
-      setQuery(user.username);
-      setShowSuggestions(false);
-      onSelectUser(user);
-    },
-    [onSelectUser]
-  );
-
   const handleClearSearch = () => {
     setQuery("");
     setShowSuggestions(false);
+    onShowSuggestionsChange(false);
     setUsers([]);
     inputRef.current?.focus();
   };
 
   const handlePressOutside = () => {
     setShowSuggestions(false);
+    onShowSuggestionsChange(false);
     Keyboard.dismiss();
   };
 
@@ -162,7 +169,11 @@ export default function UserSearch({
                 onChangeText={handleSearch}
                 placeholder={placeholder}
                 placeholderTextColor={theme.placeholder}
-                onFocus={() => setShowSuggestions(query.length > 0)}
+                onFocus={() => {
+                  const show = query.trim().length > 0;
+                  setShowSuggestions(show);
+                  onShowSuggestionsChange(show);
+                }}
               />
 
               <View
@@ -198,20 +209,29 @@ export default function UserSearch({
                 ) : (
                   <FlatList
                     data={users}
-                    keyExtractor={(item) => String(item.id)}
-                    nestedScrollEnabled={true}
+                    keyExtractor={(item) => String(item.user_id)}
+                    nestedScrollEnabled
                     keyboardShouldPersistTaps="handled"
                     renderItem={({ item }) => (
                       <CustomUser
+                        name={item.name}
                         username={item.username}
-                        profile_image="https://example.com/profile.jpg" // substitua pelo campo correto se necessário
-                        onPress={() => handleSelectUser(item)}
+                        profile_image={item.profile_image ?? ""}
+                        onPress={() => {
+                          onSelectUser(item);
+                          setQuery(item.username);
+                          setShowSuggestions(false);
+                          onShowSuggestionsChange(false);
+                        }}
                       />
                     )}
                     ListEmptyComponent={() => (
                       <View style={styles.emptyContainer}>
                         <Text
-                          style={[styles.emptyText, { color: theme.primaryText }]}
+                          style={[
+                            styles.emptyText,
+                            { color: theme.primaryText },
+                          ]}
                         >
                           Nenhum usuário encontrado
                         </Text>
@@ -247,7 +267,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     height: "100%",
-    paddingRight: 40, // espaço para o ícone ficar por cima
+    paddingRight: 40,
   },
   searchIconContainer: {
     height: "100%",
@@ -258,15 +278,12 @@ const styles = StyleSheet.create({
   },
   suggestionsContainer: {
     borderRadius: 8,
-    marginTop: 4,
-    marginHorizontal: 8,
-    maxHeight: 200, // limita o tamanho da lista de sugestões
-    backgroundColor: "#fff", // ou algum background do seu tema
-    elevation: 4, // sombra (Android)
-    shadowColor: "#000", // sombra (iOS)
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    maxHeight: 400,
     shadowRadius: 4,
+    position: "absolute",
+    flexDirection: "column",
+    paddingVertical: 50,
+    flex: 1,
   },
   emptyContainer: {
     padding: 12,
