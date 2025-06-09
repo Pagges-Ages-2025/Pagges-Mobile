@@ -94,6 +94,12 @@ export default function ProfileScreen() {
       });
     }
   };
+  
+  const handleConfig = async () => {
+    router.push({
+      pathname: "/screens/configuration",
+    });
+  };
 
   const navigateToLibrary = (tabIndex: number) => {
     router.push({
@@ -129,6 +135,8 @@ export default function ProfileScreen() {
           genres={userGenres}
           bEdit={true}
           onPressEdit={handleEditProfile}
+          bConfig={true}
+          onPressConfig={handleConfig}
           isEditMode={false}
           onPressEditGenres={() => router.push({
             pathname: "/screens/favoriteGenre",

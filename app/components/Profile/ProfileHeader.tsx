@@ -16,16 +16,21 @@ import { Ionicons } from "@expo/vector-icons";
 import profileUser from "../../assets/images/profile-user.png";
 import { Genre } from "@/app/models/Genre";
 import CustomButton from "../Buttons/CustomButton";
+import { SafeAreaView } from "react-native-safe-area-context";
 interface ProfileHeaderProps {
   marginStart: number;
   profileImageUrl?: string;
   name: string;
   isAuthor: boolean;
   bEdit?: boolean;
+  following?: boolean;
   bEditPicture?: boolean;
+  bConfig?: boolean;
   genres?: Genre[];
   isEditMode: boolean;
+  onPressFollow?:() => void;
   onPressEdit?: () => void;
+  onPressConfig?: () => void;
   onPressCameraIcon?: () => void;
   onPressEditGenres: () => void;
 }
@@ -39,10 +44,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   name,
   isAuthor,
   bEdit = false,
+  following = undefined,
   bEditPicture = false,
+  bConfig = false,
   genres,
   isEditMode = false,
+  onPressFollow,
   onPressEdit,
+  onPressConfig,
   onPressCameraIcon,
   onPressEditGenres,
 }) => {
@@ -55,7 +64,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={[]}>
       <View style={styles.profileImageContainer}>
         <ImageBackground
           source={DefaultProfileHeaderImage}
@@ -102,6 +111,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             {bEdit && (
               <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
                 <Ionicons name="create-outline" size={32} />
+              </TouchableOpacity>
+            )}
+            
+            {bConfig && (
+              <TouchableOpacity style={styles.configIcon} onPress={onPressConfig}>
+                <Ionicons name="cog-outline" size={32} />
               </TouchableOpacity>
             )}
 
@@ -175,7 +190,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </ImageBackground>
       </View>
       <View style={{ marginStart: marginStart }}>
-        <View style={styles.nameContainer}>
+      <View style={styles.nameRow}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <NunitoText style={[styles.name, dynamicTextStyle]}>
             {name}
           </NunitoText>
@@ -188,8 +204,35 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             </View>
           )}
         </View>
+
+        {following != undefined && (
+          <TouchableOpacity onPress={onPressFollow}>
+            <View
+              style={{
+                backgroundColor: following ? theme.white : theme.primary,
+                borderRadius: 30,
+                height: 25,
+                width: 80,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingHorizontal: 8,
+              }}
+            >
+              <NunitoText
+                style={{
+                  color: following ? theme.primary : theme.white,
+                  fontSize: 14,
+                  textAlign: "center",
+                }}
+              >
+                {following ? "Seguindo" : "Seguir"}
+              </NunitoText>
+            </View>
+          </TouchableOpacity>
+          )}
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -210,12 +253,18 @@ const styles = StyleSheet.create({
   profileImageContainer: {
     flexDirection: "column",
     flex: 1,
-    height: headerImageHeight * 0.75 + profileImageSize,
+    height: headerImageHeight * 0.85 + profileImageSize,
   },
   editIcon: {
     position: "absolute",
-    top: "42%",
-    right: "5%",
+    top: "40%",
+    right: "12%",
+  },
+  
+  configIcon: {
+    position: "absolute",
+    top: "40%",
+    right: "3%",
   },
   genresContainer: {
     flexDirection: "row",
@@ -236,6 +285,12 @@ const styles = StyleSheet.create({
   nameContainer: {
     flex: 1,
     flexDirection: "row",
+  },
+  nameRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingRight: 16, 
   },
   genreLabel: {
     marginEnd: 8,

@@ -1,8 +1,10 @@
+import { Genre } from "./Genre";
+
 export class User {
   id: number;
   name: string;
   biography: string;
-  favouriteGenres: string[];
+  favoriteGenres: Genre[];
   readKm: number;
   readBooks: number;
   ranking: number;
@@ -16,7 +18,7 @@ export class User {
     this.id = 0;
     this.name = "";
     this.biography = "";
-    this.favouriteGenres = [];
+    this.favoriteGenres = [];
     this.readKm = 0;
     this.readBooks = 0;
     this.ranking = 0;
