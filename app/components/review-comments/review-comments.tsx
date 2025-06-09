@@ -77,7 +77,7 @@ export const ReviewComment = forwardRef(
     };
 
     return (
-      <TouchableOpacity activeOpacity={onPress ? 0.7 : 1} onPress={onPress} disabled={!onPress}>
+      <TouchableOpacity activeOpacity={onPress ? 1 : 1} onPress={onPress} disabled={!onPress}>
         <View style={styles.container}>
           {byAuthor && (
             <View

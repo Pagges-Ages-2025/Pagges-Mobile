@@ -471,9 +471,8 @@ export default function ModalBookDetails({
                       }
                       repostNumber={0}
                       commentsNumber={bookPosts.map((p) => p.parentId).length}
-                      
+                      onPress={() => childPost(post.postId)}
                     />
-                    {childPost(post.postId)}
                   </View>
                 ))}
             </View>
