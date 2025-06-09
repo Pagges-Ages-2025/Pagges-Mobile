@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import profileUser from "../assets/images/profile-user.png";
 import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
@@ -19,6 +20,7 @@ import { base64Uri } from "../utils/imageUtils";
 import DailyChallenge from "./DailyChallenge";
 
 export default function Challenges() {
+  const router = useRouter();
   const [data, setData] = useState<User>();
   const [showChallange, setShowChallange] = useState(false);
   const [challangeData, setChallangeData] = useState<Challange>();
@@ -63,14 +65,8 @@ export default function Challenges() {
     fetchProfile();
   }, []);
 
-  const handleButtonPress = async () => {
-    try {
-      const response = await ChallangesAPI().getCurrentChallange();
-      setChallangeData(response);
-      setShowChallange(true);
-    } catch (error) {
-      console.error("Error fetching current daily challange:", error);
-    }
+  const handleButtonPress = () => {
+    router.push("/screens/trilha");
   };
 
   return (

@@ -22,7 +22,7 @@ export default function ScreensLayout() {
       // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
       if (pathname !== "screens/tests/teste") {
         // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
-        router.push("screens/tests/teste" as any);
+        router.push("screens/trilha" as any);
         // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)  
       } else {
         // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
@@ -54,7 +54,8 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
     "/screens/welcome",
     "/screens/book",
     "/screens/favoriteGenre",
-    "/screens/createReviewComment"
+    "/screens/createReviewComment",
+    "/screens/trilha"
   ];
 
   const { themeName } = useTheme();
@@ -106,6 +107,7 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
             <Stack.Screen name="createReviewComment" />
             <Stack.Screen name="configuration"/>
             <Stack.Screen name="social" />
+            <Stack.Screen name="trilha" />
           </Stack>
           {!removeNavbarFromPageList.includes(pathname) && <NavBar />}
         </View>

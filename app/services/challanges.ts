@@ -15,6 +15,18 @@ export default function ChallangesAPI() {
     }
   };
 
+  const getChallangeByLevel = async (level: number): Promise<Challange> => {
+    try {
+      const response = await axiosInstance.get(
+        `${challangesControllerUrl}/level/${level}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar desafio:", error);
+      throw error;
+    }
+  };
+
   const checkAnswar = async (alternative_id: number): Promise<boolean> => {
     const response = await axiosInstance.post(
       `${challangesControllerUrl}/challenge-answer`,
@@ -24,8 +36,10 @@ export default function ChallangesAPI() {
     );
     return response.data.user_guessed_correctly;
   };
+
   return {
     getCurrentChallange,
+    getChallangeByLevel,
     checkAnswar,
   };
 }
