@@ -96,5 +96,6 @@ export default function PostService() {
   return {
     fetchBookPosts,
     createPost,
+    getPostsByParentId
   };
 }
