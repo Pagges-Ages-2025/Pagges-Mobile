@@ -1,5 +1,5 @@
 import React, { forwardRef, LegacyRef } from "react";
-import { View, StyleSheet, Text, Image, TextInputProps } from "react-native";
+import { View, StyleSheet, Text, Image, TextInputProps, TouchableOpacity } from "react-native";
 import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -15,6 +15,7 @@ type Props = TextInputProps & {
   datePost: string;
   text: string;
   photoPostAuthor?: string;
+  onPress?: () => void; 
 };
 interface BookPageProps {
   likesNumber?: number;
@@ -36,6 +37,7 @@ export const ReviewComment = forwardRef(
       likesNumber,
       commentsNumber,
       repostNumber,
+      onPress, 
     } = props;
     const { theme } = useTheme();
     const photo = photoPostAuthor
@@ -75,112 +77,114 @@ export const ReviewComment = forwardRef(
     };
 
     return (
-      <View style={styles.container}>
-        {byAuthor && (
-          <View
-            style={[
-              styles.authorBackground,
-              { backgroundColor: theme.authorBackgroundComment },
-            ]}
-          />
-        )}
-        <View style={styles.authorInfosContainer}>
-          <Image source={photo} style={styles.authorPostImage} />
-          <NunitoText
-            style={[
-              styles.authorName,
-              { color: byAuthor ? theme.primary : theme.quinaryText },
-            ]}
-          >
-            {fullNamePostAuthor}
-          </NunitoText>
-          <NunitoText
-            style={{ color: "gray", fontSize: 10, paddingHorizontal: 5 }}
-          >
-            •
-          </NunitoText>
-          {byAuthor ? (
-            <NunitoText style={styles.datePost}>Autor(a)</NunitoText>
-          ) : (
-            <NunitoText style={styles.datePost}>
-              {calculateDaysAgo(datePost)}
-            </NunitoText>
+      <TouchableOpacity activeOpacity={onPress ? 0.7 : 1} onPress={onPress} disabled={!onPress}>
+        <View style={styles.container}>
+          {byAuthor && (
+            <View
+              style={[
+                styles.authorBackground,
+                { backgroundColor: theme.authorBackgroundComment },
+              ]}
+            />
           )}
-        </View>
-        <View style={{ paddingLeft: 45, paddingBottom: 15 }}>
-          <NunitoText
-            style={[styles.textPost, { color: theme.textColorReview }]}
-          >
-            {textValue}
-          </NunitoText>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            paddingLeft: 45,
-            alignItems: "center",
-            justifyContent: "flex-start",
-            paddingBottom: 15,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <AntDesign name="hearto" size={15} color="gray" />
+          <View style={styles.authorInfosContainer}>
+            <Image source={photo} style={styles.authorPostImage} />
             <NunitoText
               style={[
-                styles.textPost,
-                { paddingLeft: 5, color: theme.textColorReview },
+                styles.authorName,
+                { color: byAuthor ? theme.primary : theme.quinaryText },
               ]}
             >
-              {likesNumberValue}
+              {fullNamePostAuthor}
+            </NunitoText>
+            <NunitoText
+              style={{ color: "gray", fontSize: 10, paddingHorizontal: 5 }}
+            >
+              •
+            </NunitoText>
+            {byAuthor ? (
+              <NunitoText style={styles.datePost}>Autor(a)</NunitoText>
+            ) : (
+              <NunitoText style={styles.datePost}>
+                {calculateDaysAgo(datePost)}
+              </NunitoText>
+            )}
+          </View>
+          <View style={{ paddingLeft: 45, paddingBottom: 15 }}>
+            <NunitoText
+              style={[styles.textPost, { color: theme.textColorReview }]}
+            >
+              {textValue}
             </NunitoText>
           </View>
           <View
             style={{
               flexDirection: "row",
+              paddingLeft: 45,
               alignItems: "center",
-              justifyContent: "center",
-              paddingHorizontal: 10,
+              justifyContent: "flex-start",
+              paddingBottom: 15,
             }}
           >
-            <EvilIcons name="comment" size={22} color="gray" />
-            <NunitoText
-              style={[
-                styles.textPost,
-                { paddingLeft: 5, color: theme.textColorReview },
-              ]}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              {commentsNumberValue}
-            </NunitoText>
+              <AntDesign name="hearto" size={15} color="gray" />
+              <NunitoText
+                style={[
+                  styles.textPost,
+                  { paddingLeft: 5, color: theme.textColorReview },
+                ]}
+              >
+                {likesNumberValue}
+              </NunitoText>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingHorizontal: 10,
+              }}
+            >
+              <EvilIcons name="comment" size={22} color="gray" />
+              <NunitoText
+                style={[
+                  styles.textPost,
+                  { paddingLeft: 5, color: theme.textColorReview },
+                ]}
+              >
+                {commentsNumberValue}
+              </NunitoText>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {/* achar outro icone de repost */}
+              <Feather name="rotate-ccw" size={15} color="gray" />
+              <NunitoText
+                style={[
+                  styles.textPost,
+                  { paddingLeft: 5, color: theme.textColorReview },
+                ]}
+              >
+                {repostNumberValue}
+              </NunitoText>
+            </View>
           </View>
           <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {/* achar outro icone de repost */}
-            <Feather name="rotate-ccw" size={15} color="gray" />
-            <NunitoText
-              style={[
-                styles.textPost,
-                { paddingLeft: 5, color: theme.textColorReview },
-              ]}
-            >
-              {repostNumberValue}
-            </NunitoText>
-          </View>
+            style={{ height: 1, backgroundColor: "rgba(217, 217, 217, 0.5)" }}
+          />
         </View>
-        <View
-          style={{ height: 1, backgroundColor: "rgba(217, 217, 217, 0.5)" }}
-        />
-      </View>
+      </TouchableOpacity>
     );
   }
 );
