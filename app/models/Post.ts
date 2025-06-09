@@ -1,6 +1,6 @@
 export class Post {
     postId: number;
-    title: string;
+    title?: string;
     bookId: number;
     userId: number;
     isSpoiler?: boolean = false;
@@ -9,8 +9,8 @@ export class Post {
     parentId?: number;
     createdAt: Date;
     profileImage?: any;
-    googleImageUrl: string;
-    bookTitle: string;
+    googleImageUrl?: string;
+    bookTitle?: string;
     username: string;
     likedBy: number;
 
@@ -33,7 +33,7 @@ export class Post {
         } : {
             profileImage?: string,
             postId: number,
-            title: string,
+            title?: string,
             bookId: number,
             userId: number,
             isSpoiler: boolean,
@@ -41,8 +41,8 @@ export class Post {
             isReview: boolean,
             parentId: number,
             createdAt: Date,
-            googleImageUrl: string,
-            bookTitle: string,
+            googleImageUrl?: string,
+            bookTitle?: string,
             username: string,
             likedBy: number
     }

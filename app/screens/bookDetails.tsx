@@ -72,6 +72,7 @@ export default function ModalBookDetails({
   const [modalVisible, setModalVisible] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
   const [bookPosts, setBookPosts] = useState<Post[]>([]);
+  const [expandedPosts, setExpandedPosts] = useState<number[]>([]);
   const PostAPI = PostService();
 
   useEffect(() => {
@@ -83,11 +84,20 @@ export default function ModalBookDetails({
     fetchBookPosts();
   }, [id]);
 
+  const togglePostExpansion = (postId: number) => {
+    setExpandedPosts(prev => 
+      prev.includes(postId) 
+        ? prev.filter(id => id !== postId)
+        : [...prev, postId]
+    );
+  };
+
   const childPost = (parentId: number) => {
     return bookPosts
       .filter((post) => post.parentId === parentId)
       .map((post) => (
         <ReviewComment
+          key={post.postId}
           text={post.text}
           photoPostAuthor={post.googleImageUrl}
           fullNamePostAuthor={post.username}
@@ -458,7 +468,7 @@ export default function ModalBookDetails({
               {bookPosts
                 .filter((post) => !post.parentId)
                 .map((post) => (
-                  <View style={{ backgroundColor: "#1a1919" }}>
+                  <View key={post.postId} style={{ backgroundColor: "#1a1919" }}>
                     <ReviewComment
                       text={post.text}
                       photoPostAuthor={post.profileImage}
@@ -470,9 +480,14 @@ export default function ModalBookDetails({
                           : new Date(post.createdAt).toLocaleDateString()
                       }
                       repostNumber={0}
-                      commentsNumber={bookPosts.map((p) => p.parentId).length}
-                      onPress={() => childPost(post.postId)}
+                      commentsNumber={bookPosts.filter(p => p.parentId === post.postId).length}
+                      onPress={() => togglePostExpansion(post.postId)}
                     />
+                    {expandedPosts.includes(post.postId) && (
+                      <View style={{ marginLeft: 20 }}>
+                        {childPost(post.postId)}
+                      </View>
+                    )}
                   </View>
                 ))}
             </View>
