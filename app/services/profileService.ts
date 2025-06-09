@@ -104,6 +104,18 @@ export default function UserAPI() {
     }
   };
 
+  const getThirdPersonProfile = async (username: string): Promise<User> => {
+    try {
+      const response = await axiosInstance.get(`${profileControllerUrl}/third-person-profile`, {
+        params: { username },
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error("Erro ao buscar perfil:", error);
+      throw error;
+    }
+  };
+
   return {
     getProfile,
     getProfileImage,
@@ -111,5 +123,6 @@ export default function UserAPI() {
     updateBio,
     updateProfile,
     updateProfileImage,
+    getThirdPersonProfile,
   };
 }

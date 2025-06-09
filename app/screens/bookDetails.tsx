@@ -76,29 +76,32 @@ export default function ModalBookDetails({
 
   useEffect(() => {
     const fetchBookPosts = async () => {
-      PostAPI.fetchBookPosts(id)
-        .then((response: Post[]) => {
-          setBookPosts(response);
-        })
-      }
+      PostAPI.fetchBookPosts(id).then((response: Post[]) => {
+        setBookPosts(response);
+      });
+    };
     fetchBookPosts();
-  }, [id])
+  }, [id]);
 
   const childPost = (parentId: number) => {
-      return bookPosts
-        .filter((post) => post.parentId === parentId)
-        .map((post) => (
-          <ReviewComment
-            text={post.text}
-            photoPostAuthor={post.googleImageUrl}
-            fullNamePostAuthor={post.username}
-            likesNumber={post.likedBy}
-            datePost={typeof post.createdAt === "string" ? post.createdAt : new Date(post.createdAt).toLocaleDateString()}
-            repostNumber={0}
-            commentsNumber={0}
-          />
-        ))
-      };
+    return bookPosts
+      .filter((post) => post.parentId === parentId)
+      .map((post) => (
+        <ReviewComment
+          text={post.text}
+          photoPostAuthor={post.googleImageUrl}
+          fullNamePostAuthor={post.username}
+          likesNumber={post.likedBy}
+          datePost={
+            typeof post.createdAt === "string"
+              ? post.createdAt
+              : new Date(post.createdAt).toLocaleDateString()
+          }
+          repostNumber={0}
+          commentsNumber={0}
+        />
+      ));
+  };
 
   const updateAverageRating = () => {
     try {
@@ -288,7 +291,7 @@ export default function ModalBookDetails({
                   flexDirection: "row",
                   alignItems: "center",
                   width: "100%",
-                  marginBottom: 0,
+                  marginBottom: 45
                 }}
               >
                 <TouchableOpacity onPress={handleBackPress}>
@@ -298,33 +301,20 @@ export default function ModalBookDetails({
                     color={theme.white}
                   />
                 </TouchableOpacity>
-                <View style={{ flex: 1 }} />
-                <TouchableOpacity
+                <View style={{ flex: 1, flexDirection: "row", display: "flex", gap: 20, justifyContent: "flex-end" }} >
+                <CustomButton
+                  title="Criar Resenha"
                   onPress={handleCreateReview}
-                  style={{
-                    borderRadius: 15,
-                    backgroundColor: theme.primary,
-                    width: "35%",
-                    height: 25,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexDirection: "row",
-                    marginRight: 10,
-                  }}
-                >
-                  <NunitoText
-                    style={{
-                      fontSize: 15,
-                      fontWeight: "bold",
-                      color: theme.white,
-                    }}
-                  >
-                    Criar Resenha
-                  </NunitoText>
-                </TouchableOpacity>
+                  size="small"
+                  type={"primary"}
+                  fullWidth={false}
+                  width={"37%"}
+                  height={25}
+                />
                 <TouchableOpacity onPress={handleShare}>
                   <AntDesign name="export" size={24} color={theme.white} />
                 </TouchableOpacity>
+              </View>
               </View>
 
               <NunitoText style={[styles.title, { color: theme.white }]}>
@@ -385,29 +375,15 @@ export default function ModalBookDetails({
                     bookId={Number(id)}
                   />
                 </View>
-                <TouchableOpacity
+                <CustomButton
+                  title="Avaliar"
                   onPress={() => setModalVisible(true)}
-                  style={{
-                    borderRadius: 15,
-                    backgroundColor: theme.primary,
-                    width: "35%",
-                    height: 25,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexDirection: "row",
-                    marginRight: 10,
-                  }}
-                >
-                  <NunitoText
-                    style={{
-                      fontSize: 15,
-                      fontWeight: "bold",
-                      color: theme.white,
-                    }}
-                  >
-                    Avaliar
-                  </NunitoText>
-                </TouchableOpacity>
+                  size="small"
+                  type={"primary"}
+                  fullWidth={false}
+                  width={"37%"}
+                  height={25}
+                />
               </View>
             </View>
           </View>
@@ -479,42 +455,28 @@ export default function ModalBookDetails({
               >
                 Principais Resenhas e Comentários
               </NunitoText>
-               {bookPosts
-               .filter((post) => !post.parentId)
-               .map((post) => (
-                <View>
-                  <ReviewComment
-                    text={post.text}
-                    photoPostAuthor={post.profileImage}
-                    fullNamePostAuthor={post.username}
-                    likesNumber={post.likedBy}
-                    datePost={typeof post.createdAt === "string" ? post.createdAt : new Date(post.createdAt).toLocaleDateString()}
-                    repostNumber={0}
-                    commentsNumber={bookPosts.map((p) => p.parentId).length}
-                  />
-                  {childPost(post.postId)}
-                </View>
-               ))}
-
+              {bookPosts
+                .filter((post) => !post.parentId)
+                .map((post) => (
+                  <View style={{ backgroundColor: "#1a1919" }}>
+                    <ReviewComment
+                      text={post.text}
+                      photoPostAuthor={post.profileImage}
+                      fullNamePostAuthor={post.username}
+                      likesNumber={post.likedBy}
+                      datePost={
+                        typeof post.createdAt === "string"
+                          ? post.createdAt
+                          : new Date(post.createdAt).toLocaleDateString()
+                      }
+                      repostNumber={0}
+                      commentsNumber={bookPosts.map((p) => p.parentId).length}
+                      
+                    />
+                    {childPost(post.postId)}
+                  </View>
+                ))}
             </View>
-
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
-              <TouchableOpacity
-                onPress={undefined}
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: theme.primary,
-                  width: "87%",
-                  height: 25,
-                  borderRadius: 30,
-                }}
-              >
-                <Text style={{ color: theme.quinaryText }}>Acessar mais</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={{ marginBottom: 30 }}></View>
 
             <NunitoText
               style={[
@@ -567,7 +529,7 @@ export default function ModalBookDetails({
     <Modal
       visible={visible}
       animationType="slide"
-      presentationStyle="fullScreen"
+      presentationStyle="pageSheet"
       onRequestClose={onClose || router.replace("/screens/searchPage")}
     >
       <BookContent />
@@ -601,7 +563,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
   title: {
     fontSize: 30,
@@ -651,13 +613,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     paddingTop: 30,
-    paddingLeft: 30,
     paddingBottom: 10,
   },
   sinopseText: {
     fontSize: 14,
     fontWeight: "regular",
-    paddingLeft: 30,
     paddingRight: 35,
     textAlign: "justify",
   },

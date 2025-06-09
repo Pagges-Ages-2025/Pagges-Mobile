@@ -8,6 +8,9 @@ import ReviewTextField from "../components/ReviewTextField/ReviewTextField";
 import { Book } from "../components/SearchBar/SearchBar";
 import { useTheme } from "../context/ThemeContext";
 import PostService from "../services/postService";
+import { User } from "../models/User";
+import UserAPI from "../services/profileService";
+import { base64Uri } from "../utils/imageUtils";
 
 // Interface estendida para suportar ambos os formatos de livro
 interface ExtendedBook extends Book {
@@ -25,19 +28,29 @@ export default function CreateReviewCommentScreen() {
   const { createPost } = PostService();
   const router = useRouter();
   const params = useLocalSearchParams();
+  const [data, setData] = useState<User>();
+
+  const fetchProfile = async () => {
+    UserAPI()
+      .getProfile()
+      .then((response: User) => {
+        setData(response);
+      })
+      .catch((error: any) => {});
+  };
 
   console.log("CreateReviewCommentScreen renderizada");
-  
+
   // Usar useMemo para processar o livro a partir dos parâmetros apenas quando params mudar
   const bookFromParams = useMemo(() => {
     console.log("Processando parâmetros do livro");
-    
+
     if (!params.bookId || !params.bookTitle) {
       return null;
     }
-    
+
     const authorStr = params.bookAuthors ? String(params.bookAuthors) : "";
-    
+
     return {
       id: Number(params.bookId),
       title: String(params.bookTitle),
@@ -48,16 +61,17 @@ export default function CreateReviewCommentScreen() {
       capa: params.bookCover ? String(params.bookCover) : "",
       paginas: 0,
       anoDePublicacao: "",
-      generos: []
+      generos: [],
     } as ExtendedBook;
   }, [params.bookId, params.bookTitle, params.bookAuthors, params.bookCover]);
-  
+
   // Definir o livro selecionado apenas uma vez quando bookFromParams mudar
   useEffect(() => {
     if (bookFromParams && !selectedBook) {
       console.log("Definindo livro selecionado a partir dos parâmetros");
       setSelectedBook(bookFromParams);
     }
+    fetchProfile();
   }, [bookFromParams, selectedBook]);
 
   const handlePublish = async () => {
@@ -71,14 +85,14 @@ export default function CreateReviewCommentScreen() {
         text: reviewText,
         is_review: isReviewChecked,
       };
-    
+
       await createPost(newPost);
 
       // Limpa os campos após sucesso
       setReviewText("");
       setIsReviewChecked(false);
       setIsSpoilerChecked(false);
-      
+
       // Navega para a tela home após o post ser publicado com sucesso
       router.replace("/screens/home");
     } catch (error) {
@@ -101,10 +115,16 @@ export default function CreateReviewCommentScreen() {
         />
       </View>
 
-      <ReviewTextField value={reviewText} onChangeText={setReviewText} />
+      <ReviewTextField
+        value={reviewText}
+        onChangeText={setReviewText}
+        profileImage={
+          data?.profileImage ? base64Uri(data.profileImage) : undefined
+        }
+      />
 
-      <SelectBook 
-        onSelectBook={(book) => setSelectedBook(book)} 
+      <SelectBook
+        onSelectBook={(book) => setSelectedBook(book)}
         initialBook={selectedBook}
       />
 
