@@ -28,30 +28,24 @@ const Home: React.FC = () => {
   const { theme } = useTheme();
   const { getTrendingBooks, getFavoriteBasedBooks } = BooksService();
   const [trendingBooks, setTradingBooks] = useState<Book[]>();
-  const [favoriteBasedBook, setFavoriteBasedBook] = useState<Book[]>();
-  const [selectedTrendingBook, setSelectedTrendingBook] = useState<Book | null>(
+  const [genreBasedBook, setGenreBasedBook] = useState<Book[]>();
+  const [selectedBook, setSelectedBook] = useState<Book | null>(
     null
   );
-  const [selectedFavoriteBasedBook, setSelectedFavoriteBasedBook] = useState<Book | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { searchByGenre } = SearchAPI();
+  const [loadingGenreBasedBooks, setLoadingGenreBasedBooks] = useState(false);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [loadingGenres, setLoadingGenres] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   const handleCloseModal = () => {
     setModalVisible(false);
-    setSelectedTrendingBook(null);
-  };
-
-    const handleCloseFavoriteModal = () => {
-    setModalVisible(false);
-    setSelectedFavoriteBasedBook(null);
+    setSelectedBook(null);
   };
 
   const handleSelectTrendingBook = (book: Book) => {
-    setSelectedTrendingBook(book);
+    setSelectedBook(book);
     setModalVisible(true);
   };
 
@@ -106,18 +100,18 @@ const Home: React.FC = () => {
   }, [fetchTrendingBooks, fetchGenres]);
 
     const handleSelectFavoriteBasedBook = (book: Book) => {
-    setSelectedFavoriteBasedBook(book);
+    setSelectedBook(book);
     setModalVisible(true);
   };
 
     const fetchFavoriteBasedBooks = useCallback(async () => {
-    setLoading(true);
+    setLoadingGenreBasedBooks(true);
     try {
       const results = await getFavoriteBasedBooks();
-      setFavoriteBasedBook(results);
+      setGenreBasedBook(results);
     } catch (error) {
       console.error("Erro ao buscar livros baseados nos favoritos:", error);
-      setFavoriteBasedBook([]);
+      setGenreBasedBook([]);
     } finally {
       setLoading(false);
     }
@@ -216,13 +210,20 @@ const Home: React.FC = () => {
             Com base nos seus favoritos
           </NunitoText>
 
+          {loadingGenreBasedBooks ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.primary} />
+            </View>
+          ) : genreBasedBook && genreBasedBook.length > 0 ? (
+            
+            
           <CustomCarousel
             isHorizontal
             data={
-              favoriteBasedBook
-                ? favoriteBasedBook.map((book) => (
+              genreBasedBook
+                ? genreBasedBook.map((book) => (
                     <CustomBook
-                      size="medium"
+                      size="small"
                       key={book.id}
                       bookId={book.id}
                       photoPath={book.capa}
@@ -234,36 +235,40 @@ const Home: React.FC = () => {
                 : []
             }
           />
-
+        ) : (
+          <NunitoText style={{ color: theme.secondaryText }}>
+            Nenhum livro encontrado para os gêneros favoritos.
+          </NunitoText>
+        )}
         </View>
 
-        {selectedTrendingBook && (
+        {selectedBook && (
           <ModalBookDetails
             visible={modalVisible}
             onClose={handleCloseModal}
-            title={selectedTrendingBook.titulo || "Título não disponível"}
-            pages={selectedTrendingBook.paginas || 0}
-            synopsis={selectedTrendingBook.sinopse || "Sinopse não disponível"}
+            title={selectedBook.titulo || "Título não disponível"}
+            pages={selectedBook.paginas || 0}
+            synopsis={selectedBook.sinopse || "Sinopse não disponível"}
             review="Sem avaliações disponíveis ainda."
             authors={
-              selectedTrendingBook.autores?.join(", ") || "Autor desconhecido"
+              selectedBook.autores?.join(", ") || "Autor desconhecido"
             }
             year={
-              selectedTrendingBook.anoDePublicacao?.substring(0, 4) ||
+              selectedBook.anoDePublicacao?.substring(0, 4) ||
               "Desconhecido"
             }
-            id={selectedTrendingBook.id?.toString() || "0"}
+            id={selectedBook.id?.toString() || "0"}
             genre={
-              selectedTrendingBook.generos?.[0] || "Gênero não especificado"
+              selectedBook.generos?.[0] || "Gênero não especificado"
             }
-            google_image_url={selectedTrendingBook.capa || ""}
+            google_image_url={selectedBook.capa || ""}
             onCreateReview={() =>
-              console.log("Criar resenha para:", selectedTrendingBook.titulo)
+              console.log("Criar resenha para:", selectedBook.titulo)
             }
             onShare={() =>
-              console.log("Compartilhar:", selectedTrendingBook.titulo)
+              console.log("Compartilhar:", selectedBook.titulo)
             }
-            bookId={selectedTrendingBook.id}
+            bookId={selectedBook.id}
           />
         )}
 

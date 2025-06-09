@@ -107,10 +107,3 @@ export default function BooksService() {
     getBooksByGenre,
   };
 }
-
-// 1. usar @user token info para pegar id do usuario
-// 2. com id do usuario, realizar busca com prisma para pegar o id dos generos favoritos
-// 3. com os ids dos generos favoritos, fazer a busca na tabela de livros pegando
-// somente os livros que correspondem ao id dos generos
-// colocar no prisma a configuração de take: 12
-// fazer isso no module de books
