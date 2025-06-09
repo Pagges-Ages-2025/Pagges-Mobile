@@ -113,7 +113,7 @@ const Home: React.FC = () => {
       console.error("Erro ao buscar livros baseados nos favoritos:", error);
       setGenreBasedBook([]);
     } finally {
-      setLoading(false);
+      setLoadingGenreBasedBooks(false);
     }
   }, []);
 
