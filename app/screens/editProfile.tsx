@@ -168,7 +168,6 @@ export default function EditProfileScreen() {
             profileImageUrl={image?.uri}
             name={profileName?.toString() || ""}
             isAuthor={false}
-            bEditPicture={image ? false : true}
             isEditMode={true}
             onPressCameraIcon={() => pickImage()}
             onPressEditGenres={() =>

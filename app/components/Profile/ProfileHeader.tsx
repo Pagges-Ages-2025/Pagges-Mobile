@@ -24,11 +24,10 @@ interface ProfileHeaderProps {
   isAuthor: boolean;
   bEdit?: boolean;
   following?: boolean;
-  bEditPicture?: boolean;
+  isEditMode?: boolean;
   bConfig?: boolean;
   genres?: Genre[];
-  isEditMode: boolean;
-  onPressFollow?:() => void;
+  onPressFollow?: () => void;
   onPressEdit?: () => void;
   onPressConfig?: () => void;
   onPressCameraIcon?: () => void;
@@ -45,10 +44,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   isAuthor,
   bEdit = false,
   following = undefined,
-  bEditPicture = false,
+  isEditMode = false,
   bConfig = false,
   genres,
-  isEditMode = false,
   onPressFollow,
   onPressEdit,
   onPressConfig,
@@ -71,51 +69,36 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           style={styles.backgroundImage}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            {isEditMode && bEditPicture ? (
-              <View
-                style={[
-                  styles.profileImage,
-                  {
-                    marginStart: marginStart,
-                    backgroundColor: "gray",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: 50,
-                  },
-                ]}
-              >
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  onPress={onPressCameraIcon}
-                  style={styles.cameraIcon}
-                >
+            <TouchableOpacity
+              activeOpacity={0.7}
+              disabled={!isEditMode}
+              onPress={onPressCameraIcon}
+              style={[styles.profileImage, { marginStart: marginStart }]}
+            >
+              <Image
+                source={
+                  profileImageUrl ? { uri: profileImageUrl } : profileUser
+                }
+                style={{ flex: 1, borderRadius: 50 }}
+              />
+              {isEditMode && !bEdit && (
+                <View style={styles.cameraIcon}>
                   <Ionicons name="camera" size={48} color={theme.white} />
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                disabled={!isEditMode}
-                onPress={onPressCameraIcon}
-                style={[styles.profileImage, { marginStart: marginStart }]}
-              >
-                <Image
-                  source={
-                    profileImageUrl ? { uri: profileImageUrl } : profileUser
-                  }
-                  style={{ flex: 1, borderRadius: 50 }}
-                />
-              </TouchableOpacity>
-            )}
+                </View>
+              )}
+            </TouchableOpacity>
 
             {bEdit && (
               <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
                 <Ionicons name="create-outline" size={32} />
               </TouchableOpacity>
             )}
-            
+
             {bConfig && (
-              <TouchableOpacity style={styles.configIcon} onPress={onPressConfig}>
+              <TouchableOpacity
+                style={styles.configIcon}
+                onPress={onPressConfig}
+              >
                 <Ionicons name="cog-outline" size={32} />
               </TouchableOpacity>
             )}
@@ -129,7 +112,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   paddingRight: 6,
                 }}
               >
-                {bEditPicture ? (
+                {isEditMode ? (
                   <View style={{ paddingLeft: 6 }}>
                     <View
                       style={{
@@ -190,45 +173,45 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </ImageBackground>
       </View>
       <View style={{ marginStart: marginStart }}>
-      <View style={styles.nameRow}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <NunitoText style={[styles.name, dynamicTextStyle]}>
-            {name}
-          </NunitoText>
-          {isAuthor && (
-            <View style={styles.isAuthorContainer}>
-              <VerifiedIcon width={16} height={16} fill={theme.primary} />
-              <NunitoText style={[styles.isAuthorText, dynamicTextStyle]}>
-                {Strings.author}
-              </NunitoText>
-            </View>
-          )}
-        </View>
+        <View style={styles.nameRow}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <NunitoText style={[styles.name, dynamicTextStyle]}>
+              {name}
+            </NunitoText>
+            {isAuthor && (
+              <View style={styles.isAuthorContainer}>
+                <VerifiedIcon width={16} height={16} fill={theme.primary} />
+                <NunitoText style={[styles.isAuthorText, dynamicTextStyle]}>
+                  {Strings.author}
+                </NunitoText>
+              </View>
+            )}
+          </View>
 
-        {following != undefined && (
-          <TouchableOpacity onPress={onPressFollow}>
-            <View
-              style={{
-                backgroundColor: following ? theme.white : theme.primary,
-                borderRadius: 30,
-                height: 25,
-                width: 80,
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 8,
-              }}
-            >
-              <NunitoText
+          {following != undefined && (
+            <TouchableOpacity onPress={onPressFollow}>
+              <View
                 style={{
-                  color: following ? theme.primary : theme.white,
-                  fontSize: 14,
-                  textAlign: "center",
+                  backgroundColor: following ? theme.white : theme.primary,
+                  borderRadius: 30,
+                  height: 25,
+                  width: 80,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingHorizontal: 8,
                 }}
               >
-                {following ? "Seguindo" : "Seguir"}
-              </NunitoText>
-            </View>
-          </TouchableOpacity>
+                <NunitoText
+                  style={{
+                    color: following ? theme.primary : theme.white,
+                    fontSize: 14,
+                    textAlign: "center",
+                  }}
+                >
+                  {following ? "Seguindo" : "Seguir"}
+                </NunitoText>
+              </View>
+            </TouchableOpacity>
           )}
         </View>
       </View>
@@ -260,7 +243,7 @@ const styles = StyleSheet.create({
     top: "40%",
     right: "12%",
   },
-  
+
   configIcon: {
     position: "absolute",
     top: "40%",
@@ -290,7 +273,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingRight: 16, 
+    paddingRight: 16,
   },
   genreLabel: {
     marginEnd: 8,
