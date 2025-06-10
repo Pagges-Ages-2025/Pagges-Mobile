@@ -13,6 +13,7 @@ export class Post {
     bookTitle?: string;
     username: string;
     likedBy: number;
+    child?: Post[] = [];
 
     constructor(
         {   
@@ -45,6 +46,7 @@ export class Post {
             bookTitle?: string,
             username: string,
             likedBy: number
+            child?: Post[]
     }
     ) {
         this.postId = postId;

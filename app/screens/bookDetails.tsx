@@ -83,7 +83,18 @@ export default function ModalBookDetails({
     };
     fetchBookPosts();
   }, [id]);
-
+  
+  const setChildren = (id: number) => {
+    useEffect(() => {
+    const fetchChildPosts = async () => {
+    const response = await PostAPI.getPostsByParentId(id);
+    bookPosts.filter(post => post.parentId === id).forEach((post) => {
+      post.child = response
+    })};
+    fetchChildPosts();
+  }, []);
+  }
+  
   const togglePostExpansion = (postId: number) => {
     setExpandedPosts(prev => 
       prev.includes(postId) 
@@ -94,7 +105,7 @@ export default function ModalBookDetails({
 
   const childPost = (parentId: number) => {
     return bookPosts
-      .filter((post) => post.parentId === parentId)
+      .filter((post) => post.postId === parentId)
       .map((post) => (
         <ReviewComment
           key={post.postId}
