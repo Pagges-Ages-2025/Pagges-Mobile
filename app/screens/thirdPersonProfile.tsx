@@ -103,7 +103,7 @@ export default function ThirdPersonProfileScreen() {
           <UserStats
             kmLidos={stats.readKms}
             livros={stats.readBooks}
-            ranking={data?.ranking || 0}
+            ranking={data?.posicao_ranking || 0}
             amigos={data?.friendsNumber || 0}
           />
         </View>

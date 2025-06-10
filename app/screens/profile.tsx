@@ -149,7 +149,7 @@ export default function ProfileScreen() {
             // kmLidos={data?.readKm || 0}
             kmLidos={stats.readKms}
             livros={stats.readBooks}
-            ranking={data?.ranking || 0}
+            ranking={data?.posicao_ranking || 0}
             amigos={data?.friendsNumber || 0}
           />
         </View>
