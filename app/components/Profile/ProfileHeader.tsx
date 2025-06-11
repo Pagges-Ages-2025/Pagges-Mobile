@@ -61,6 +61,86 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     color: theme.primaryText,
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flexDirection: "column",
+    },
+    backgroundImage: {
+      width: "100%",
+      height: headerImageHeight,
+      position: "relative",
+    },
+    profileImage: {
+      width: profileImageSize,
+      height: profileImageSize,
+      marginTop: headerImageHeight * 0.75,
+    },
+    profileImageContainer: {
+      flexDirection: "column",
+      flex: 1,
+      height: headerImageHeight * 0.85 + profileImageSize,
+    },
+    editIcon: {
+      position: "absolute",
+      top: "40%",
+      right: "12%",
+    },
+    configIcon: {
+      position: "absolute",
+      top: "40%",
+      right: "3%",
+    },
+    genresContainer: {
+      flexDirection: "row",
+      marginTop: 8,
+    },
+    name: {
+      fontSize: 28,
+      fontWeight: 700,
+    },
+    cameraIconContainer: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      backgroundColor: theme.primary,
+      borderRadius: 20,
+      padding: 4,
+    },
+    cameraIcon: {
+      height: 24,
+      width: 24,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    username: {
+      fontSize: 18,
+      fontWeight: 400,
+    },
+    nameContainer: {
+      flex: 1,
+      flexDirection: "row",
+    },
+    nameRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingRight: 16,
+    },
+    genreLabel: {
+      marginEnd: 8,
+    },
+    isAuthorContainer: {
+      marginLeft: 8,
+      marginTop: 4,
+      flexDirection: "row",
+      alignItems: "flex-start",
+    },
+    isAuthorText: {
+      fontSize: 12,
+      fontWeight: 400,
+    },
+  });
+
   return (
     <SafeAreaView style={styles.container} edges={[]}>
       <View style={styles.profileImageContainer}>
@@ -82,8 +162,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 style={{ flex: 1, borderRadius: 50 }}
               />
               {isEditMode && !bEdit && (
-                <View style={styles.cameraIcon}>
-                  <Ionicons name="camera" size={48} color={theme.white} />
+                <View style={styles.cameraIconContainer}>
+                  <View style={styles.cameraIcon}>
+                    <Ionicons name="camera" size={24} color={theme.white} />
+                  </View>
                 </View>
               )}
             </TouchableOpacity>
@@ -218,76 +300,5 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "column",
-  },
-  backgroundImage: {
-    width: "100%",
-    height: headerImageHeight,
-    position: "relative",
-  },
-  profileImage: {
-    width: profileImageSize,
-    height: profileImageSize,
-    marginTop: headerImageHeight * 0.75,
-  },
-  profileImageContainer: {
-    flexDirection: "column",
-    flex: 1,
-    height: headerImageHeight * 0.85 + profileImageSize,
-  },
-  editIcon: {
-    position: "absolute",
-    top: "40%",
-    right: "12%",
-  },
-
-  configIcon: {
-    position: "absolute",
-    top: "40%",
-    right: "3%",
-  },
-  genresContainer: {
-    flexDirection: "row",
-    marginTop: 8,
-  },
-  name: {
-    fontSize: 28,
-    fontWeight: 700,
-  },
-  cameraIcon: {
-    height: 48,
-    width: 48,
-  },
-  username: {
-    fontSize: 18,
-    fontWeight: 400,
-  },
-  nameContainer: {
-    flex: 1,
-    flexDirection: "row",
-  },
-  nameRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingRight: 16,
-  },
-  genreLabel: {
-    marginEnd: 8,
-  },
-  isAuthorContainer: {
-    marginLeft: 8,
-    marginTop: 4,
-    flexDirection: "row",
-    alignItems: "flex-start",
-  },
-  isAuthorText: {
-    fontSize: 12,
-    fontWeight: 400,
-  },
-});
 
 export default ProfileHeader;
