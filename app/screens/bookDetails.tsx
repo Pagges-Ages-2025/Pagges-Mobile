@@ -96,6 +96,9 @@ export default function ModalBookDetails({
   }
   
   const togglePostExpansion = (postId: number) => {
+    if(bookPosts.find(post => post.postId === postId)?.child) {
+      setChildren(postId);
+    }
     setExpandedPosts(prev => 
       prev.includes(postId) 
         ? prev.filter(id => id !== postId)
