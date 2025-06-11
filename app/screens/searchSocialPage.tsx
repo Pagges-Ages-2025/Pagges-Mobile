@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import { View, SafeAreaView, StyleSheet, Text } from "react-native";
 import UserSearch, { User } from "../components/searchUser/SearchUser";
 import { useTheme } from "../context/ThemeContext";
-import { SearchHistoryList } from "../components/SearchBar/SearchHistoryList"; // Certifique-se de usar este
-
 import {
   loadUserSearchHistory,
   addUserToSearchHistory,

@@ -1,4 +1,3 @@
-// src/components/User/CustomUser.tsx
 import React from "react";
 import {
     TouchableOpacity,
@@ -76,7 +75,6 @@ const styles = StyleSheet.create({
     },
     nameText: {
         fontSize: 16,
-        // fontWeight: "500",
         fontFamily: "Nunito-Regular",
         color: "#333",
     },
@@ -88,7 +86,6 @@ const styles = StyleSheet.create({
     username: {
         fontSize: 12,
         color: "gray",
-        // marginTop: 2,
         fontFamily: "Nunito-Regular",
     }
 });

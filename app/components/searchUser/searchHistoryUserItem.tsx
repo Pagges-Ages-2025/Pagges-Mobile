@@ -1,4 +1,3 @@
-// src/components/SearchBar/SearchHistoryItem.tsx
 import React from 'react';
 import {
   View,

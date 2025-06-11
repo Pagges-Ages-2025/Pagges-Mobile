@@ -1,4 +1,3 @@
-// src/components/SearchBar/SearchHistoryList.tsx
 import React from 'react';
 import { FlatList, View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { SearchHistoryItem } from './searchHistoryUserItem';
