@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
-import { useTheme } from "../context/ThemeContext";
-import CustomButton from "./Buttons/CustomButton";
+import { useTheme } from "../../context/ThemeContext";
+import CustomButton from "../Buttons/CustomButton";
 import { Ionicons } from "@expo/vector-icons";
 
 interface FollowUserComponentProps {
@@ -46,7 +46,9 @@ export default function FollowUserComponent({
         </View>
       )}
       <View style={styles.userInfo}>
-        <Text style={[styles.userName, { color: theme.primaryText }]}>@{userName}</Text>
+        <Text style={[styles.userName, { color: theme.primaryText }]}>
+          @{userName}
+        </Text>
       </View>
       <CustomButton
         title={isFollowing ? "Deixar de seguir" : "Seguir"}
@@ -84,4 +86,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
   },
-}); 
+});

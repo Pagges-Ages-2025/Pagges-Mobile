@@ -18,7 +18,7 @@ import { Genre } from "../models/Genre";
 
 import FollowUser from "../components/Follow-User/FollowUserComponent";
 
-const Follower: React.FC = () => {
+const Followers: React.FC = () => {
   const { theme, themeName } = useTheme();
   const { from } = useLocalSearchParams<{ from: string }>();
 
@@ -59,6 +59,7 @@ const Follower: React.FC = () => {
             name="return-up-back-outline"
             size={30}
             color={themeName === "dark" ? theme.white : theme.black}
+            onPress={router.back}
           />
         </TouchableOpacity>
         <NunitoText
@@ -120,4 +121,4 @@ function showErrorModal(title: string, message: string, type: string) {
   console.warn(`[${type.toUpperCase()}] ${title}: ${message}`);
 }
 
-export default Follower;
+export default Followers;

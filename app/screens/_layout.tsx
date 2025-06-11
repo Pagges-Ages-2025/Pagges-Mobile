@@ -9,11 +9,9 @@ import { StatusBar, View } from "react-native";
 import NavBar from "../components/Nav/NavBar";
 import { Redirect } from "expo-router";
 
-
 export default function ScreensLayout() {
   const router = useRouter();
   const pathname = usePathname();
-
 
   // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
   const handleLongPress = ({ nativeEvent }: any) => {
@@ -23,7 +21,7 @@ export default function ScreensLayout() {
       if (pathname !== "screens/tests/teste") {
         // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
         router.push("screens/tests/teste" as any);
-        // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)  
+        // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
       } else {
         // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
         router.back();
@@ -48,13 +46,13 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
   const pathname = usePathname();
 
   const removeNavbarFromPageList = [
-    "/screens/login", 
-    "/screens/register", 
+    "/screens/login",
+    "/screens/register",
     "/screens/splash",
     "/screens/welcome",
     "/screens/book",
     "/screens/favoriteGenre",
-    "/screens/createReviewComment"
+    "/screens/createReviewComment",
   ];
 
   const { themeName } = useTheme();
@@ -76,36 +74,42 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
             screenOptions={{
               headerShown: false,
               gestureEnabled: true,
-                       animation: "none"
+              animation: "none",
             }}
-          >{/*as rotas sao aqui */}
+          >
+            {/*as rotas sao aqui */}
             <Stack.Screen name="splash" />
             <Stack.Screen name="welcome" />
             <Stack.Screen name="login" />
             <Stack.Screen name="register" />
-            <Stack.Screen name="favoriteGenre"/>
+            <Stack.Screen name="favoriteGenre" />
             <Stack.Screen name="home" />
             <Stack.Screen name="searchPage" />
             <Stack.Screen name="tests/teste" />
-            <Stack.Screen name="book"/>
-            <Stack.Screen name="personalLibrary"
-            options={{
-              animation: "slide_from_bottom",
-              animationDuration: 300,
-              
-              gestureDirection: "vertical",
-            }} />
-            <Stack.Screen name="genreLibrary"
-            options={{
-              animation: "slide_from_bottom",
-              animationDuration: 300,
-              
-              gestureDirection: "vertical",
-            }} />
+            <Stack.Screen name="book" />
+            <Stack.Screen
+              name="personalLibrary"
+              options={{
+                animation: "slide_from_bottom",
+                animationDuration: 300,
+
+                gestureDirection: "vertical",
+              }}
+            />
+            <Stack.Screen
+              name="genreLibrary"
+              options={{
+                animation: "slide_from_bottom",
+                animationDuration: 300,
+
+                gestureDirection: "vertical",
+              }}
+            />
             <Stack.Screen name="profile" />
             <Stack.Screen name="createReviewComment" />
-            <Stack.Screen name="configuration"/>
+            <Stack.Screen name="configuration" />
             <Stack.Screen name="social" />
+            <Stack.Screen name="followers" />
           </Stack>
           {!removeNavbarFromPageList.includes(pathname) && <NavBar />}
         </View>

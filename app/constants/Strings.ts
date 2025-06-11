@@ -22,11 +22,12 @@ export default {
   warningTitle: "Aviso",
   noChangesDetected: "Nenhuma alteração detectada.",
   unexpectedError: "Erro inesperado.",
-  placeholderReview:"Algo a falar sobre seu livro ?",
+  placeholderReview: "Algo a falar sobre seu livro ?",
   genreTitle: "Escolha seus favoritos",
-  review:"Resenha",
+  review: "Resenha",
   spoilerWarningPlain: "Contém spoiler",
   selectBook: "Selecionar um livro",
   noBooks: "Nenhum livro encontrado",
-  editGenres: "Editar gêneros favoritos"
+  editGenres: "Editar gêneros favoritos",
+  followersPage: "Seguidores",
 };
