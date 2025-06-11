@@ -97,8 +97,7 @@ export default function ModalBookDetails({
   
   const togglePostExpansion = async (postId: number) => {
     const post = bookPosts.find((p) => p.postId === postId);
-    console.log(post?.child)
-    if (post && Array.isArray(post.child) && post.child.length === 0) {
+    if (post && !post.child) {
       console.log("Fetching children for postId:", postId);
       // Fetch children only if not already fetched
       const response = await PostAPI.getPostsByParentId(postId);
