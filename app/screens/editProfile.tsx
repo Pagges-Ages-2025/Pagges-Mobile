@@ -19,6 +19,7 @@ import * as ImagePicker from "expo-image-picker";
 import NunitoText from "../components/Texts/NunitoText";
 import { Genre } from "../models/Genre";
 import axiosInstance from "../services/axios-instance-singleton";
+import { base64Uri } from "../utils/imageUtils";
 
 export default function EditProfileScreen() {
   const { theme } = useTheme();
@@ -35,6 +36,9 @@ export default function EditProfileScreen() {
   const [changesMade, setChangesMade] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [userGenres, setUserGenres] = useState<Genre[]>([]);
+  const [profileImage, setProfileImage] = useState<string | undefined>(
+    undefined
+  );
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
@@ -44,6 +48,21 @@ export default function EditProfileScreen() {
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | undefined>(
     undefined
   );
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await UserAPI().getProfile();
+        if (response.profileImage) {
+          setProfileImage(base64Uri(response.profileImage));
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
 
   useEffect(() => {
     const fetchUserGenres = async () => {
@@ -64,11 +83,11 @@ export default function EditProfileScreen() {
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 1,
+      quality: 0.5, // Reduce image quality for better performance
     });
 
     if (!result.canceled) {
@@ -149,10 +168,6 @@ export default function EditProfileScreen() {
     }
   };
 
-  // <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-  //<Ionicons name="arrow-undo-circle" size={42} />
-  //</TouchableOpacity>
-
   return (
     <>
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
@@ -165,7 +180,7 @@ export default function EditProfileScreen() {
         <View>
           <ProfileHeader
             marginStart={30}
-            profileImageUrl={image?.uri}
+            profileImageUrl={image?.uri || profileImage}
             name={profileName?.toString() || ""}
             isAuthor={false}
             isEditMode={true}
