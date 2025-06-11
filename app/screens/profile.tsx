@@ -20,6 +20,9 @@ import { base64Uri } from "../utils/imageUtils";
 import NunitoText from "../components/Texts/NunitoText";
 import CustomButton from "../components/Buttons/CustomButton";
 import { Genre } from "../models/Genre";
+import { Post } from "../models/Post";
+import PostService from "../services/postService";
+import PostCard from "../components/Cards/PostCard";
 
 const getToken = async () => {
   const userToken = await AsyncStorage.getItem("userToken");
@@ -29,8 +32,10 @@ const getToken = async () => {
 export default function ProfileScreen() {
   const [data, setData] = useState<User>();
   const [userGenres, setUserGenres] = useState<Genre[]>([]);
+  const [profilePosts, setProfilePosts] = useState<Post[]>([]);
   const { theme } = useTheme();
   const router = useRouter();
+  const PostAPI = PostService();
 
   const [stats, setStats] = useState<{ readBooks: number; readKms: number }>({
     readBooks: 0,
@@ -46,6 +51,19 @@ export default function ProfileScreen() {
       console.error("Erro ao buscar os gêneros do usuário:", error);
     }
   };
+
+  useEffect(() => {
+    const fetchProfilePosts = async () => {
+      const userToken = await getToken();
+      try {
+        const response = await PostAPI.getPostsByProfile();
+        setProfilePosts(response);
+      } catch (error) {
+        console.error("Erro ao buscar posts do perfil:", error);
+      }
+    };
+    fetchProfilePosts();
+  }, []);
 
   const fetchProfile = async () => {
     UserAPI()
@@ -199,6 +217,23 @@ export default function ProfileScreen() {
 
         <View style={styles.achievementContainer}>
           <Achievement />
+        </View>
+        
+        <View>
+          {profilePosts
+            .map((post) => (
+              <PostCard
+                key={post.postId}
+                title={post.title ? post.title : ""}
+                subtitle={post.text}
+                bookcover= {post.googleImageUrl}
+                username= {post.username}
+                bSpoiler={post.isSpoiler || false}
+                repost={0}
+                likes={post.likedBy}
+                comments={0}
+              />
+            ))}
         </View>
       </View>
     </ScrollView>

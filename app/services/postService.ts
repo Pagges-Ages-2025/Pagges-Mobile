@@ -70,6 +70,37 @@ export default function PostService() {
     }
   }
 
+  const getPostsByProfile = async (): Promise<Post[]> => {
+    console.log("Buscando posts recentes do usuário...");
+    try {
+      const response = await axiosInstance.get("/posts/user-recent-reviews");
+      console.log("Resposta da API:", response);
+      const mappedPosts = response.data.data.map(
+        (item: any) =>
+          new Post({
+            postId: item.post_id,
+            bookId: item.book_id,
+            userId: item.user_id,
+            isSpoiler: item.is_spoiler,
+            title: item.livro.title,
+            text: item.text,
+            isReview: item.is_review,
+            parentId: item.parent_id,
+            createdAt: item.created_at,
+            profileImage: item.user.profile_image,
+            googleImageUrl: item.livro.google_image_url,
+            bookTitle: item.livro.title,
+            username: item.user.username,
+            likedBy: item._count.liked_by
+          })
+      );
+      return mappedPosts;
+    } catch (error) {
+      console.error("Erro ao buscar posts por perfil:", error);
+      throw error;
+    }
+  }
+
   const createPost = async (payload: CreatePostPayload): Promise<void> => {
     try {
       // Remove os campos undefined (tenho amenor ideia oq é isso mas ta funcionando)
@@ -92,7 +123,8 @@ export default function PostService() {
 
   return {
     fetchBookPosts,
+    getPostsByParentId,
+    getPostsByProfile,
     createPost,
-    getPostsByParentId
   };
 }
