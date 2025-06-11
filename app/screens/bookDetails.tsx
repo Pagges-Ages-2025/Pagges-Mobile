@@ -95,36 +95,46 @@ export default function ModalBookDetails({
   }, []);
   }
   
-  const togglePostExpansion = (postId: number) => {
-    if(bookPosts.find(post => post.postId === postId)?.child) {
-      setChildren(postId);
+  const togglePostExpansion = async (postId: number) => {
+    const post = bookPosts.find((p) => p.postId === postId);
+    console.log(post?.child)
+    if (post && Array.isArray(post.child) && post.child.length === 0) {
+      console.log("Fetching children for postId:", postId);
+      // Fetch children only if not already fetched
+      const response = await PostAPI.getPostsByParentId(postId);
+      setBookPosts((prevPosts) =>
+        prevPosts.map((p) =>
+          p.postId === postId ? { ...p, child: response } : p
+        )
+      );
     }
-    setExpandedPosts(prev => 
-      prev.includes(postId) 
-        ? prev.filter(id => id !== postId)
+    setExpandedPosts((prev) =>
+      prev.includes(postId)
+        ? prev.filter((id) => id !== postId)
         : [...prev, postId]
     );
   };
 
   const childPost = (parentId: number) => {
-    return bookPosts
-      .filter((post) => post.postId === parentId)
-      .map((post) => (
-        <ReviewComment
-          key={post.postId}
-          text={post.text}
-          photoPostAuthor={post.googleImageUrl}
-          fullNamePostAuthor={post.username}
-          likesNumber={post.likedBy}
-          datePost={
-            typeof post.createdAt === "string"
-              ? post.createdAt
-              : new Date(post.createdAt).toLocaleDateString()
-          }
-          repostNumber={0}
-          commentsNumber={0}
-        />
-      ));
+    console.log("childPost called with parentId:", parentId);
+    const parent = bookPosts.find((post) => post.postId === parentId);
+    if (!parent || !parent.child) return null;
+    return parent.child.map((post: Post) => (
+      <ReviewComment
+        key={post.postId}
+        text={post.text}
+        photoPostAuthor={post.googleImageUrl}
+        fullNamePostAuthor={post.username}
+        likesNumber={post.likedBy}
+        datePost={
+          typeof post.createdAt === "string"
+            ? post.createdAt
+            : new Date(post.createdAt).toLocaleDateString()
+        }
+        repostNumber={0}
+        commentsNumber={0}
+      />
+    ));
   };
 
   const updateAverageRating = () => {

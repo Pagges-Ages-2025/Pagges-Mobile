@@ -13,7 +13,7 @@ export class Post {
     bookTitle?: string;
     username: string;
     likedBy: number;
-    child?: Post[] = [];
+    child?: Post[];
 
     constructor(
         {   
