@@ -19,6 +19,7 @@ export default function ThirdPersonProfileScreen() {
     const [isFollowing, setIsFollowing] = useState(false);
     const [userGenres, setUserGenres] = useState<Genre[]>([]);
     const { username } = useLocalSearchParams();
+    const [offSetFollowers, setOffSetFollowers] = useState<number>(0)
     const thirdPersonUsername = useMemo(() =>Array.isArray(username) ? username[0] : username, [username]);
     const [stats, setStats] = useState<{ readBooks: number; readKms: number }>({
         readBooks: 0,
@@ -30,8 +31,14 @@ export default function ThirdPersonProfileScreen() {
             SocialAPI()
             .unfollowUser(thirdPersonUsername)
             .then(() => {
+              const x = 1;
                 setIsFollowing(!isFollowing);
             })
+            .finally(
+              ()=>{
+              const offSet = offSetFollowers - 1
+              setOffSetFollowers(offSet)}
+            )
             .catch((error: any) => {
                 console.error("Error unfollowing user:", error);
             });
@@ -42,6 +49,11 @@ export default function ThirdPersonProfileScreen() {
             .then(() => {
                 setIsFollowing(!isFollowing);
             })
+            .finally(
+              ()=>{
+                const offSet = offSetFollowers + 1
+                setOffSetFollowers(offSet)}
+            )
             .catch((error: any) => {
                 console.error("Error following user:", error);
             });
@@ -58,6 +70,7 @@ export default function ThirdPersonProfileScreen() {
                 readBooks: response.readBooks,
                 readKms: response.readKm
               });
+            setOffSetFollowers(response?.friendsNumber ?? 0)
         })
         .catch((error: any) => {
             console.error("Erro ao buscar perfil:", error);
@@ -104,7 +117,7 @@ export default function ThirdPersonProfileScreen() {
             kmLidos={stats.readKms}
             livros={stats.readBooks}
             ranking={data?.ranking || 0}
-            amigos={data?.friendsNumber || 0}
+            amigos={offSetFollowers}
           />
         </View>
         <View style={styles.biographyContainer}>

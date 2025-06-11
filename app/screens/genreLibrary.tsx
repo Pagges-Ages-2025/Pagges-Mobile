@@ -86,7 +86,9 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
   return (
     <Animated.View
       style={[
-        styles.container,
+        styles.container,{
+          backgroundColor: theme.Background,
+        },
         {
           transform: [
             {
@@ -101,26 +103,17 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
     >
       {/* header */}
       <View style={styles.headerPage}>
-        <TouchableOpacity onPress={handleClose} style={[styles.circleButton]}>
+         <TouchableOpacity onPress={handleClose} style={styles.circleButton}>
           <Ionicons
             name="return-up-back-outline"
             size={30}
             color={theme.primaryText}
-            style={{ paddingRight: 20 }}
           />
         </TouchableOpacity>
 
-        <View style={{ paddingLeft: "13%" }}>
-          <NunitoText
-            style={{
-              fontSize: 20,
-              fontWeight: "bold",
-              color: theme.quinaryText,
-            }}
-          >
-            {selectedGenreName}
-          </NunitoText>
-        </View>
+       <NunitoText style={[styles.headerTitle, { color: theme.quinaryText }]}>
+          {selectedGenreName}
+        </NunitoText>
       </View>
 
       <View style={{ flex: 1, width: "100%" }}>
@@ -241,13 +234,6 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
   },
-  headerPage: {
-    alignItems: "center",
-    flexDirection: "row",
-    marginTop: 80,
-    paddingLeft: 30,
-    width: "100%",
-  },
   onTopBar: {
     alignItems: "center",
     backgroundColor: "#9D0F54",
@@ -278,4 +264,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  headerPage: {
+  alignItems: "center",
+  flexDirection: "row",
+  marginTop: 80,
+  paddingHorizontal: 20,
+  width: "100%",
+  height: 50,
+  justifyContent: "flex-start",
+  position: "relative",
+},
+
+headerTitle: {
+  position: "absolute",
+  left: 0,
+  right: 0,
+  textAlign: "center",
+  fontSize: 20,
+  fontWeight: "bold",
+},
+
 });
