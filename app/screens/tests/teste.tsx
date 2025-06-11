@@ -21,6 +21,7 @@ import AdditionalButtonsSection from "./sections/additionalButtonsSection";
 import PostCardSection from "./sections/postCardSection";
 import CheckboxSection from "./sections/checkboxSection";
 import GenreLabelSection from "./sections/genreLabelSection";
+import RankingPlaceCard from "@/app/components/RankingPlaceCard/RankingPlaceCard";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
