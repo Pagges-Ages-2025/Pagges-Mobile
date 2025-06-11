@@ -153,7 +153,12 @@ export default function ProfileScreen() {
             livros={stats.readBooks}
             ranking={data?.ranking || 0}
             seguidores={data?.friendsNumber || 0}
-            onSeguidoresClick={() => router.push("/screens/followers")}
+            onSeguidoresClick={() => {
+              router.push({
+                pathname: "/screens/followers",
+                params: { fromScreen: "profile" },
+              });
+            }}
           />
         </View>
         <View style={styles.biographyContainer}>

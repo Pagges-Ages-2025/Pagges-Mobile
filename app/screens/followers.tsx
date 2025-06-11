@@ -19,6 +19,8 @@ import { Genre } from "../models/Genre";
 import FollowUser from "../components/Follow-User/FollowUserComponent";
 
 const Followers: React.FC = () => {
+  const { fromScreen } = useLocalSearchParams();
+
   const { theme, themeName } = useTheme();
   const { from } = useLocalSearchParams<{ from: string }>();
 
@@ -71,7 +73,7 @@ const Followers: React.FC = () => {
           {Strings.followersPage}
         </NunitoText>
 
-        <View>colocar o componente aqui</View>
+        <View></View>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContainer}></ScrollView>

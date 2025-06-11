@@ -1,3 +1,4 @@
+import { UserFollower } from "../models/UserFollower";
 import axiosInstance from "./axios-instance-singleton";
 export default function SocialAPI() {
   async function isFollowing(username: string): Promise<boolean> {
@@ -32,6 +33,44 @@ export default function SocialAPI() {
       return axiosResponse.data;
     } catch (error) {
       console.error("Erro ao seguir o usuário:", error);
+      throw error;
+    }
+  }
+
+  async function getFollowersFromOtherUser(
+    userId: number
+  ): Promise<UserFollower[]> {
+    try {
+      const axiosResponse = await axiosInstance.get(
+        `others-followers/${userId}`
+      );
+      return axiosResponse.data.data.map((userFollower: any) => {
+        return new UserFollower(
+          userFollower.user_id,
+          userFollower.imFollowing,
+          userFollower.username,
+          userFollower.profile_image
+        );
+      });
+    } catch (error) {
+      console.error("Erro ao buscar o usuário:", error);
+      throw error;
+    }
+  }
+
+  async function getUserFollowers(): Promise<UserFollower[]> {
+    try {
+      const axiosResponse = await axiosInstance.get(`followers`);
+      return axiosResponse.data.data.map((userFollower: any) => {
+        return new UserFollower(
+          userFollower.user_id,
+          userFollower.imFollowing,
+          userFollower.username,
+          userFollower.profile_image
+        );
+      });
+    } catch (error) {
+      console.error("Erro ao buscar o usuário:", error);
       throw error;
     }
   }
