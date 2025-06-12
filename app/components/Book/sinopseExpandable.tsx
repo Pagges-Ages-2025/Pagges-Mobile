@@ -12,7 +12,7 @@ export const SinopseExpandable: React.FC<Props> = ({ synopsis }) => {
   const { theme } = useTheme();
 
   return (
-    <View>
+    <View style={{paddingHorizontal: 30}}>
       <NunitoText
         style={{ color: theme.primaryText, textAlign: 'justify', justifyContent: "center", alignItems: "center" }}
         numberOfLines={showMoreText ? undefined : 3}
