@@ -111,7 +111,7 @@ export default function NavBar() {
           >
             <IconComp
               name={item.icon as any}
-              size={24}
+              size={item.name === "Add" ? 32 : 24}
               color={
                 item.name === "Add"
                   ? theme.Background
@@ -120,21 +120,20 @@ export default function NavBar() {
                     : theme.placeholder
               }
             />
-            <NunitoText
-              style={[
-                styles.navText,
-                {
-                  color:
-                    item.name === "Add"
-                      ? theme.Background
-                      : isCurrentRoute(item.route)
-                        ? theme.primary
-                        : theme.placeholder,
-                },
-              ]}
-            >
-              {item.name}
-            </NunitoText>
+            {item.name !== "Add" && (
+              <NunitoText
+                style={[
+                  styles.navText,
+                  {
+                    color: isCurrentRoute(item.route)
+                      ? theme.primary
+                      : theme.placeholder,
+                  },
+                ]}
+              >
+                {item.name}
+              </NunitoText>
+            )}
           </TouchableOpacity>
         );
       })}
@@ -151,6 +150,8 @@ const styles = StyleSheet.create({
     height: 56,
     marginTop: -20,
     width: 56,
+    justifyContent: "center",
+    alignItems: "center",
   },
   container: {
     alignItems: "center",
