@@ -13,17 +13,14 @@ import { useRouter } from "expo-router";
 import profileUser from "../assets/images/profile-user.png";
 import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
-import { Challange } from "../models/Challanges";
 import ChallangesAPI from "../services/challanges";
 import UserAPI from "../services/profileService";
 import { base64Uri } from "../utils/imageUtils";
-import DailyChallenge from "./DailyChallenge";
 
 export default function Challenges() {
   const router = useRouter();
   const [data, setData] = useState<User>();
-  const [showChallange, setShowChallange] = useState(false);
-  const [challangeData, setChallangeData] = useState<Challange>();
+  const [challangeData, setChallangeData] = useState<number>(0);
   const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const { theme } = useTheme();
@@ -56,17 +53,26 @@ export default function Challenges() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await UserAPI().getProfile();
-        setData(response);
+        const [profileResponse, correctsResponse] = await Promise.all([
+          UserAPI().getProfile(),
+          ChallangesAPI().getUserCorrects(),
+        ]);
+        setData(profileResponse);
+        setChallangeData(correctsResponse);
+        console.log("RESPOSTAS CORRETAS:", correctsResponse);
       } catch (error) {
-        console.error("Error fetching profile:", error);
+        console.error("Erro ao buscar perfil:", error);
       }
     };
     fetchProfile();
   }, []);
 
   const handleButtonPress = () => {
-    router.push("/screens/trilha");
+    router.push({
+      pathname: "/screens/trilha",
+      params: { correctAnswers: challangeData }
+    }); 
+    console.log("Button pressed");
   };
 
   return (
@@ -149,28 +155,6 @@ export default function Challenges() {
           </NunitoText>
         </View>
       </ScrollView>
-
-      {challangeData && (
-        <DailyChallenge
-          visible={showChallange}
-          onClose={async (earnedPoints) => {
-            setShowChallange(false);
-            if (earnedPoints) {
-              animatePoints(earnedPoints);
-              try {
-                const response = await UserAPI().getProfile();
-                setData(response);
-              } catch (error) {
-                console.error("Error refreshing profile:", error);
-              }
-            }
-          }}
-          question={challangeData!.question}
-          alternatives={challangeData!.alternatives}
-          points={challangeData!.points}
-          challengeId={challangeData!.challenge_id}
-        ></DailyChallenge>
-      )}
     </SafeAreaView>
   );
 }
