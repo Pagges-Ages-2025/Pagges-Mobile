@@ -9,7 +9,7 @@ import NunitoText from "../Texts/NunitoText";
 export default function NavBar() {
   const router = useRouter();
   const pathname = usePathname();
-  const { theme, themeName, setThemeName } = useTheme();
+  const { theme } = useTheme();
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const backgroundColor = theme.Background;
@@ -42,22 +42,12 @@ export default function NavBar() {
     }
   };
 
-  const toggleTheme = () => {
-    setThemeName(themeName === "dark" ? "light" : "dark");
-  };
-
   const navigationItems = [
     {
       name: "Home",
       icon: "home-outline",
       route: "/screens/home",
       lib: "Ionicons",
-    },
-    {
-      name: themeName === "dark" ? "Light" : "Dark",
-      icon: themeName === "dark" ? "sunny" : "moon",
-      action: toggleTheme,
-      lib: "Ionicons"
     },
     {
       name: "Social",
