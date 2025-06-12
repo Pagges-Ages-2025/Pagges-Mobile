@@ -109,7 +109,7 @@ export default function ThirdPersonProfileScreen() {
             onSeguidoresClick={() => {
               router.push({
                 pathname: "/screens/followers",
-                params: { fromScreen: "thirdPersonProfile" },
+                params: { otherUserId: data?.id },
               });
             }}
           />

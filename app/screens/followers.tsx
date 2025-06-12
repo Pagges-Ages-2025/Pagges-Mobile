@@ -1,54 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ScrollView, StyleSheet, View, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 
-import CustomButton from "../components/Buttons/CustomButton";
-import SelectionButton from "../components/Buttons/SelectionButton";
 import NunitoText from "../components/Texts/NunitoText";
 import Strings from "../constants/Strings";
 import { useTheme } from "../context/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {
-  retriveUserGenres,
-  retriveAllGenres,
-} from "../services/genres.service";
-import UserAPI from "../services/profileService";
-import { Genre } from "../models/Genre";
 
 import FollowUser from "../components/Follow-User/FollowUserComponent";
+import { UserFollower } from "../models/UserFollower";
+import SocialService from "../services/socialService";
+import { FlatList } from "react-native-gesture-handler";
 
 const Followers: React.FC = () => {
-  const { fromScreen } = useLocalSearchParams();
+  const { otherUserId } = useLocalSearchParams();
 
   const { theme, themeName } = useTheme();
-  const { from } = useLocalSearchParams<{ from: string }>();
 
-  const [genres, setGenres] = useState<Genre[]>([]);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [followers, setFollowers] = useState<UserFollower[]>();
 
-  const toggleSelection = (id: number) => {
-    setSelectedItems((prev) =>
-      prev.includes(id)
-        ? prev.filter((x) => x !== id)
-        : prev.length < 3
-          ? [...prev, id]
-          : prev
-    );
+  const loadFollower = async () => {
+    try {
+      if (otherUserId == null) {
+        const data = await SocialService().getUserFollowers();
+        setFollowers(data);
+      } else {
+        const data = await SocialService().getFollowersFromOtherUser(
+          Number(otherUserId)
+        );
+        setFollowers(data);
+      }
+    } catch {}
   };
 
   useEffect(() => {
-    const fetchGenres = async () => {
-      const genresData = await retriveAllGenres();
-      setGenres(genresData.data);
-
-      const userGenresData = await retriveUserGenres();
-      setSelectedItems(
-        userGenresData.data.map((genre: Genre) => genre.genre_id)
-      );
-    };
-
-    fetchGenres();
+    loadFollower();
   }, []);
 
   return (
@@ -72,11 +59,24 @@ const Followers: React.FC = () => {
         >
           {Strings.followersPage}
         </NunitoText>
-
-        <View></View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContainer}></ScrollView>
+      {followers && (
+        <FlatList
+          contentContainerStyle={styles.scrollContainer}
+          data={followers}
+          renderItem={({ item }) => {
+            return (
+              <FollowUser
+                userName={item.username}
+                imageUrl={item.profileImage ? item.profileImage : ""}
+                isFollowing={item.imFollowing}
+                onFollowChange={() => {}}
+              />
+            );
+          }}
+        ></FlatList>
+      )}
     </SafeAreaView>
   );
 };

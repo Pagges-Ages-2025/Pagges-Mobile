@@ -156,7 +156,7 @@ export default function ProfileScreen() {
             onSeguidoresClick={() => {
               router.push({
                 pathname: "/screens/followers",
-                params: { fromScreen: "profile" },
+                params: { otherUserId: null },
               });
             }}
           />

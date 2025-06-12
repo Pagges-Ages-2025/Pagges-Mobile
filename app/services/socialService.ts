@@ -42,9 +42,9 @@ export default function SocialAPI() {
   ): Promise<UserFollower[]> {
     try {
       const axiosResponse = await axiosInstance.get(
-        `others-followers/${userId}`
+        `social/others-followers/${userId}`
       );
-      return axiosResponse.data.data.map((userFollower: any) => {
+      return axiosResponse.data.followers.map((userFollower: any) => {
         return new UserFollower(
           userFollower.user_id,
           userFollower.imFollowing,
@@ -60,8 +60,9 @@ export default function SocialAPI() {
 
   async function getUserFollowers(): Promise<UserFollower[]> {
     try {
-      const axiosResponse = await axiosInstance.get(`followers`);
-      return axiosResponse.data.data.map((userFollower: any) => {
+      const axiosResponse = await axiosInstance.get(`social/followers`);
+
+      return axiosResponse.data.followers.map((userFollower: any) => {
         return new UserFollower(
           userFollower.user_id,
           userFollower.imFollowing,
@@ -79,5 +80,7 @@ export default function SocialAPI() {
     isFollowing,
     unfollowUser,
     followUser,
+    getFollowersFromOtherUser,
+    getUserFollowers,
   };
 }
