@@ -74,8 +74,7 @@ export default function PostService() {
     console.log("Buscando posts recentes do usuário...");
     try {
       const response = await axiosInstance.get("/posts/user-recent-reviews");
-      console.log("Resposta da API:", response);
-      const mappedPosts = response.data.data.map(
+      const mappedPosts = response.data.map(
         (item: any) =>
           new Post({
             postId: item.post_id,
