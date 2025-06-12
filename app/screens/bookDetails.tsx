@@ -84,55 +84,70 @@ export default function ModalBookDetails({
     fetchBookPosts();
   }, [id]);
   
-  const setChildren = (id: number) => {
-    useEffect(() => {
-    const fetchChildPosts = async () => {
-    const response = await PostAPI.getPostsByParentId(id);
-    bookPosts.filter(post => post.parentId === id).forEach((post) => {
-      post.child = response
-    })};
-    fetchChildPosts();
-  }, []);
+  function findPostById(posts: Post[], postId: number): Post | undefined {
+    for (const post of posts) {
+      if (post.postId === postId) return post;
+      if (post.child) {
+        const found = findPostById(post.child, postId);
+        if (found) return found;
+      }
+    }
+    return undefined;
   }
-  
+
   const togglePostExpansion = async (postId: number) => {
-    const post = bookPosts.find((p) => p.postId === postId);
+    console.log("togglePostExpansion called with postId:", postId);
+    const post = findPostById(bookPosts, postId);
+    console.log("Found post:", post);
     if (post && !post.child) {
-      console.log("Fetching children for postId:", postId);
-      // Fetch children only if not already fetched
-      const response = await PostAPI.getPostsByParentId(postId);
-      setBookPosts((prevPosts) =>
-        prevPosts.map((p) =>
-          p.postId === postId ? { ...p, child: response } : p
-        )
-      );
+      console.log("Fetching children for postId:", post.postId);
+      const response = await PostAPI.getPostsByParentId(post.postId);
+      console.log("Fetched children:", response);
+      function updatePostChildren(posts: Post[]): Post[] {
+        return posts.map((p) => {
+          if (p.postId === postId) {
+            return { ...p, child: response };
+          } else if (p.child) {
+            return { ...p, child: updatePostChildren(p.child) };
+          } else {
+            return p;
+          }
+        });
+      }
+      setBookPosts((prevPosts) => updatePostChildren(prevPosts));
     }
     setExpandedPosts((prev) =>
       prev.includes(postId)
         ? prev.filter((id) => id !== postId)
-        : [...prev, postId]
+        : [...prev.filter((id) => id !== postId), postId]
     );
   };
 
   const childPost = (parentId: number) => {
-    console.log("childPost called with parentId:", parentId);
-    const parent = bookPosts.find((post) => post.postId === parentId);
+    const parent = findPostById(bookPosts, parentId);
     if (!parent || !parent.child) return null;
     return parent.child.map((post: Post) => (
-      <ReviewComment
-        key={post.postId}
-        text={post.text}
-        photoPostAuthor={post.googleImageUrl}
-        fullNamePostAuthor={post.username}
-        likesNumber={post.likedBy}
-        datePost={
-          typeof post.createdAt === "string"
-            ? post.createdAt
-            : new Date(post.createdAt).toLocaleDateString()
-        }
-        repostNumber={0}
-        commentsNumber={0}
-      />
+      <View key={post.postId}>
+        <ReviewComment
+          text={post.text}
+          photoPostAuthor={post.googleImageUrl}
+          fullNamePostAuthor={post.username}
+          likesNumber={post.likedBy}
+          datePost={
+            typeof post.createdAt === "string"
+              ? post.createdAt
+              : new Date(post.createdAt).toLocaleDateString()
+          }
+          repostNumber={0}
+          commentsNumber={0}
+          onPress={() => togglePostExpansion(post.postId)}
+        />
+        {expandedPosts.includes(post.postId) && (
+          <View>
+            {childPost(post.postId)}
+          </View>
+        )}
+      </View>
     ));
   };
 
