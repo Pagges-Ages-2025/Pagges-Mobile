@@ -39,7 +39,7 @@ export default function ProfileScreen() {
 
   const fetchUserGenres = async () => {
     try {
-      const response = await axiosInstance.get('/user-genres/user');
+      const response = await axiosInstance.get("/user-genres/user");
       setUserGenres(response.data.data);
       console.log("Gêneros atualizados:", response.data.data);
     } catch (error) {
@@ -53,7 +53,7 @@ export default function ProfileScreen() {
       .then((response: User) => {
         setData(response);
       })
-      .catch((error: any) => { });
+      .catch((error: any) => {});
   };
 
   const fetchStats = async () => {
@@ -62,7 +62,7 @@ export default function ProfileScreen() {
       .then((response: { readBooks: number; readKms: number }) => {
         setStats(response);
       })
-      .catch((error: any) => { });
+      .catch((error: any) => {});
   };
 
   // Atualiza dados quando a tela recebe foco
@@ -94,7 +94,7 @@ export default function ProfileScreen() {
       });
     }
   };
-  
+
   const handleConfig = async () => {
     router.push({
       pathname: "/screens/configuration",
@@ -138,10 +138,12 @@ export default function ProfileScreen() {
           bConfig={true}
           onPressConfig={handleConfig}
           isEditMode={false}
-          onPressEditGenres={() => router.push({
-            pathname: "/screens/favoriteGenre",
-            params: { from: "edit" },
-          })}
+          onPressEditGenres={() =>
+            router.push({
+              pathname: "/screens/favoriteGenre",
+              params: { from: "edit" },
+            })
+          }
         />
 
         <View style={styles.statsContainer}>
@@ -162,12 +164,13 @@ export default function ProfileScreen() {
 
         {/* Biblioteca pessoal buttons - Now placed above achievements */}
         <View style={styles.libraryButtonsContainer}>
-          <NunitoText style={[styles.libraryTitle, { color: theme.primaryText }]}>
+          <NunitoText
+            style={[styles.libraryTitle, { color: theme.primaryText }]}
+          >
             Biblioteca Pessoal
           </NunitoText>
 
           <View style={styles.libraryTabsContainer}>
-
             <CustomButton
               title={"Quero Ler"}
               onPress={() => navigateToLibrary(0)}
@@ -192,8 +195,6 @@ export default function ProfileScreen() {
               size="small"
               height={30}
             />
-
-
           </View>
         </View>
 
