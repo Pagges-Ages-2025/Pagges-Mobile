@@ -15,6 +15,7 @@ import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
 import { DatabaseBookModel } from "../models/DatabaseBook.model";
 import BooksService from "../services/booksService";
+import ModalBookDetails from "./bookDetails";
 
 interface LibraryProps {
   onClose?: () => void;
@@ -33,6 +34,7 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
   const [actualPage] = useState(initialPageIndex);
   const [books, setBooks] = useState<DatabaseBookModel[]>([]);
   const [selectedBook, setSelectedBook] = useState<any>(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const slideAnim = useRef(new Animated.Value(actualPage)).current;
   const slideOutAnim = useRef(new Animated.Value(0)).current;
@@ -46,6 +48,11 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
     }).start(() => {
       router.back();
     });
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setSelectedBook(null);
   };
 
   const fetchBooks = async (genreId: number) => {
@@ -71,6 +78,7 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
 
   const handleSelectBook = (book: DatabaseBookModel) => {
     setSelectedBook(book);
+    setModalVisible(true);
   };
 
   useEffect(() => {
@@ -86,7 +94,8 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
   return (
     <Animated.View
       style={[
-        styles.container,{
+        styles.container,
+        {
           backgroundColor: theme.Background,
         },
         {
@@ -103,7 +112,7 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
     >
       {/* header */}
       <View style={styles.headerPage}>
-         <TouchableOpacity onPress={handleClose} style={styles.circleButton}>
+        <TouchableOpacity onPress={handleClose} style={styles.circleButton}>
           <Ionicons
             name="return-up-back-outline"
             size={30}
@@ -111,7 +120,7 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
           />
         </TouchableOpacity>
 
-       <NunitoText style={[styles.headerTitle, { color: theme.quinaryText }]}>
+        <NunitoText style={[styles.headerTitle, { color: theme.quinaryText }]}>
           {selectedGenreName}
         </NunitoText>
       </View>
@@ -193,6 +202,27 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
                 </View>
               </View>
             )}
+
+            <ModalBookDetails
+              visible={modalVisible}
+              onClose={handleCloseModal}
+              title={selectedBook.titulo || "Título não disponível"}
+              pages={selectedBook.paginas || 0}
+              synopsis={selectedBook.sinopse || "Sinopse não disponível"}
+              review="Sem avaliações disponíveis ainda."
+              authors={selectedBook.autores?.join(", ") || "Autor desconhecido"}
+              year={
+                selectedBook.anoDePublicacao?.substring(0, 4) || "Desconhecido"
+              }
+              id={selectedBook.id?.toString() || "0"}
+              genre={selectedBook.generos?.[0] || "Gênero não especificado"}
+              google_image_url={selectedBook.capa || ""}
+              onCreateReview={() =>
+                console.log("Criar resenha para:", selectedBook.titulo)
+              }
+              onShare={() => console.log("Compartilhar:", selectedBook.titulo)}
+              bookId={selectedBook.id}
+            />
           </View>
         </ScrollView>
       </View>
@@ -210,16 +240,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 2,
     justifyContent: "center",
+    marginBottom: 15,
     position: "relative",
     width: "90%",
-    marginBottom: 15,
   },
   button: {
     alignItems: "center",
-    paddingBottom: 10,
     flex: 1,
     justifyContent: "center",
+    paddingBottom: 10,
     paddingHorizontal: 10,
+  },
+  centered: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
   },
   circleButton: {
     alignItems: "center",
@@ -230,58 +265,52 @@ const styles = StyleSheet.create({
     width: 40,
   },
   container: {
+    alignItems: "center",
     flex: 1,
     width: "100%",
+  },
+  headerPage: {
     alignItems: "center",
+    flexDirection: "row",
+    height: 50,
+    justifyContent: "flex-start",
+    marginTop: 80,
+    paddingHorizontal: 20,
+    position: "relative",
+    width: "100%",
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    left: 0,
+    position: "absolute",
+    right: 0,
+    textAlign: "center",
   },
   onTopBar: {
     alignItems: "center",
     backgroundColor: "#9D0F54",
+    borderRadius: 1.5,
     bottom: 0,
     height: 3,
     justifyContent: "center",
     position: "absolute",
-    borderRadius: 1.5,
+  },
+  scrollContent: {
+    alignItems: "center",
+    gap: 20,
+    paddingVertical: 20,
   },
   tabs: {
     flexDirection: "row",
-    paddingTop: 30,
-    width: "90%",
     justifyContent: "space-between",
     marginBottom: 10,
+    paddingTop: 30,
+    width: "90%",
   },
+
   textTabs: {
     fontSize: 20,
     textAlign: "center",
   },
-  scrollContent: {
-    alignItems: "center",
-    paddingVertical: 20,
-    gap: 20,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerPage: {
-  alignItems: "center",
-  flexDirection: "row",
-  marginTop: 80,
-  paddingHorizontal: 20,
-  width: "100%",
-  height: 50,
-  justifyContent: "flex-start",
-  position: "relative",
-},
-
-headerTitle: {
-  position: "absolute",
-  left: 0,
-  right: 0,
-  textAlign: "center",
-  fontSize: 20,
-  fontWeight: "bold",
-},
-
 });
