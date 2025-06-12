@@ -82,12 +82,12 @@ export default function EditProfileScreen() {
   }, [image]);
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
+    
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.5, // Reduce image quality for better performance
+      quality: 0.1, 
     });
 
     if (!result.canceled) {
