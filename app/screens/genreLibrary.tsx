@@ -203,26 +203,28 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
               </View>
             )}
 
-            <ModalBookDetails
-              visible={modalVisible}
-              onClose={handleCloseModal}
-              title={selectedBook.titulo || "Título não disponível"}
-              pages={selectedBook.paginas || 0}
-              synopsis={selectedBook.sinopse || "Sinopse não disponível"}
-              review="Sem avaliações disponíveis ainda."
-              authors={selectedBook.autores?.join(", ") || "Autor desconhecido"}
-              year={
-                selectedBook.anoDePublicacao?.substring(0, 4) || "Desconhecido"
-              }
-              id={selectedBook.id?.toString() || "0"}
-              genre={selectedBook.generos?.[0] || "Gênero não especificado"}
-              google_image_url={selectedBook.capa || ""}
-              onCreateReview={() =>
-                console.log("Criar resenha para:", selectedBook.titulo)
-              }
-              onShare={() => console.log("Compartilhar:", selectedBook.titulo)}
-              bookId={selectedBook.id}
-            />
+            {selectedBook && (
+              <ModalBookDetails
+                visible={modalVisible}
+                onClose={handleCloseModal}
+                title={selectedBook.titulo || "Título não disponível"}
+                pages={selectedBook.paginas || 0}
+                synopsis={selectedBook.sinopse || "Sinopse não disponível"}
+                review="Sem avaliações disponíveis ainda."
+                authors={selectedBook.autores?.join(", ") || "Autor desconhecido"}
+                year={
+                  selectedBook.anoDePublicacao?.substring(0, 4) || "Desconhecido"
+                }
+                id={selectedBook.id?.toString() || "0"}
+                genre={selectedBook.generos?.[0] || "Gênero não especificado"}
+                google_image_url={selectedBook.capa || ""}
+                onCreateReview={() =>
+                  console.log("Criar resenha para:", selectedBook.titulo)
+                }
+                onShare={() => console.log("Compartilhar:", selectedBook.titulo)}
+                bookId={selectedBook.id}
+              />
+            )}
           </View>
         </ScrollView>
       </View>
