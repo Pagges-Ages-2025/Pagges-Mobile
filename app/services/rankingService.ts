@@ -1,7 +1,7 @@
 import axiosInstance from "./axios-instance-singleton";
 
 export interface UserRanking {
-  posicao: number;
+  position: number;
   name: string;
   profile_image: string | null;
   points: number;
@@ -35,5 +35,5 @@ export default function RankingService() {
 
   return {
     fetchAndSplitRanking,
-  };
+  };
 }

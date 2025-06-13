@@ -1,18 +1,13 @@
 // generalRanking.tsx
 import React, { useEffect, useState } from "react";
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import { Image, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
 import { base64Uri } from "../utils/imageUtils";
 import profileUser from "../assets/images/profile-user.png";
 import RankingPlaceCard from "../components/RankingPlaceCard/RankingPlaceCard";
-import RankingService, { UserRanking} from "../services/rankingService";
+import RankingService, { UserRanking } from "../services/rankingService";
 
 export default function GeneralRanking() {
   const { theme } = useTheme();
@@ -53,11 +48,13 @@ export default function GeneralRanking() {
             {outros7.map((user) => (
               <View style={styles.rankingItem} key={user.name}>
                 <RankingPlaceCard
-                  position={user.posicao}
+                  position={user.position}
                   name={user.name}
-                  imageUrl={user.profile_image
-                    ? base64Uri(user.profile_image)
-                    : Image.resolveAssetSource(profileUser).uri}
+                  imageUrl={
+                    user.profile_image
+                      ? base64Uri(user.profile_image)
+                      : Image.resolveAssetSource(profileUser).uri
+                  }
                 />
               </View>
             ))}
