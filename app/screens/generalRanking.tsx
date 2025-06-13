@@ -1,6 +1,6 @@
 // generalRanking.tsx
 import React, { useEffect, useState } from "react";
-import { Image, ScrollView, StyleSheet, View } from "react-native";
+import { Image, TouchableOpacity, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
@@ -8,13 +8,20 @@ import { base64Uri } from "../utils/imageUtils";
 import profileUser from "../assets/images/profile-user.png";
 import RankingPlaceCard from "../components/RankingPlaceCard/RankingPlaceCard";
 import RankingService, { UserRanking } from "../services/rankingService";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 export default function GeneralRanking() {
+  const router = useRouter();
   const { theme } = useTheme();
   const [top3, setTop3] = useState<UserRanking[]>([]);
   const [outros7, setOutros7] = useState<UserRanking[]>([]);
 
   const { fetchAndSplitRanking } = RankingService();
+
+  const handleNavigation = () => {
+      router.back();
+  };
 
   useEffect(() => {
     fetchAndSplitRanking()
@@ -36,11 +43,13 @@ export default function GeneralRanking() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.section}>
-          <NunitoText
-            style={[styles.sectionTitle, { color: theme.primaryText }]}
-          >
-            Ranking Geral
-          </NunitoText>
+          <TouchableOpacity onPress={() => handleNavigation}>
+                  <Ionicons
+                    name="return-up-back-outline"
+                    size={30}
+                    color={theme.primaryText}
+                  />
+            </TouchableOpacity>
 
           <View style={styles.podiumPlaceholder}></View>
 

@@ -18,7 +18,13 @@ const RankingPlaceCard: React.FC<RankingPlaceCardProps> = ({ position, name, ima
     <View style={styles.container}>
       <Text style={styles.position}>#{position}</Text>
       <Image source={imageUrl?{ uri: imageUrl }:defaultImage} style={styles.profileImage} />
-      <Text style={styles.name}>{name}</Text>
+      <Text
+        style={styles.name}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
+        {name}
+      </Text>
     </View>
   );
 };
@@ -33,7 +39,8 @@ const getStyles = (theme: Theme) => StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 20,
     backgroundColor: "#FFFFFF",
-    gap: 20
+    gap: 20,
+    width: "95%",
   },
   position: {
     fontWeight: 'bold',
