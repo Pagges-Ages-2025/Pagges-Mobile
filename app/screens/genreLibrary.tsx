@@ -207,22 +207,22 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
               <ModalBookDetails
                 visible={modalVisible}
                 onClose={handleCloseModal}
-                title={selectedBook.titulo || "Título não disponível"}
-                pages={selectedBook.paginas || 0}
-                synopsis={selectedBook.sinopse || "Sinopse não disponível"}
+                title={selectedBook.title || "Título não disponível"}
+                pages={selectedBook.pages || 0}
+                synopsis={selectedBook.synopsis || "Sinopse não disponível"}
                 review="Sem avaliações disponíveis ainda."
-                authors={selectedBook.autores?.join(", ") || "Autor desconhecido"}
+                authors={selectedBook.authors?.join(", ") || "Autor desconhecido"}
                 year={
-                  selectedBook.anoDePublicacao?.substring(0, 4) || "Desconhecido"
+                  selectedBook.year?.substring(0, 4) || "Desconhecido"
                 }
-                id={selectedBook.id?.toString() || "0"}
-                genre={selectedBook.generos?.[0] || "Gênero não especificado"}
-                google_image_url={selectedBook.capa || ""}
+                id={selectedBook.book_id?.toString() || "0"}
+                genre={selectedBook.google_book_id?.[0] || "Gênero não especificado"}
+                google_image_url={selectedBook.google_image_url || ""}
                 onCreateReview={() =>
-                  console.log("Criar resenha para:", selectedBook.titulo)
+                  console.log("Criar resenha para:", selectedBook.title)
                 }
                 onShare={() => console.log("Compartilhar:", selectedBook.titulo)}
-                bookId={selectedBook.id}
+                bookId={selectedBook.book_id}
               />
             )}
           </View>
