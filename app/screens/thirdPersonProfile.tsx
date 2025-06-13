@@ -14,88 +14,81 @@ import { Genre } from "../models/Genre";
 import SocialAPI from "../services/socialService";
 
 export default function ThirdPersonProfileScreen() {
-    const [ data, setData] = useState<User>();
-    const { theme } = useTheme();
-    const [isFollowing, setIsFollowing] = useState(false);
-    const [userGenres, setUserGenres] = useState<Genre[]>([]);
-    const { username } = useLocalSearchParams();
-    const [offSetFollowers, setOffSetFollowers] = useState<number>(0)
-    const thirdPersonUsername = useMemo(() =>Array.isArray(username) ? username[0] : username, [username]);
-    const [stats, setStats] = useState<{ readBooks: number; readKms: number }>({
-        readBooks: 0,
-        readKms: 0,
-    });
+  const [data, setData] = useState<User>();
+  const { theme } = useTheme();
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [userGenres, setUserGenres] = useState<Genre[]>([]);
+  const { username } = useLocalSearchParams();
+  const [offSetFollowers, setOffSetFollowers] = useState<number>(0);
+  const thirdPersonUsername = useMemo(
+    () => (Array.isArray(username) ? username[0] : username),
+    [username]
+  );
+  const [stats, setStats] = useState<{ readBooks: number; readKms: number }>({
+    readBooks: 0,
+    readKms: 0,
+  });
 
-    const onPressFollow = () => {
-        if(isFollowing){
-            SocialAPI()
-            .unfollowUser(thirdPersonUsername)
-            .then(() => {
-              const x = 1;
-                setIsFollowing(!isFollowing);
-            })
-            .finally(
-              ()=>{
-              const offSet = offSetFollowers - 1
-              setOffSetFollowers(offSet)}
-            )
-            .catch((error: any) => {
-                console.error("Error unfollowing user:", error);
-            });
-
-        } else{
-            SocialAPI()
-            .followUser(thirdPersonUsername)
-            .then(() => {
-                setIsFollowing(!isFollowing);
-            })
-            .finally(
-              ()=>{
-                const offSet = offSetFollowers + 1
-                setOffSetFollowers(offSet)}
-            )
-            .catch((error: any) => {
-                console.error("Error following user:", error);
-            });
-        }
-    }
-
-    const fetchThirdPersonProfile = async () => {
-        UserAPI()
-        .getThirdPersonProfile(thirdPersonUsername)
-        .then((response: User) => {
-            setData(response);
-            setUserGenres(response.favoriteGenres);
-            setStats({
-                readBooks: response.readBooks,
-                readKms: response.readKm
-              });
-            setOffSetFollowers(response?.friendsNumber ?? 0)
+  const onPressFollow = () => {
+    if (isFollowing) {
+      SocialAPI()
+        .unfollowUser(thirdPersonUsername)
+        .then(() => {
+          const x = 1;
+          setIsFollowing(!isFollowing);
+          setOffSetFollowers(prev => prev - 1)
         })
         .catch((error: any) => {
-            console.error("Erro ao buscar perfil:", error);
+          console.error("Error unfollowing user:", error);
         });
-    }; 
-
-    const fetchIsFollowingUser = async () => {
-        SocialAPI()
-        .isFollowing(thirdPersonUsername)
-        .then((response: boolean) => {
-            setIsFollowing(response);
+    } else {
+      SocialAPI()
+        .followUser(thirdPersonUsername)
+        .then(() => {
+          setIsFollowing(!isFollowing);
+          setOffSetFollowers(prev => prev + 1);
         })
+        .catch((error: any) => {
+          console.error("Error following user:", error);
+        });
     }
+  };
 
-    useEffect(() => {
-        fetchThirdPersonProfile();
-        fetchIsFollowingUser();
-    }, [username]);
+  const fetchThirdPersonProfile = async () => {
+    UserAPI()
+      .getThirdPersonProfile(thirdPersonUsername)
+      .then((response: User) => {
+        setData(response);
+        setUserGenres(response.favoriteGenres);
+        setStats({
+          readBooks: response.readBooks,
+          readKms: response.readKm,
+        });
+        setOffSetFollowers(response?.friendsNumber ?? 0);
+      })
+      .catch((error: any) => {
+        console.error("Erro ao buscar perfil:", error);
+      });
+  };
 
-    return (
-        
+  const fetchIsFollowingUser = async () => {
+    SocialAPI()
+      .isFollowing(thirdPersonUsername)
+      .then((response: boolean) => {
+        setIsFollowing(response);
+      });
+  };
+
+  useEffect(() => {
+    fetchThirdPersonProfile();
+    fetchIsFollowingUser();
+  }, [username]);
+
+  return (
     <ScrollView
       style={[styles.container, { backgroundColor: theme.Background }]}
-      showsVerticalScrollIndicator={false}>
-        
+      showsVerticalScrollIndicator={false}
+    >
       <View style={[styles.content, { backgroundColor: theme.Background }]}>
         <ProfileHeader
           marginStart={30}
@@ -132,7 +125,7 @@ export default function ThirdPersonProfileScreen() {
         </View>
       </View>
     </ScrollView>
-    )
+  );
 }
 
 const styles = StyleSheet.create({
