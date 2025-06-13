@@ -5,26 +5,29 @@ import NunitoText from "../Texts/NunitoText";
 
 const { width } = Dimensions.get("window");
 
+interface UserRank {
+  name: string;
+  image: string;
+}
+
 type Props = {
-  // cards: CardItem[];
-  route: string;
+  firstRank: UserRank;
+  secondRank: UserRank;
+  thirdRank: UserRank;
 };
 
-const PodiumRanking = ({ route }: Props) => {
+const PodiumRanking = ({ firstRank, secondRank, thirdRank }: Props) => {
   const { theme } = useTheme();
 
   return (
     <View style={styles.container}>
           
       <View style={styles.secondContainer}>
-        <View style={styles.imageCircle} >
-          {/* <Image
-            source={
-              profileImageUrl ? { uri: profileImageUrl } : profileUser
-            }
-            style={{ flex: 1, borderRadius: 50 }}
-          /> */}
-        </View>
+          <Image
+            style={styles.imageCircle} 
+            source={require('../../../assets/images/react-logo.png')}
+            resizeMode="cover"
+          />
         <View style={styles.personName}>
           <NunitoText style={{
               color:theme.primaryText, 
@@ -32,7 +35,7 @@ const PodiumRanking = ({ route }: Props) => {
               fontSize:12,
               fontWeight:'bold'
             }}>
-            Luiza Maria
+            {secondRank.name}
           </NunitoText>
         </View>
         <View style={styles.secondTop} />
@@ -43,8 +46,17 @@ const PodiumRanking = ({ route }: Props) => {
 
       <View style={styles.firstContainer}>
         
-        <View style={styles.imageCircle}>
-          <View style={styles.crown} />
+        <View>
+          <Image
+            style={styles.imageCircle} 
+            source={require('../../../assets/images/react-logo.png')}
+            resizeMode="cover"
+          />
+            <Image
+              style={styles.crown}
+              source={require('../../../assets/images/rank_crown.png')}
+              resizeMode="contain"
+            />
         </View>
         <View style={styles.personName}>
           <NunitoText style={{
@@ -53,7 +65,7 @@ const PodiumRanking = ({ route }: Props) => {
               fontSize:12,
               fontWeight:'bold'
             }}>
-            Carlos Antonio
+            {firstRank.name}
           </NunitoText>
         </View>
         <View style={styles.firstTop} />
@@ -63,7 +75,11 @@ const PodiumRanking = ({ route }: Props) => {
       </View>
       
       <View style={styles.thirdContainer}>
-        <View style={styles.imageCircle} />
+          <Image
+            style={styles.imageCircle} 
+            source={require('../../../assets/images/react-logo.png')}
+            resizeMode="cover"
+          />
         <View style={styles.personName}>
           <NunitoText style={{
               color:theme.primaryText, 
@@ -71,7 +87,7 @@ const PodiumRanking = ({ route }: Props) => {
               fontSize:12,
               fontWeight:'bold'
             }}>
-            Luiza da Silva
+            {thirdRank.name}
           </NunitoText>
         </View>
         <View style={styles.thirdTop} />
@@ -254,11 +270,11 @@ const styles = StyleSheet.create({
   },
   crown:{
    position: 'absolute',
-    top: -20,
-    left: 10,
-    width: 30,
-    height: 30,
-    backgroundColor: "yellow",
+    top: -40,
+    left: -25,
+    width: 70,
+    height: 70,
+    transform: [{ rotate: '-30deg' }] 
   },
     searchBookPhoto: {
     width: 45,
