@@ -9,26 +9,27 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
-import { User } from "../models/User";
-import UserAPI from "../services/profileService";
 import { base64Uri } from "../utils/imageUtils";
 import profileUser from "../assets/images/profile-user.png";
 import RankingPlaceCard from "../components/RankingPlaceCard/RankingPlaceCard";
+import RankingService, { UserRanking} from "../services/rankingService";
 
 export default function GeneralRanking() {
   const { theme } = useTheme();
-  const [rankingList, setRankingList] = useState<User[]>([]);
+  const [top3, setTop3] = useState<UserRanking[]>([]);
+  const [outros7, setOutros7] = useState<UserRanking[]>([]);
+
+  const { fetchAndSplitRanking } = RankingService();
 
   useEffect(() => {
-    const fetchRanking = async () => {
-      try {
-        const users = await UserAPI().getRanking();
-        setRankingList(users);
-      } catch (error) {
-        console.error("Erro ao buscar ranking:", error);
-      }
-    };
-    fetchRanking();
+    fetchAndSplitRanking()
+      .then(({ top3, outros7 }) => {
+        setTop3(top3);
+        setOutros7(outros7);
+      })
+      .catch((err) => {
+        console.error("Erro ao carregar ranking:", err);
+      });
   }, []);
 
   return (
@@ -49,13 +50,13 @@ export default function GeneralRanking() {
           <View style={styles.podiumPlaceholder}></View>
 
           <View style={styles.rankingList}>
-            {rankingList.map((user, index) => (
-              <View style={styles.rankingItem} key={user.email}>
+            {outros7.map((user) => (
+              <View style={styles.rankingItem} key={user.name}>
                 <RankingPlaceCard
-                  position={index + 1}
+                  position={user.posicao}
                   name={user.name}
-                  imageUrl={user.profileImage
-                    ? base64Uri(user.profileImage)
+                  imageUrl={user.profile_image
+                    ? base64Uri(user.profile_image)
                     : Image.resolveAssetSource(profileUser).uri}
                 />
               </View>
