@@ -33,7 +33,7 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
   const selectedGenreName = params.genreName;
   const [actualPage] = useState(initialPageIndex);
   const [books, setBooks] = useState<DatabaseBookModel[]>([]);
-  const [selectedBook, setSelectedBook] = useState<any>(null);
+  const [selectedBook, setSelectedBook] = useState<DatabaseBookModel>();
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const slideAnim = useRef(new Animated.Value(actualPage)).current;
@@ -52,7 +52,7 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
 
   const handleCloseModal = () => {
     setModalVisible(false);
-    setSelectedBook(null);
+    setSelectedBook(undefined);
   };
 
   const fetchBooks = async (genreId: number) => {
@@ -211,17 +211,21 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
                 pages={selectedBook.pages || 0}
                 synopsis={selectedBook.synopsis || "Sinopse não disponível"}
                 review="Sem avaliações disponíveis ainda."
-                authors={selectedBook.authors?.join(", ") || "Autor desconhecido"}
+                authors={selectedBook.authors || "Autor desconhecido"}
                 year={
-                  selectedBook.year?.substring(0, 4) || "Desconhecido"
+                  selectedBook.year ? String(selectedBook.year).substring(0,4) : "Desconhecido"
                 }
                 id={selectedBook.book_id?.toString() || "0"}
-                genre={selectedBook.google_book_id?.[0] || "Gênero não especificado"}
+                genre={
+                 Array.isArray(params.genreName)
+                    ? params.genreName[0]
+                    : params.genreName || "Gênero não especificado"
+                }
                 google_image_url={selectedBook.google_image_url || ""}
                 onCreateReview={() =>
                   console.log("Criar resenha para:", selectedBook.title)
                 }
-                onShare={() => console.log("Compartilhar:", selectedBook.titulo)}
+                onShare={() => console.log("Compartilhar:", selectedBook.title)}
                 bookId={selectedBook.book_id}
               />
             )}
