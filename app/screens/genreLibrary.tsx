@@ -41,9 +41,10 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
   const { getBooksByGenre } = BooksService();
 
   const handleClose = () => {
+    console.log(router);
     Animated.timing(slideOutAnim, {
       toValue: 1,
-      duration: 80,
+      duration: 300,
       useNativeDriver: true,
     }).start(() => {
       router.back();
@@ -112,7 +113,13 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
     >
       {/* header */}
       <View style={styles.headerPage}>
-        <TouchableOpacity onPress={handleClose} style={styles.circleButton}>
+        <TouchableOpacity
+          onPress={handleClose}
+          style={[
+            styles.circleButton,
+            { zIndex: 999 }, // Número alto = na frente
+          ]}
+        >
           <Ionicons
             name="return-up-back-outline"
             size={30}
@@ -120,7 +127,15 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
           />
         </TouchableOpacity>
 
-        <NunitoText style={[styles.headerTitle, { color: theme.quinaryText }]}>
+        <NunitoText
+          style={[
+            styles.headerTitle,
+            {
+              color: theme.quinaryText,
+              zIndex: 1
+            },
+          ]}
+        >
           {selectedGenreName}
         </NunitoText>
       </View>
@@ -265,10 +280,9 @@ const styles = StyleSheet.create({
   circleButton: {
     alignItems: "center",
     borderRadius: 20,
-    height: 40,
+    height: 80,
     justifyContent: "center",
-    paddingLeft: 3,
-    width: 40,
+    width: 80,
   },
   container: {
     alignItems: "center",
@@ -292,6 +306,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 0,
     textAlign: "center",
+    width: "auto",
   },
   onTopBar: {
     alignItems: "center",
