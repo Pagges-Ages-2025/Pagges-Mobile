@@ -22,7 +22,7 @@ export default function ScreensLayout() {
       // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
       if (pathname !== "screens/tests/teste") {
         // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
-        router.push("screens/trilha" as any);
+        router.push("screens/tests/teste" as any);
         // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)  
       } else {
         // NÃO COMMITAR AQUI (ASS: OTAVIO - AGES III)
