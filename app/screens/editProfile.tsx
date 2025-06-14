@@ -19,6 +19,7 @@ import * as ImagePicker from "expo-image-picker";
 import NunitoText from "../components/Texts/NunitoText";
 import { Genre } from "../models/Genre";
 import axiosInstance from "../services/axios-instance-singleton";
+import { base64Uri } from "../utils/imageUtils";
 
 export default function EditProfileScreen() {
   const { theme } = useTheme();
@@ -35,6 +36,9 @@ export default function EditProfileScreen() {
   const [changesMade, setChangesMade] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [userGenres, setUserGenres] = useState<Genre[]>([]);
+  const [profileImage, setProfileImage] = useState<string | undefined>(
+    undefined
+  );
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
@@ -46,15 +50,30 @@ export default function EditProfileScreen() {
   );
 
   useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await UserAPI().getProfile();
+        if (response.profileImage) {
+          setProfileImage(base64Uri(response.profileImage));
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
+  useEffect(() => {
     const fetchUserGenres = async () => {
       try {
-        const response = await axiosInstance.get('/user-genres/user');
+        const response = await axiosInstance.get("/user-genres/user");
         setUserGenres(response.data.data);
       } catch (error) {
         console.error("Erro ao buscar os gêneros do usuário:", error);
       }
     };
-  
+
     fetchUserGenres();
   }, []);
 
@@ -63,12 +82,12 @@ export default function EditProfileScreen() {
   }, [image]);
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
+    
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 1,
+      quality: 0.1, 
     });
 
     if (!result.canceled) {
@@ -152,7 +171,7 @@ export default function EditProfileScreen() {
   return (
     <>
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Ionicons name="arrow-undo-circle" size={42} />
+        <Ionicons name="return-up-back-outline" size={30} color={theme.black} />
       </TouchableOpacity>
       <ScrollView
         style={[styles.container, { backgroundColor: theme.Background }]}
@@ -161,10 +180,9 @@ export default function EditProfileScreen() {
         <View>
           <ProfileHeader
             marginStart={30}
-            profileImageUrl={image?.uri}
+            profileImageUrl={image?.uri || profileImage}
             name={profileName?.toString() || ""}
             isAuthor={false}
-            bEditPicture={image ? false : true}
             isEditMode={true}
             onPressCameraIcon={() => pickImage()}
             onPressEditGenres={() =>

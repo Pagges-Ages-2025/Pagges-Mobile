@@ -39,7 +39,7 @@ export default function ProfileScreen() {
 
   const fetchUserGenres = async () => {
     try {
-      const response = await axiosInstance.get('/user-genres/user');
+      const response = await axiosInstance.get("/user-genres/user");
       setUserGenres(response.data.data);
       console.log("Gêneros atualizados:", response.data.data);
     } catch (error) {
@@ -53,7 +53,7 @@ export default function ProfileScreen() {
       .then((response: User) => {
         setData(response);
       })
-      .catch((error: any) => { });
+      .catch((error: any) => {});
   };
 
   const fetchStats = async () => {
@@ -62,7 +62,7 @@ export default function ProfileScreen() {
       .then((response: { readBooks: number; readKms: number }) => {
         setStats(response);
       })
-      .catch((error: any) => { });
+      .catch((error: any) => {});
   };
 
   // Atualiza dados quando a tela recebe foco
@@ -93,6 +93,12 @@ export default function ProfileScreen() {
         },
       });
     }
+  };
+
+  const handleConfig = async () => {
+    router.push({
+      pathname: "/screens/configuration",
+    });
   };
 
   const navigateToLibrary = (tabIndex: number) => {
@@ -129,11 +135,15 @@ export default function ProfileScreen() {
           genres={userGenres}
           bEdit={true}
           onPressEdit={handleEditProfile}
+          bConfig={true}
+          onPressConfig={handleConfig}
           isEditMode={false}
-          onPressEditGenres={() => router.push({
-            pathname: "/screens/favoriteGenre",
-            params: { from: "edit" },
-          })}
+          onPressEditGenres={() =>
+            router.push({
+              pathname: "/screens/favoriteGenre",
+              params: { from: "edit" },
+            })
+          }
         />
 
         <View style={styles.statsContainer}>
@@ -141,7 +151,7 @@ export default function ProfileScreen() {
             // kmLidos={data?.readKm || 0}
             kmLidos={stats.readKms}
             livros={stats.readBooks}
-            ranking={data?.ranking || 0}
+            ranking={data?.ranking_position || 0}
             amigos={data?.friendsNumber || 0}
           />
         </View>
@@ -154,12 +164,13 @@ export default function ProfileScreen() {
 
         {/* Biblioteca pessoal buttons - Now placed above achievements */}
         <View style={styles.libraryButtonsContainer}>
-          <NunitoText style={[styles.libraryTitle, { color: theme.primaryText }]}>
+          <NunitoText
+            style={[styles.libraryTitle, { color: theme.primaryText }]}
+          >
             Biblioteca Pessoal
           </NunitoText>
 
           <View style={styles.libraryTabsContainer}>
-
             <CustomButton
               title={"Quero Ler"}
               onPress={() => navigateToLibrary(0)}
@@ -184,8 +195,6 @@ export default function ProfileScreen() {
               size="small"
               height={30}
             />
-
-
           </View>
         </View>
 
