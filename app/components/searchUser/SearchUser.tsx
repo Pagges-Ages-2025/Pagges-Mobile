@@ -16,6 +16,7 @@ import CustomUser from "./customUser";
 import { base64Uri } from "@/app/utils/imageUtils";
 import { searchUsers } from "@/app/services/search-user.service";
 import { UserSearchResult } from "@/app/models/UserSearchResult";
+import { router } from "expo-router";
 
 type SearchIconPosition = "right" | "left";
 type SearchColor = "primary" | "secondary";
@@ -212,7 +213,7 @@ export default function UserSearch({
                           // setQuery(item.username);
                           // setShowSuggestions(false);
                           // onShowSuggestionsChange(false);
-                          // router.push({pathname : "screens/thirdPersonProfile", params: {username : user.username}})
+                          router.push({pathname : "/screens/thirdPersonProfile", params: {username : item.username}})
                         }}
                       />
                     )}
