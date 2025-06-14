@@ -17,6 +17,9 @@ import ChallangesAPI from "../services/challanges";
 import UserAPI from "../services/profileService";
 import { base64Uri } from "../utils/imageUtils";
 import DailyChallenge from "./DailyChallenge";
+import PodiumRanking from "../components/Podium/PodiumRanking";
+import RankingService, { UserRanking } from "../services/rankingService";
+import { useRouter } from "expo-router";
 
 export default function Challenges() {
   const [data, setData] = useState<User>();
@@ -25,6 +28,41 @@ export default function Challenges() {
   const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const { theme } = useTheme();
+  const [top3, setTop3] = useState<UserRanking[]>([]);
+  const router = useRouter();
+
+  const handleNavigateToRanking = () => {
+    router.replace("/screens/generalRanking");
+  };
+
+
+    const { fetchAndSplitRanking } = RankingService();
+
+    useEffect(() => {
+      fetchAndSplitRanking()
+        .then(({ top3 }) => {
+          setTop3(top3);
+        })
+        .catch((err) => {
+          console.error("Erro ao carregar ranking:", err);
+        });
+    }, []);
+  
+      const topUsers = {
+        firstRank: {
+          name: top3[0].name,
+          //image: top3[0].profile_image
+        },
+        secondRank: {
+          name: top3[1].name,
+          //image: top3[1].profile_image
+        },
+        thirdRank: {
+          name: top3[2].name,
+          //image: top3[2].profile_image
+        },
+      };
+  
 
   const animatePoints = (points: number) => {
     setEarnedPoints(points);
@@ -151,6 +189,14 @@ export default function Challenges() {
           >
             Rankings
           </NunitoText>
+
+          <TouchableOpacity onPress={handleNavigateToRanking} activeOpacity={0.8}>
+            <PodiumRanking
+              firstRank={topUsers.firstRank}
+              secondRank={topUsers.secondRank}
+              thirdRank={topUsers.thirdRank}
+            />
+          </TouchableOpacity>
         </View>
       </ScrollView>
 

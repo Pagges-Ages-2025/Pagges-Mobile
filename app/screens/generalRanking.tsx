@@ -10,6 +10,7 @@ import RankingPlaceCard from "../components/RankingPlaceCard/RankingPlaceCard";
 import RankingService, { UserRanking } from "../services/rankingService";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import PodiumRanking from "../components/Podium/PodiumRanking";
 
 export default function GeneralRanking() {
   const router = useRouter();
@@ -34,6 +35,21 @@ export default function GeneralRanking() {
       });
   }, []);
 
+    const topUsers = {
+      firstRank: {
+        name: top3[0].name,
+        //image: top3[0].profile_image
+      },
+      secondRank: {
+        name: top3[1].name,
+        //image: top3[1].profile_image
+      },
+      thirdRank: {
+        name: top3[2].name,
+        //image: top3[2].profile_image
+      },
+    };
+
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.Background }]}
@@ -51,7 +67,11 @@ export default function GeneralRanking() {
                   />
             </TouchableOpacity>
 
-          <View style={styles.podiumPlaceholder}></View>
+            <PodiumRanking
+              firstRank={topUsers.firstRank}
+              secondRank={topUsers.secondRank}
+              thirdRank={topUsers.thirdRank}
+            />
 
           <View style={styles.rankingList}>
             {outros7.map((user) => (
