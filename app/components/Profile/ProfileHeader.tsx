@@ -24,11 +24,10 @@ interface ProfileHeaderProps {
   isAuthor: boolean;
   bEdit?: boolean;
   following?: boolean;
-  bEditPicture?: boolean;
+  isEditMode?: boolean;
   bConfig?: boolean;
   genres?: Genre[];
-  isEditMode: boolean;
-  onPressFollow?:() => void;
+  onPressFollow?: () => void;
   onPressEdit?: () => void;
   onPressConfig?: () => void;
   onPressCameraIcon?: () => void;
@@ -45,10 +44,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   isAuthor,
   bEdit = false,
   following = undefined,
-  bEditPicture = false,
+  isEditMode = false,
   bConfig = false,
   genres,
-  isEditMode = false,
   onPressFollow,
   onPressEdit,
   onPressConfig,
@@ -63,6 +61,86 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     color: theme.primaryText,
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flexDirection: "column",
+    },
+    backgroundImage: {
+      width: "100%",
+      height: headerImageHeight,
+      position: "relative",
+    },
+    profileImage: {
+      width: profileImageSize,
+      height: profileImageSize,
+      marginTop: headerImageHeight * 0.75,
+    },
+    profileImageContainer: {
+      flexDirection: "column",
+      flex: 1,
+      height: headerImageHeight * 0.85 + profileImageSize,
+    },
+    editIcon: {
+      position: "absolute",
+      top: "40%",
+      right: "12%",
+    },
+    configIcon: {
+      position: "absolute",
+      top: "40%",
+      right: "3%",
+    },
+    genresContainer: {
+      flexDirection: "row",
+      marginTop: 8,
+    },
+    name: {
+      fontSize: 28,
+      fontWeight: 700,
+    },
+    cameraIconContainer: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      backgroundColor: theme.primary,
+      borderRadius: 20,
+      padding: 4,
+    },
+    cameraIcon: {
+      height: 24,
+      width: 24,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    username: {
+      fontSize: 18,
+      fontWeight: 400,
+    },
+    nameContainer: {
+      flex: 1,
+      flexDirection: "row",
+    },
+    nameRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingRight: 16,
+    },
+    genreLabel: {
+      marginEnd: 8,
+    },
+    isAuthorContainer: {
+      marginLeft: 8,
+      marginTop: 4,
+      flexDirection: "row",
+      alignItems: "flex-start",
+    },
+    isAuthorText: {
+      fontSize: 12,
+      fontWeight: 400,
+    },
+  });
+
   return (
     <SafeAreaView style={styles.container} edges={[]}>
       <View style={styles.profileImageContainer}>
@@ -71,51 +149,38 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           style={styles.backgroundImage}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            {isEditMode && bEditPicture ? (
-              <View
-                style={[
-                  styles.profileImage,
-                  {
-                    marginStart: marginStart,
-                    backgroundColor: "gray",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: 50,
-                  },
-                ]}
-              >
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  onPress={onPressCameraIcon}
-                  style={styles.cameraIcon}
-                >
-                  <Ionicons name="camera" size={48} color={theme.white} />
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                disabled={!isEditMode}
-                onPress={onPressCameraIcon}
-                style={[styles.profileImage, { marginStart: marginStart }]}
-              >
-                <Image
-                  source={
-                    profileImageUrl ? { uri: profileImageUrl } : profileUser
-                  }
-                  style={{ flex: 1, borderRadius: 50 }}
-                />
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              activeOpacity={0.7}
+              disabled={!isEditMode}
+              onPress={onPressCameraIcon}
+              style={[styles.profileImage, { marginStart: marginStart }]}
+            >
+              <Image
+                source={
+                  profileImageUrl ? { uri: profileImageUrl } : profileUser
+                }
+                style={{ flex: 1, borderRadius: 50 }}
+              />
+              {isEditMode && !bEdit && (
+                <View style={styles.cameraIconContainer}>
+                  <View style={styles.cameraIcon}>
+                    <Ionicons name="camera" size={24} color={theme.white} />
+                  </View>
+                </View>
+              )}
+            </TouchableOpacity>
 
             {bEdit && (
               <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
                 <Ionicons name="create-outline" size={32} />
               </TouchableOpacity>
             )}
-            
+
             {bConfig && (
-              <TouchableOpacity style={styles.configIcon} onPress={onPressConfig}>
+              <TouchableOpacity
+                style={styles.configIcon}
+                onPress={onPressConfig}
+              >
                 <Ionicons name="cog-outline" size={32} />
               </TouchableOpacity>
             )}
@@ -129,7 +194,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   paddingRight: 6,
                 }}
               >
-                {bEditPicture ? (
+                {isEditMode ? (
                   <View style={{ paddingLeft: 6 }}>
                     <View
                       style={{
@@ -190,121 +255,50 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </ImageBackground>
       </View>
       <View style={{ marginStart: marginStart }}>
-      <View style={styles.nameRow}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <NunitoText style={[styles.name, dynamicTextStyle]}>
-            {name}
-          </NunitoText>
-          {isAuthor && (
-            <View style={styles.isAuthorContainer}>
-              <VerifiedIcon width={16} height={16} fill={theme.primary} />
-              <NunitoText style={[styles.isAuthorText, dynamicTextStyle]}>
-                {Strings.author}
-              </NunitoText>
-            </View>
-          )}
-        </View>
+        <View style={styles.nameRow}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <NunitoText style={[styles.name, dynamicTextStyle]}>
+              {name}
+            </NunitoText>
+            {isAuthor && (
+              <View style={styles.isAuthorContainer}>
+                <VerifiedIcon width={16} height={16} fill={theme.primary} />
+                <NunitoText style={[styles.isAuthorText, dynamicTextStyle]}>
+                  {Strings.author}
+                </NunitoText>
+              </View>
+            )}
+          </View>
 
-        {following != undefined && (
-          <TouchableOpacity onPress={onPressFollow}>
-            <View
-              style={{
-                backgroundColor: following ? theme.white : theme.primary,
-                borderRadius: 30,
-                height: 25,
-                width: 80,
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 8,
-              }}
-            >
-              <NunitoText
+          {following != undefined && (
+            <TouchableOpacity onPress={onPressFollow}>
+              <View
                 style={{
-                  color: following ? theme.primary : theme.white,
-                  fontSize: 14,
-                  textAlign: "center",
+                  backgroundColor: following ? theme.white : theme.primary,
+                  borderRadius: 30,
+                  height: 25,
+                  width: 80,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingHorizontal: 8,
                 }}
               >
-                {following ? "Seguindo" : "Seguir"}
-              </NunitoText>
-            </View>
-          </TouchableOpacity>
+                <NunitoText
+                  style={{
+                    color: following ? theme.primary : theme.white,
+                    fontSize: 14,
+                    textAlign: "center",
+                  }}
+                >
+                  {following ? "Seguindo" : "Seguir"}
+                </NunitoText>
+              </View>
+            </TouchableOpacity>
           )}
         </View>
       </View>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "column",
-  },
-  backgroundImage: {
-    width: "100%",
-    height: headerImageHeight,
-    position: "relative",
-  },
-  profileImage: {
-    width: profileImageSize,
-    height: profileImageSize,
-    marginTop: headerImageHeight * 0.75,
-  },
-  profileImageContainer: {
-    flexDirection: "column",
-    flex: 1,
-    height: headerImageHeight * 0.85 + profileImageSize,
-  },
-  editIcon: {
-    position: "absolute",
-    top: "40%",
-    right: "12%",
-  },
-  
-  configIcon: {
-    position: "absolute",
-    top: "40%",
-    right: "3%",
-  },
-  genresContainer: {
-    flexDirection: "row",
-    marginTop: 8,
-  },
-  name: {
-    fontSize: 28,
-    fontWeight: 700,
-  },
-  cameraIcon: {
-    height: 48,
-    width: 48,
-  },
-  username: {
-    fontSize: 18,
-    fontWeight: 400,
-  },
-  nameContainer: {
-    flex: 1,
-    flexDirection: "row",
-  },
-  nameRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingRight: 16, 
-  },
-  genreLabel: {
-    marginEnd: 8,
-  },
-  isAuthorContainer: {
-    marginLeft: 8,
-    marginTop: 4,
-    flexDirection: "row",
-    alignItems: "flex-start",
-  },
-  isAuthorText: {
-    fontSize: 12,
-    fontWeight: 400,
-  },
-});
 
 export default ProfileHeader;
