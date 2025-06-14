@@ -16,7 +16,7 @@ export default function SocialAPI() {
   async function unfollowUser(username: string): Promise<void> {
     try {
       const axiosResponse = await axiosInstance.delete("social/unfollow", {
-        data: { username },
+        data: { username: username },
       });
       return axiosResponse.data;
     } catch (error) {
@@ -28,7 +28,7 @@ export default function SocialAPI() {
   async function followUser(username: string): Promise<void> {
     try {
       const axiosResponse = await axiosInstance.post("social/follow", {
-        username,
+        username: username,
       });
       return axiosResponse.data;
     } catch (error) {

@@ -1,22 +1,22 @@
+import Strings from "@/app/constants/Strings";
+import { Genre } from "@/app/models/Genre";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
-  View,
-  StyleSheet,
   Image,
   ImageBackground,
+  StyleSheet,
   TextStyle,
   TouchableOpacity,
+  View,
 } from "react-native";
-import NunitoText from "../Texts/NunitoText";
-import { useTheme } from "../../context/ThemeContext";
-import VerifiedIcon from "../../assets/images/ic_verified.svg";
-import Strings from "@/app/constants/Strings";
-import DefaultProfileHeaderImage from "../../assets/images/default_profile_header_image.png";
-import { Ionicons } from "@expo/vector-icons";
-import profileUser from "../../assets/images/profile-user.png";
-import { Genre } from "@/app/models/Genre";
-import CustomButton from "../Buttons/CustomButton";
 import { SafeAreaView } from "react-native-safe-area-context";
+import DefaultProfileHeaderImage from "../../assets/images/default_profile_header_image.png";
+import VerifiedIcon from "../../assets/images/ic_verified.svg";
+import profileUser from "../../assets/images/profile-user.png";
+import { useTheme } from "../../context/ThemeContext";
+import CustomButton from "../Buttons/CustomButton";
+import NunitoText from "../Texts/NunitoText";
 interface ProfileHeaderProps {
   marginStart: number;
   profileImageUrl?: string;
