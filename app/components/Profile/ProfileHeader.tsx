@@ -169,13 +169,77 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 </View>
               )}
             </TouchableOpacity>
-
+            <View
+              style={{
+                flex: 1,
+                marginLeft: 16,
+                marginTop: 134,
+                flexDirection: "row",
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              {isEditMode ? (
+                <View style={{ paddingLeft: 6 }}>
+                  <View
+                    style={{
+                      borderRadius: 30,
+                      height: 30,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingHorizontal: 8,
+                    }}
+                  >
+                    <CustomButton
+                      title={Strings.editGenres}
+                      onPress={onPressEditGenres}
+                      size="small"
+                      type={"primary"}
+                    />
+                  </View>
+                </View>
+              ) : (
+                genres?.map((genre, index) => {
+                  const firstWord = genre.genre_name.split(" ")[0];
+                  const backgroundColor =
+                    colorsBackground[index % colorsBackground.length];
+                  const colorsTitle = colorsLabel[index % colorsLabel.length];
+                  return (
+                    <View
+                      key={index}
+                      style={{ marginRight: 8, marginBottom: 8 }}
+                    >
+                      <View
+                        style={{
+                          backgroundColor,
+                          borderRadius: 30,
+                          height: 25,
+                          justifyContent: "center",
+                          alignItems: "center",
+                          paddingHorizontal: 12,
+                          pointerEvents: "none",
+                        }}
+                      >
+                        <NunitoText
+                          style={{
+                            color: colorsTitle,
+                            fontSize: 14,
+                            textAlign: "center",
+                          }}
+                        >
+                          {firstWord}
+                        </NunitoText>
+                      </View>
+                    </View>
+                  );
+                })
+              )}
+            </View>
             {bEdit && (
               <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
                 <Ionicons name="create-outline" size={32} />
               </TouchableOpacity>
             )}
-
             {bConfig && (
               <TouchableOpacity
                 style={styles.configIcon}
@@ -184,73 +248,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 <Ionicons name="cog-outline" size={32} />
               </TouchableOpacity>
             )}
-
-            {
-              <View
-                style={{
-                  paddingLeft: 10,
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  paddingRight: 6,
-                }}
-              >
-                {isEditMode ? (
-                  <View style={{ paddingLeft: 6 }}>
-                    <View
-                      style={{
-                        borderRadius: 30,
-                        height: 30,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        paddingHorizontal: 8,
-                        top: "240%",
-                      }}
-                    >
-                      <CustomButton
-                        title={Strings.editGenres}
-                        onPress={onPressEditGenres}
-                        size="small"
-                        type={"primary"}
-                      />
-                    </View>
-                  </View>
-                ) : (
-                  genres?.map((genre, index) => {
-                    const firstWord = genre.genre_name.split(" ")[0];
-                    const backgroundColor =
-                      colorsBackground[index % colorsBackground.length];
-                    const colorsTitle = colorsLabel[index % colorsLabel.length];
-                    return (
-                      <View key={index} style={{ paddingLeft: 10 }}>
-                        <View
-                          style={{
-                            backgroundColor,
-                            borderRadius: 30,
-                            height: 25,
-                            maxWidth: 100,
-                            justifyContent: "center",
-                            alignItems: "center",
-                            paddingHorizontal: 8,
-                            pointerEvents: "none",
-                            top: "240%",
-                          }}
-                        >
-                          <NunitoText
-                            style={{
-                              color: colorsTitle,
-                              fontSize: 14,
-                              textAlign: "center",
-                            }}
-                          >
-                            {firstWord}
-                          </NunitoText>
-                        </View>
-                      </View>
-                    );
-                  })
-                )}
-              </View>
-            }
           </View>
         </ImageBackground>
       </View>

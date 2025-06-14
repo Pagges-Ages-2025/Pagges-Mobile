@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { ScrollView, View, StyleSheet, TouchableOpacity } from "react-native";
-import { useTheme } from "../context/ThemeContext";
 import CustomButton from "@/app/components/Buttons/CustomButton";
 import ProfileHeader from "@/app/components/Profile/ProfileHeader";
-import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTheme } from "../context/ThemeContext";
 import { User } from "../models/User";
-import { base64Uri } from "../utils/imageUtils";
 import UserAPI from "../services/profileService";
+import { base64Uri } from "../utils/imageUtils";
 
 export default function ConfigurationScreen() {
   const { theme, themeName, setThemeName } = useTheme();
@@ -76,8 +76,7 @@ export default function ConfigurationScreen() {
 
           <View style={styles.formContainer}>
             <CustomButton
-              //title={Strings.editGenres}
-              title={"Alterar modo " + themeName}
+              title={"Alterar Tema do Aplicativo"}
               onPress={toggleTheme}
               size="small"
               type={"primary"}
