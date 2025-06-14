@@ -1,5 +1,5 @@
 export interface UserSearchResult {
-  user_id: number;
+  id: number;
   name: string;
   username: string;
   profile_image: string | null;

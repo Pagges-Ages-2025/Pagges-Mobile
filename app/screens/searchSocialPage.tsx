@@ -31,7 +31,7 @@ const SearchSocialPage: React.FC = () => {
   const handleSelectUser = async (user: UserSearchResult) => {
     const updated = await addUserToSearchHistory(user);
     setSearchHistory(updated);
-    console.log("Usuário selecionado:", searchHistory);
+    console.log("Usuário selecionado:", updated);
   };
 
   const handleDeleteHistoryItem = async (index: number) => {

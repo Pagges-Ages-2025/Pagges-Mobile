@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FlatList, View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { SearchHistoryItem } from './searchHistoryUserItem';
 
 import { useTheme } from '../../context/ThemeContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { User } from '@/app/models/User';
 import { UserSearchResult } from '@/app/models/UserSearchResult';
 
 interface Props {
@@ -22,6 +21,10 @@ export const SearchUserHistoryList = ({
 }: Props) => {
   const { theme } = useTheme();
   if (history.length === 0) return null;
+
+  useEffect(() => {
+  console.log("Histórico atualizado:", SearchHistoryItem);
+}, [SearchHistoryItem]);
 
   return (
     <View style={styles.container}>

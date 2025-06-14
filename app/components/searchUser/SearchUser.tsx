@@ -101,7 +101,7 @@ export default function UserSearch({
       // const array = response.data as User[];
       const array = await searchUsers(term);
       const simplified = array.map((aux) => ({
-        user_id: aux.id,
+        id: aux.id,
         name: aux.name,
         username: aux.username,
         profile_image: aux.profileImage ?? null,
@@ -199,7 +199,7 @@ export default function UserSearch({
                 ) : (
                   <FlatList
                     data={users}
-                    keyExtractor={(item) => String(item.user_id)}
+                    keyExtractor={(item) => String(item.id)}
                     nestedScrollEnabled
                     keyboardShouldPersistTaps="handled"
                     renderItem={({ item }) => (
@@ -209,10 +209,10 @@ export default function UserSearch({
                         // profile_image={item.profile_image ?? ""}
                         profile_image={item.profile_image ? base64Uri(item.profile_image) : null}
                         onPress={() => {
-                          // onSelectUser(item);
-                          // setQuery(item.username);
-                          // setShowSuggestions(false);
-                          // onShowSuggestionsChange(false);
+                          onSelectUser(item);
+                          setQuery(item.username);
+                          setShowSuggestions(false);
+                          onShowSuggestionsChange(false);
                           router.push({pathname : "/screens/thirdPersonProfile", params: {username : item.username}})
                         }}
                       />
