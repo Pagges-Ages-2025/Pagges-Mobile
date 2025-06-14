@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  ScrollView,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { ScrollView, View, StyleSheet, TouchableOpacity } from "react-native";
 import { useTheme } from "../context/ThemeContext";
 import CustomButton from "@/app/components/Buttons/CustomButton";
 import ProfileHeader from "@/app/components/Profile/ProfileHeader";
@@ -19,16 +14,16 @@ export default function ConfigurationScreen() {
   const { theme, themeName, setThemeName } = useTheme();
   const router = useRouter();
   const [data, setData] = useState<User>();
-  
+
   const fetchProfile = async () => {
     UserAPI()
       .getProfile()
       .then((response: User) => {
         setData(response);
       })
-      .catch((error: any) => { });
+      .catch((error: any) => {});
   };
-  
+
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem("userToken");
@@ -38,25 +33,30 @@ export default function ConfigurationScreen() {
       console.error("Error during logout:", error);
     }
   };
-  
+
   const toggleTheme = () => {
     setThemeName(themeName === "dark" ? "light" : "dark");
   };
 
-    useFocusEffect(
-      useCallback(() => {
-        fetchProfile();
-      }, [])
-    );
-  
-    useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
       fetchProfile();
-    }, []);
+    }, [])
+  );
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
   return (
     <>
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Ionicons name="arrow-undo-circle" size={42} />
+      <TouchableOpacity style={styles.backButton}>
+        <Ionicons
+          name="return-up-back-outline"
+          size={30}
+          color={theme.black}
+          onPress={router.back}
+        />
       </TouchableOpacity>
       <ScrollView
         style={[styles.container, { backgroundColor: theme.Background }]}
@@ -71,7 +71,7 @@ export default function ConfigurationScreen() {
             name={data?.name.toString() || ""}
             isAuthor={false}
             isEditMode={false}
-            onPressEditGenres={() =>{}}
+            onPressEditGenres={() => {}}
           />
 
           <View style={styles.formContainer}>

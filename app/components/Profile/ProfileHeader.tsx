@@ -53,7 +53,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   onPressCameraIcon,
   onPressEditGenres,
 }) => {
-  const { theme } = useTheme();
+  const { theme, themeName } = useTheme();
   const colorsBackground = ["#9E0E53AA", "#F4D06F", "#388383C7"];
   const colorsLabel = ["#FFFFFF", "#000000", "#FFFFFF"];
 
@@ -274,7 +274,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <TouchableOpacity onPress={onPressFollow}>
               <View
                 style={{
-                  backgroundColor: following ? theme.white : theme.primary,
+                  backgroundColor: following
+                    ? themeName === "dark"
+                      ? theme.Background
+                      : theme.white
+                    : theme.primary,
                   borderRadius: 30,
                   height: 25,
                   width: 80,
@@ -285,7 +289,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               >
                 <NunitoText
                   style={{
-                    color: following ? theme.primary : theme.white,
+                    color: following
+                      ? themeName === "dark"
+                        ? theme.white
+                        : theme.primary
+                      : theme.white,
                     fontSize: 14,
                     textAlign: "center",
                   }}
