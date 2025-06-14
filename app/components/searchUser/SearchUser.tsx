@@ -13,14 +13,9 @@ import {
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 import CustomUser from "./customUser";
-import axiosInstance from "@/app/services/axios-instance-singleton";
-
-export interface User {
-  name: string;
-  user_id: number;
-  username: string;
-  profile_image: string | null;
-}
+import { base64Uri } from "@/app/utils/imageUtils";
+import { searchUsers } from "@/app/services/search-user.service";
+import { UserSearchResult } from "@/app/models/UserSearchResult";
 
 type SearchIconPosition = "right" | "left";
 type SearchColor = "primary" | "secondary";
@@ -33,7 +28,7 @@ interface UserSearchProps {
   border?: boolean;
   placeholder?: string;
   isBottomSheet?: boolean;
-  onSelectUser: (user: User) => void;
+  onSelectUser: (user: UserSearchResult) => void;
   onShowSuggestionsChange?: (show: boolean) => void;
 }
 
@@ -51,7 +46,7 @@ export default function UserSearch({
   const inputRef = useRef<TextInput>(null);
 
   const [query, setQuery] = useState("");
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserSearchResult[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -88,13 +83,6 @@ export default function UserSearch({
     const shouldShow = text.trim().length > 0;
     setShowSuggestions(shouldShow);
     onShowSuggestionsChange(shouldShow);
-    console.log(
-      "▶ handleSearch → showSuggestions =",
-      shouldShow,
-      " | query='",
-      text,
-      "'"
-    );
 
     if (!shouldShow) {
       setUsers([]);
@@ -106,15 +94,16 @@ export default function UserSearch({
   const fetchUsers = async (term: string) => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.get(`/user-search/user`, {
-        params: { name: term },
-      });
-      const array = response.data as User[];
+      // const response = await axiosInstance.get(`/user-search/user`, {
+      //   params: { name: term },
+      // });
+      // const array = response.data as User[];
+      const array = await searchUsers(term);
       const simplified = array.map((aux) => ({
-        user_id: aux.user_id,
+        user_id: aux.id,
         name: aux.name,
         username: aux.username,
-        profile_image: aux.profile_image ?? null,
+        profile_image: aux.profileImage ?? null,
       }));
       setUsers(simplified);
     } catch (error) {
@@ -216,12 +205,14 @@ export default function UserSearch({
                       <CustomUser
                         name={item.name}
                         username={item.username}
-                        profile_image={item.profile_image ?? ""}
+                        // profile_image={item.profile_image ?? ""}
+                        profile_image={item.profile_image ? base64Uri(item.profile_image) : null}
                         onPress={() => {
-                          onSelectUser(item);
-                          setQuery(item.username);
-                          setShowSuggestions(false);
-                          onShowSuggestionsChange(false);
+                          // onSelectUser(item);
+                          // setQuery(item.username);
+                          // setShowSuggestions(false);
+                          // onShowSuggestionsChange(false);
+                          // router.push({pathname : "screens/thirdPersonProfile", params: {username : user.username}})
                         }}
                       />
                     )}

@@ -1,6 +1,7 @@
 export class User {
   id: number;
   name: string;
+  username: string;
   biography: string;
   favouriteGenres: string[];
   readKm: number;
@@ -15,6 +16,7 @@ export class User {
   constructor() {
     this.id = 0;
     this.name = "";
+    this.username = "";
     this.biography = "";
     this.favouriteGenres = [];
     this.readKm = 0;

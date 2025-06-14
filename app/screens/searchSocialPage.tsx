@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, SafeAreaView, StyleSheet, Text } from "react-native";
-import UserSearch, { User } from "../components/searchUser/SearchUser";
+import UserSearch from "../components/searchUser/SearchUser";
 import { useTheme } from "../context/ThemeContext";
 import {
   loadUserSearchHistory,
@@ -9,10 +9,11 @@ import {
   clearUserSearchHistory,
 } from "../services/user-search-history.service";
 import { SearchUserHistoryList } from "../components/searchUser/searchHistoryUserList";
+import { UserSearchResult } from "../models/UserSearchResult";
 
 const SearchSocialPage: React.FC = () => {
   const { theme } = useTheme();
-  const [searchHistory, setSearchHistory] = useState<User[]>([]);
+  const [searchHistory, setSearchHistory] = useState<UserSearchResult[]>([]);
   const [showingResults, setShowingResults] = useState(false);
 
   useEffect(() => {
@@ -22,12 +23,12 @@ const SearchSocialPage: React.FC = () => {
     })();
   }, []);
 
-  const handleSelectHistoryItem = async (user: User) => {
+  const handleSelectHistoryItem = async (user: UserSearchResult) => {
     await handleSelectUser(user);
     console.log("Item de histórico selecionado:",);
   };
 
-  const handleSelectUser = async (user: User) => {
+  const handleSelectUser = async (user: UserSearchResult) => {
     const updated = await addUserToSearchHistory(user);
     setSearchHistory(updated);
     console.log("Usuário selecionado:", searchHistory);

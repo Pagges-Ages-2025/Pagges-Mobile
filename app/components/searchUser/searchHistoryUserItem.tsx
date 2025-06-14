@@ -7,10 +7,11 @@ import {
 } from 'react-native';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
-import { User } from '../searchUser/SearchUser';
+import { UserSearchResult } from '@/app/models/UserSearchResult';
+
 
 interface Props {
-  user: User;
+  user: UserSearchResult;
   onDelete: () => void;
   isHistoryItem?: boolean;
   onSelect?: () => void;

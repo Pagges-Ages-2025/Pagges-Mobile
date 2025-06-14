@@ -9,9 +9,9 @@ import {
 } from "react-native";
 
 interface CustomUserProps {
-    name: string;
-    username: string;
-    profile_image: string;
+    name: string | null;
+    username: string | null;
+    profile_image: string | null;
     onPress: (event: GestureResponderEvent) => void;
 }
 
@@ -29,7 +29,7 @@ export default function CustomUser({
                 ) : (
                     <View style={styles.placeholderAvatar}>
                         <Text style={styles.placeholderText}>
-                            {username.charAt(0).toUpperCase()}
+                            {username?.charAt(0).toUpperCase()}
                         </Text>
                     </View>
                 )}

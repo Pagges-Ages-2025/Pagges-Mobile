@@ -1,14 +1,16 @@
 import React from 'react';
 import { FlatList, View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { SearchHistoryItem } from './searchHistoryUserItem';
-import { User } from '../searchUser/SearchUser';
+
 import { useTheme } from '../../context/ThemeContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { User } from '@/app/models/User';
+import { UserSearchResult } from '@/app/models/UserSearchResult';
 
 interface Props {
-  history: User[];
+  history: UserSearchResult[];
   onDeleteItem: (index: number) => void;
-  onSelectItem?: (user: User) => void;
+  onSelectItem?: (user: UserSearchResult) => void;
   onClearHistory?: () => void;
 }
 
