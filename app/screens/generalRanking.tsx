@@ -1,4 +1,3 @@
-// generalRanking.tsx
 import React, { useEffect, useState } from "react";
 import { Image, TouchableOpacity, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,11 +16,16 @@ export default function GeneralRanking() {
   const { theme } = useTheme();
   const [top3, setTop3] = useState<UserRanking[]>([]);
   const [outros7, setOutros7] = useState<UserRanking[]>([]);
+  const [topUsers, setTopUsers] = useState<{
+    firstRank: UserRanking;
+    secondRank: UserRanking;
+    thirdRank: UserRanking;
+  }>();
 
   const { fetchAndSplitRanking } = RankingService();
 
   const handleNavigation = () => {
-      router.back();
+    router.back();
   };
 
   useEffect(() => {
@@ -29,49 +33,41 @@ export default function GeneralRanking() {
       .then(({ top3, outros7 }) => {
         setTop3(top3);
         setOutros7(outros7);
+
+        if (top3.length >= 3) {
+          setTopUsers({
+            firstRank: top3[0],
+            secondRank: top3[1],
+            thirdRank: top3[2],
+          });
+        } else {
+          console.error("Top 3 incompleto.");
+        }
       })
       .catch((err) => {
         console.error("Erro ao carregar ranking:", err);
       });
   }, []);
 
-    const topUsers = {
-      firstRank: {
-        name: top3[0].name,
-        //image: top3[0].profile_image
-      },
-      secondRank: {
-        name: top3[1].name,
-        //image: top3[1].profile_image
-      },
-      thirdRank: {
-        name: top3[2].name,
-        //image: top3[2].profile_image
-      },
-    };
-
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.Background }]}
-    >
-      <ScrollView
-        style={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.Background }]}>
+      <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
-          <TouchableOpacity onPress={() => handleNavigation}>
-                  <Ionicons
-                    name="return-up-back-outline"
-                    size={30}
-                    color={theme.primaryText}
-                  />
-            </TouchableOpacity>
+          <TouchableOpacity onPress={handleNavigation}>
+            <Ionicons
+              name="return-up-back-outline"
+              size={30}
+              color={theme.primaryText}
+            />
+          </TouchableOpacity>
 
+          {topUsers && (
             <PodiumRanking
               firstRank={topUsers.firstRank}
               secondRank={topUsers.secondRank}
               thirdRank={topUsers.thirdRank}
             />
+          )}
 
           <View style={styles.rankingList}>
             {outros7.map((user) => (
@@ -116,9 +112,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 24,
   },
-  rankingList: {
-    gap: 14,
-  },
+rankingList: {
+  gap: 14,
+  marginTop: 24,
+},
   rankingItem: {
     alignItems: "center",
   },

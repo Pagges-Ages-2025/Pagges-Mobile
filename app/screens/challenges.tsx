@@ -35,34 +35,47 @@ export default function Challenges() {
     router.replace("/screens/generalRanking");
   };
 
+  const [topUsers, setTopUsers] = useState<{
+    firstRank: UserRanking;
+    secondRank: UserRanking;
+    thirdRank: UserRanking;
+  }>();
 
-    const { fetchAndSplitRanking } = RankingService();
 
-    useEffect(() => {
-      fetchAndSplitRanking()
-        .then(({ top3 }) => {
+  const { fetchAndSplitRanking, getMyRanking } = RankingService();
+  const [myRankingPosition, setMyRankingPosition] = useState<number | null>(null);
+
+
+  useEffect(() => {
+    fetchAndSplitRanking()
+      .then(({ top3 }) => {
+        if (top3.length >= 3) {
           setTop3(top3);
-        })
-        .catch((err) => {
-          console.error("Erro ao carregar ranking:", err);
-        });
+          setTopUsers({
+            firstRank: top3[0],
+            secondRank: top3[1],
+            thirdRank: top3[2],
+          });
+        } else {
+          console.error("Ranking precisa de ao menos 3 usuários.");
+        }
+      })
+      .catch((err) => {
+        console.error("Erro ao carregar ranking:", err);
+      });
+  }, []);
+
+  useEffect(() => {
+    const fetchMyRanking = async () => {
+      try {
+        const response = await getMyRanking();
+        setMyRankingPosition(response.position);
+      } catch (error) {
+        console.error("Erro ao buscar ranking pessoal:", error);
+      }
+    };
+      fetchMyRanking();
     }, []);
-  
-      const topUsers = {
-        firstRank: {
-          name: top3[0].name,
-          //image: top3[0].profile_image
-        },
-        secondRank: {
-          name: top3[1].name,
-          //image: top3[1].profile_image
-        },
-        thirdRank: {
-          name: top3[2].name,
-          //image: top3[2].profile_image
-        },
-      };
-  
 
   const animatePoints = (points: number) => {
     setEarnedPoints(points);
@@ -130,7 +143,7 @@ export default function Challenges() {
           />
           <View style={{ marginStart: 12, flex: 1 }}>
             <NunitoText style={styles.rankingLabel}>
-              {data?.ranking ? data.ranking : "xº"} lugar ranking geral
+              {myRankingPosition !== null ? `${myRankingPosition}º` : "xº"} lugar ranking geral
             </NunitoText>
             <View style={styles.pointsContainer}>
               <NunitoText style={[styles.points, { color: theme.primary }]}>
@@ -190,13 +203,16 @@ export default function Challenges() {
             Rankings
           </NunitoText>
 
-          <TouchableOpacity onPress={handleNavigateToRanking} activeOpacity={0.8}>
-            <PodiumRanking
-              firstRank={topUsers.firstRank}
-              secondRank={topUsers.secondRank}
-              thirdRank={topUsers.thirdRank}
-            />
-          </TouchableOpacity>
+          {topUsers && (
+            <TouchableOpacity onPress={handleNavigateToRanking} activeOpacity={0.8}>
+              <PodiumRanking
+                firstRank={topUsers.firstRank}
+                secondRank={topUsers.secondRank}
+                thirdRank={topUsers.thirdRank}
+              />
+            </TouchableOpacity>
+          )}
+
         </View>
       </ScrollView>
 
