@@ -1,33 +1,33 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  StyleSheet,
+  Animated,
   Dimensions,
   Image,
-  ScrollView,
-  Animated,
-  TouchableOpacity,
   NativeScrollEvent,
   NativeSyntheticEvent,
-} from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import pointImage from '../assets/images/level.png';
-import { Challange } from '../models/Challanges';
-import ChallangesAPI from '../services/challanges';
-import DailyChallenge from './DailyChallenge';
-import { useTheme } from '../context/ThemeContext';
-import Svg, { Path } from 'react-native-svg';
-import NunitoText from '../components/Texts/NunitoText';
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Svg, { Path } from "react-native-svg";
+import pointImage from "../assets/images/level.png";
+import NunitoText from "../components/Texts/NunitoText";
+import { useTheme } from "../context/ThemeContext";
+import { Challange } from "../models/Challanges";
+import ChallangesAPI from "../services/challanges";
+import DailyChallenge from "./DailyChallenge";
 
-import ActiveLevel from "../assets/images/activeLevel.png"
-import cloud from "../assets/images/cloud.png"
-import book1 from "../assets/images/background/book1.png"
-import book2 from "../assets/images/background/book2.png"
-import book3 from "../assets/images/background/book3.png"
-import book4 from "../assets/images/background/book4.png"
+import ActiveLevel from "../assets/images/activeLevel.png";
+import book1 from "../assets/images/background/book1.png";
+import book2 from "../assets/images/background/book2.png";
+import book3 from "../assets/images/background/book3.png";
+import book4 from "../assets/images/background/book4.png";
+import cloud from "../assets/images/cloud.png";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 const POINT_SIZE = 80;
 const CURVE_AMPLITUDE = 100;
 const POINTS_PER_SECTION = 4;
@@ -55,7 +55,7 @@ const Trilha = () => {
     setTimeout(() => {
       scrollViewRef.current?.scrollTo({
         y: totalHeight,
-        animated: false
+        animated: false,
       });
     }, 100);
   }, []);
@@ -64,7 +64,7 @@ const Trilha = () => {
     console.log("RESPOSTAS CORRETAS da trilha:", correctAnswers);
     console.log("Bloco atual:", currentBlock);
     console.log("Níveis mostrados:", startLevel, "até", endLevel);
-  }, [correctAnswers, currentBlock, startLevel, endLevel])
+  }, [correctAnswers, currentBlock, startLevel, endLevel]);
 
   // Função para calcular a posição X baseada na posição Y
   const calculateX = (y: number, totalHeight: number) => {
@@ -79,14 +79,15 @@ const Trilha = () => {
     const numBooks = 35; // Mais livros para preencher melhor
 
     for (let i = 0; i < numBooks; i++) {
-      const y = (i / numBooks) * totalHeight + Math.random() * (totalHeight / numBooks); // Distribui melhor verticalmente
+      const y =
+        (i / numBooks) * totalHeight + Math.random() * (totalHeight / numBooks); // Distribui melhor verticalmente
       const trailX = calculateX(y, totalHeight);
       const bookImage = books[Math.floor(Math.random() * books.length)];
-      
+
       // Criar diferentes "camadas" de profundidade
       const layer = Math.floor(Math.random() * 3); // 0, 1, 2 (fundo, meio, frente)
       let scale, baseSize;
-      
+
       switch (layer) {
         case 0: // Fundo - livros menores e mais transparentes
           scale = 0.6 + Math.random() * 0.3; // 0.6 - 0.9
@@ -104,18 +105,21 @@ const Trilha = () => {
           scale = 1.0;
           baseSize = { width: 120, height: 180 };
       }
-      
+
       // Posicionamento melhorado
       const isLeft = Math.random() > 0.5;
-      const safeDistance = 140 + (layer * 20); // Distância varia por camada
-      
+      const safeDistance = 140 + layer * 20; // Distância varia por camada
+
       let x;
       if (isLeft) {
         // Lado esquerdo - múltiplas zonas
         const zones = [
           { min: 15, max: width * 0.15 }, // Muito na borda
           { min: width * 0.05, max: width * 0.25 }, // Zona intermediária
-          { min: width * 0.1, max: Math.max(50, width / 2 + trailX - safeDistance) } // Próximo da trilha
+          {
+            min: width * 0.1,
+            max: Math.max(50, width / 2 + trailX - safeDistance),
+          }, // Próximo da trilha
         ];
         const zone = zones[Math.floor(Math.random() * zones.length)];
         x = zone.min + Math.random() * Math.max(20, zone.max - zone.min);
@@ -125,21 +129,26 @@ const Trilha = () => {
         const zones = [
           { min: minRightX, max: width * 0.75 }, // Próximo da trilha
           { min: width * 0.75, max: width * 0.9 }, // Zona intermediária
-          { min: width * 0.85, max: width - 15 } // Muito na borda
+          { min: width * 0.85, max: width - 15 }, // Muito na borda
         ];
-        
-        const validZones = zones.filter(zone => zone.min < zone.max);
+
+        const validZones = zones.filter((zone) => zone.min < zone.max);
         if (validZones.length > 0) {
-          const zone = validZones[Math.floor(Math.random() * validZones.length)];
+          const zone =
+            validZones[Math.floor(Math.random() * validZones.length)];
           x = zone.min + Math.random() * (zone.max - zone.min);
         } else {
           // Fallback para lado esquerdo
-          x = 15 + Math.random() * Math.max(20, width / 2 + trailX - safeDistance - 15);
+          x =
+            15 +
+            Math.random() *
+              Math.max(20, width / 2 + trailX - safeDistance - 15);
         }
       }
 
       const rotation = (Math.random() - 0.5) * 50; // Rotação mais variada
-      const opacity = layer === 0 ? 0.4 + Math.random() * 0.3 : 0.6 + Math.random() * 0.4;
+      const opacity =
+        layer === 0 ? 0.4 + Math.random() * 0.3 : 0.6 + Math.random() * 0.4;
 
       decorativeBooks.push({
         id: i,
@@ -164,14 +173,14 @@ const Trilha = () => {
   const generateTrailAndPoints = () => {
     const totalHeight = height * 10;
     const numPoints = 1000;
-    let path = '';
+    let path = "";
     let firstPoint = true;
     const points = [];
     const sections = 10;
 
     // Gerar pontos da trilha
     for (let i = 0; i < numPoints; i++) {
-      const y = totalHeight - (i * (totalHeight / numPoints));
+      const y = totalHeight - i * (totalHeight / numPoints);
       const x = calculateX(y, totalHeight);
 
       if (firstPoint) {
@@ -185,7 +194,8 @@ const Trilha = () => {
     // Gerar pontos de desafio (sempre 40 pontos, mas com números do bloco atual)
     for (let section = 0; section < sections; section++) {
       for (let i = 0; i < POINTS_PER_SECTION; i++) {
-        const y = totalHeight - (section * height + (height / POINTS_PER_SECTION) * i);
+        const y =
+          totalHeight - (section * height + (height / POINTS_PER_SECTION) * i);
         const x = calculateX(y, totalHeight);
         const positionInBlock = section * POINTS_PER_SECTION + i; // 0-39
         const levelNumber = startLevel + positionInBlock; // Número real do nível
@@ -202,18 +212,24 @@ const Trilha = () => {
   const handlePointPress = async (levelNumber: number) => {
     // Só permite acessar níveis que o usuário já desbloqueou
     if (levelNumber > correctAnswers + 1) {
-      console.log(`Nível ${levelNumber} ainda não desbloqueado. Máximo permitido: ${correctAnswers + 1}`);
+      console.log(
+        `Nível ${levelNumber} ainda não desbloqueado. Máximo permitido: ${correctAnswers + 1}`
+      );
       return;
     }
 
     try {
-      console.log(`Acessando nível ${levelNumber} do bloco ${currentBlock + 1}`);
+      console.log(
+        `Acessando nível ${levelNumber} do bloco ${currentBlock + 1}`
+      );
       try {
         const response = await ChallangesAPI().getCurrentChallange();
         setChallangeData(response);
         setShowChallange(true);
       } catch (error) {
-        console.warn(`Não foi possível buscar desafio do nível ${levelNumber}. Usando desafio atual.`);
+        console.warn(
+          `Não foi possível buscar desafio do nível ${levelNumber}. Usando desafio atual.`
+        );
         const currentChallenge = await ChallangesAPI().getCurrentChallange();
         setChallangeData(currentChallenge);
         setShowChallange(true);
@@ -230,7 +246,6 @@ const Trilha = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.Background }]}>
-
       <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
         <Ionicons name="arrow-back" size={24} color={theme.primaryText} />
       </TouchableOpacity>
@@ -260,22 +275,38 @@ const Trilha = () => {
                       { scale: book.scale },
                       {
                         translateY: scrollY.interpolate({
-                          inputRange: [book.y - height, book.y, book.y + height],
-                          outputRange: [10 + book.layer * 5, 0, 10 + book.layer * 5], // Movimento varia por camada
-                          extrapolate: 'clamp',
+                          inputRange: [
+                            book.y - height,
+                            book.y,
+                            book.y + height,
+                          ],
+                          outputRange: [
+                            10 + book.layer * 5,
+                            0,
+                            10 + book.layer * 5,
+                          ], // Movimento varia por camada
+                          extrapolate: "clamp",
                         }),
                       },
                     ],
                     opacity: scrollY.interpolate({
-                      inputRange: [book.y - height * 2, book.y, book.y + height * 2],
-                      outputRange: [book.opacity * 0.3, book.opacity, book.opacity * 0.3],
-                      extrapolate: 'clamp',
+                      inputRange: [
+                        book.y - height * 2,
+                        book.y,
+                        book.y + height * 2,
+                      ],
+                      outputRange: [
+                        book.opacity * 0.3,
+                        book.opacity,
+                        book.opacity * 0.3,
+                      ],
+                      extrapolate: "clamp",
                     }),
                   },
                 ]}
               >
-                <Image 
-                  source={book.image} 
+                <Image
+                  source={book.image}
                   style={[
                     styles.bookImage,
                     {
@@ -287,8 +318,8 @@ const Trilha = () => {
                         height: book.layer * 3,
                       },
                       shadowRadius: book.layer * 4,
-                    }
-                  ]} 
+                    },
+                  ]}
                 />
               </Animated.View>
             ))}
@@ -318,7 +349,9 @@ const Trilha = () => {
 
             {challengePoints.map((point, index) => {
               const isActiveLevel = point.levelNumber === correctAnswers + 1;
-              const currentPointImage = isActiveLevel ? ActiveLevel : pointImage;
+              const currentPointImage = isActiveLevel
+                ? ActiveLevel
+                : pointImage;
 
               return (
                 <Animated.View
@@ -331,9 +364,13 @@ const Trilha = () => {
                         { translateY: point.y - POINT_OFFSET },
                         {
                           scale: scrollY.interpolate({
-                            inputRange: [point.y - height, point.y, point.y + height],
+                            inputRange: [
+                              point.y - height,
+                              point.y,
+                              point.y + height,
+                            ],
                             outputRange: [0.8, 1, 0.8],
-                            extrapolate: 'clamp',
+                            extrapolate: "clamp",
                           }),
                         },
                       ],
@@ -345,15 +382,15 @@ const Trilha = () => {
                       source={currentPointImage}
                       style={[
                         styles.point,
-                        point.locked && styles.lockedPointImage
+                        point.locked && styles.lockedPointImage,
                       ]}
                     />
                     {point.levelNumber <= correctAnswers ? (
-                      <Ionicons 
-                        name="checkmark" 
-                        size={60} 
-                        color={theme.primary} 
-                        style={[styles.levelNumber, styles.checkIcon]} 
+                      <Ionicons
+                        name="checkmark"
+                        size={60}
+                        color={theme.primary}
+                        style={[styles.levelNumber, styles.checkIcon]}
                       />
                     ) : (
                       <NunitoText style={styles.levelNumber}>
@@ -382,7 +419,15 @@ const Trilha = () => {
       {challangeData && (
         <DailyChallenge
           visible={showChallange}
-          onClose={() => setShowChallange(false)}
+          onClose={(earnedPoints) => {
+            setShowChallange(false);
+            if (earnedPoints) {
+              router.push({
+                pathname: "/screens/challenges",
+                params: { earnedPoints: earnedPoints.toString() },
+              });
+            }
+          }}
           question={challangeData.question}
           alternatives={challangeData.alternatives}
           points={challangeData.points}
@@ -398,11 +443,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 65,
     left: 25,
     padding: 8,
-    zIndex: 9999
+    zIndex: 9999,
   },
   scrollView: {
     flex: 1,
@@ -423,43 +468,43 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   pointContainer: {
-    position: 'absolute',
+    position: "absolute",
     left: width / 2 - POINT_SIZE / 2,
   },
   pointWrapper: {
     width: POINT_SIZE,
     height: POINT_SIZE,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   point: {
     width: POINT_SIZE,
     height: POINT_SIZE,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   lockedPointImage: {
     opacity: 0.5,
   },
   levelNumber: {
-    position: 'absolute',
-    color: '#FFFFFF',
+    position: "absolute",
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   cloudImage: {
     width: 100,
     height: 50,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   bottomCloudContainer: {
-    position: 'absolute',
-    objectFit: 'contain',
+    position: "absolute",
+    objectFit: "contain",
     bottom: -260,
     left: 0,
     right: 0,
   },
   topCloudContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: -30,
     left: 0,
     right: 0,
@@ -467,23 +512,23 @@ const styles = StyleSheet.create({
   fullWidthCloud: {
     width: width,
     height: 250,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   decorativeBooksContainer: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 0,
   },
   decorativeBook: {
-    position: 'absolute',
+    position: "absolute",
   },
   bookImage: {
-    resizeMode: 'contain',
-    shadowColor: '#000',
+    resizeMode: "contain",
+    shadowColor: "#000",
   },
   checkIcon: {
     fontSize: 35,
-    position: 'absolute',
+    position: "absolute",
   },
 });
 
-export default Trilha; 
+export default Trilha;

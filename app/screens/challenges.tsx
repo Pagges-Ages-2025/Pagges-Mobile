@@ -1,6 +1,6 @@
 import { User } from "@/app/models/User";
-import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Animated,
   Image,
@@ -21,6 +21,7 @@ import { base64Uri } from "../utils/imageUtils";
 
 export default function Challenges() {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const [data, setData] = useState<User>();
   const [challangeData, setChallangeData] = useState<number>(0);
   const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
@@ -42,36 +43,58 @@ export default function Challenges() {
     null
   );
 
-  useEffect(() => {
-    fetchAndSplitRanking()
-      .then(({ top3 }) => {
-        if (top3.length >= 3) {
-          console.log("top3 secondRank:", top3[1]);
-          setTopUsers({
-            firstRank: top3[0],
-            secondRank: top3[1],
-            thirdRank: top3[2],
-          });
-        } else {
-          console.error("Ranking precisa de ao menos 3 usuários.");
+  // Handle earned points from navigation params
+  useFocusEffect(
+    useCallback(() => {
+      const earnedPointsParam = params.earnedPoints;
+      if (earnedPointsParam) {
+        const points = parseInt(earnedPointsParam as string);
+        if (!isNaN(points)) {
+          animatePoints(points);
+          // Clear the parameter after using it
+          router.setParams({ earnedPoints: undefined });
         }
-      })
-      .catch((err) => {
-        console.error("Erro ao carregar ranking:", err);
-      });
-  }, []);
-
-  useEffect(() => {
-    const fetchMyRanking = async () => {
-      try {
-        const response = await getMyRanking();
-        setMyRankingPosition(response.position);
-      } catch (error) {
-        console.error("Erro ao buscar ranking pessoal:", error);
       }
-    };
-    fetchMyRanking();
-  }, []);
+    }, [params.earnedPoints])
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchAllData = async () => {
+        try {
+          // Fetch profile and correct answers
+          const [profileResponse, correctsResponse] = await Promise.all([
+            UserAPI().getProfile(),
+            ChallangesAPI().getUserCorrects(),
+          ]);
+          setData(profileResponse);
+          setChallangeData(correctsResponse);
+          console.log("RESPOSTAS CORRETAS:", correctsResponse);
+
+          // Fetch ranking data
+          const { top3 } = await fetchAndSplitRanking();
+          if (top3.length >= 3) {
+            console.log("top3 secondRank:", top3[1]);
+            setTopUsers({
+              firstRank: top3[0],
+              secondRank: top3[1],
+              thirdRank: top3[2],
+            });
+          } else {
+            console.error("Ranking precisa de ao menos 3 usuários.");
+          }
+
+          // Fetch personal ranking
+          const myRankingResponse = await getMyRanking();
+          setMyRankingPosition(myRankingResponse.position);
+        } catch (error) {
+          console.error("Erro ao carregar dados:", error);
+        }
+      };
+
+      fetchAllData();
+    }, [])
+  );
 
   const animatePoints = (points: number) => {
     setEarnedPoints(points);
@@ -97,23 +120,6 @@ export default function Challenges() {
       setEarnedPoints(null);
     });
   };
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const [profileResponse, correctsResponse] = await Promise.all([
-          UserAPI().getProfile(),
-          ChallangesAPI().getUserCorrects(),
-        ]);
-        setData(profileResponse);
-        setChallangeData(correctsResponse);
-        console.log("RESPOSTAS CORRETAS:", correctsResponse);
-      } catch (error) {
-        console.error("Erro ao buscar perfil:", error);
-      }
-    };
-    fetchProfile();
-  }, []);
 
   const handleButtonPress = () => {
     router.push({
@@ -143,7 +149,7 @@ export default function Challenges() {
           <View style={{ marginStart: 12, flex: 1 }}>
             <NunitoText style={styles.rankingLabel}>
               {myRankingPosition !== null ? `${myRankingPosition}º` : "xº"}{" "}
-              lugar ranking geral
+              lugar no ranking geral
             </NunitoText>
             <View style={styles.pointsContainer}>
               <NunitoText style={[styles.points, { color: theme.primary }]}>
@@ -183,19 +189,11 @@ export default function Challenges() {
             <NunitoText
               style={[styles.dailyButtonText, { color: theme.white }]}
             >
-              Desafio diário
+              Perguntas Diárias
             </NunitoText>
           </TouchableOpacity>
         </View>
 
-        {/* We don't have information for the next two times, but when we do, just put it here. */}
-        <View style={styles.section}>
-          <NunitoText
-            style={[styles.sectionTitle, { color: theme.primaryText }]}
-          >
-            Perguntas Diárias
-          </NunitoText>
-        </View>
         <View style={styles.section}>
           <NunitoText
             style={[styles.sectionTitle, { color: theme.primaryText }]}
