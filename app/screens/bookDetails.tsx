@@ -5,14 +5,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   ImageBackground,
   Modal,
-  Platform,
   ScrollView,
   StyleSheet,
-  Text,
-  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -94,44 +90,16 @@ export default function ModalBookDetails({
         bookId,
         state
       );
-
-      if (response.status === 200) {
-        console.log(`Adicionado a ${state} da biblioteca pessoal`);
-        if (Platform.OS === "android") {
-          ToastAndroid.show(
-            `Livro adicionado com sucesso à sua biblioteca`,
-            ToastAndroid.SHORT
-          );
-        } else {
-          Alert.alert(
-            "Sucesso",
-            `Livro adicionado com sucesso à sua biblioteca`
-          );
-        }
-      } else {
-        console.error(`Erro ao adicionar livro com estado ${state}:`);
-        if (Platform.OS === "android") {
-          ToastAndroid.show(
-            "Erro ao adicionar livro à biblioteca",
-            ToastAndroid.SHORT
-          );
-        } else {
-          Alert.alert(
-            "Erro",
-            "Não foi possível adicionar o livro à biblioteca"
-          );
-        }
+      if (response.status === 201) {
+        console.log(
+          `Atualizado o estado dolivro para ${state} da biblioteca pessoal`,
+          {
+            data: response.data,
+          }
+        );
       }
     } catch (error) {
-      console.error(`Erro ao adicionar livro (${state}):`, error);
-      if (Platform.OS === "android") {
-        ToastAndroid.show(
-          "Erro ao adicionar livro à biblioteca",
-          ToastAndroid.SHORT
-        );
-      } else {
-        Alert.alert("Erro", "Não foi possível adicionar o livro à biblioteca");
-      }
+      console.log(`Erro ao adicionar livro (${state}):`, error);
     }
   };
 
@@ -283,7 +251,7 @@ export default function ModalBookDetails({
                     size="small"
                     type={"primary"}
                     fullWidth={false}
-                    width={"50%"}
+                    width={"37%"}
                     height={25}
                   />
                   <TouchableOpacity onPress={handleShare}>
