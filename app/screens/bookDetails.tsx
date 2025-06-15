@@ -251,7 +251,7 @@ export default function ModalBookDetails({
                     size="small"
                     type={"primary"}
                     fullWidth={false}
-                    width={"37%"}
+                    width={"50%"}
                     height={25}
                   />
                   <TouchableOpacity onPress={handleShare}>
