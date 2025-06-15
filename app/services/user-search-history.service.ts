@@ -30,7 +30,6 @@ export const addUserToSearchHistory = async (user: UserSearchResult): Promise<Us
     const filtered = current.filter(u => u.id !== user.id);
     const updated = [user, ...filtered].slice(0, MAX_HISTORY_ITEMS);
     await saveUserSearchHistory(updated);
-    console.log("Histórico salvo:", updated);
     return updated;
   } catch (err) {
     console.error('Erro ao adicionar usuário ao histórico:', err);

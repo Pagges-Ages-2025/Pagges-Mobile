@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, SafeAreaView, StyleSheet, Text } from "react-native";
+import { View, StyleSheet } from "react-native";
 import UserSearch from "../components/searchUser/SearchUser";
 import { useTheme } from "../context/ThemeContext";
 import {
@@ -8,9 +8,9 @@ import {
   removeUserFromSearchHistory,
   clearUserSearchHistory,
 } from "../services/user-search-history.service";
-import { SearchUserHistoryList } from "../components/searchUser/searchHistoryUserList";
 import { UserSearchResult } from "../models/UserSearchResult";
 import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const SearchSocialPage: React.FC = () => {
   const { theme } = useTheme();
@@ -25,19 +25,16 @@ const SearchSocialPage: React.FC = () => {
   }, []);
 
   const handleSelectHistoryItem = async (user: UserSearchResult) => {
-    console.log("Item de histórico selecionado:", user);
     await handleSelectUser(user);
     router.push({
       pathname: "/screens/thirdPersonProfile",
       params: { username: user.username },
     });
-    console.log("Item de histórico selecionado:");
   };
 
   const handleSelectUser = async (user: UserSearchResult) => {
     const updated = await addUserToSearchHistory(user);
     setSearchHistory(updated);
-    console.log("Usuário selecionado:", updated);
   };
 
   const handleDeleteHistoryItem = async (index: number) => {
