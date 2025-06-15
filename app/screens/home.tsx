@@ -128,7 +128,10 @@ const Home: React.FC = () => {
     >
       <ScrollView>
         <View style={styles.content}>
-          <StaticSearchBar />
+          <StaticSearchBar 
+          toRoute="/screens/searchPage"
+          placeholder="Buscar Livro..."
+          />
 
           <View style={styles.carouselContainer}>
             <HomeCarouselSection route={"/screens/home"} cards={mockCards} />

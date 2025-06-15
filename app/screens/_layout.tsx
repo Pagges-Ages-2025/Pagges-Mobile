@@ -110,6 +110,7 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
             <Stack.Screen name="configuration" />
             <Stack.Screen name="social" />
             <Stack.Screen name="followers" />
+            <Stack.Screen name="searchSocialPage"/>
           </Stack>
           {!removeNavbarFromPageList.includes(pathname) && <NavBar />}
         </View>
