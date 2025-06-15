@@ -1,13 +1,12 @@
 import { Stack, usePathname, useRouter } from "expo-router";
-import { ThemeProvider, useTheme } from "../context/ThemeContext";
+import React from "react";
+import { StatusBar, View } from "react-native";
 import {
   GestureHandlerRootView,
   LongPressGestureHandler,
 } from "react-native-gesture-handler";
-import React from "react";
-import { StatusBar, View } from "react-native";
 import NavBar from "../components/Nav/NavBar";
-import { Redirect } from "expo-router";
+import { ThemeProvider, useTheme } from "../context/ThemeContext";
 
 export default function ScreensLayout() {
   const router = useRouter();
@@ -53,6 +52,7 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
     "/screens/book",
     "/screens/favoriteGenre",
     "/screens/createReviewComment",
+    "/screens/trilha",
   ];
 
   const { themeName } = useTheme();
@@ -109,6 +109,7 @@ function InnerLayout({ onLongPress }: { onLongPress: (e: any) => void }) {
             <Stack.Screen name="createReviewComment" />
             <Stack.Screen name="configuration" />
             <Stack.Screen name="social" />
+            <Stack.Screen name="trilha" />
             <Stack.Screen name="followers" />
             <Stack.Screen name="searchSocialPage" />
             <Stack.Screen name="generalRanking" />
