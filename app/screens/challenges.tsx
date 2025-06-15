@@ -209,18 +209,21 @@ export default function Challenges() {
               <PodiumRanking
                 firstRank={{
                   name: topUsers.firstRank.name,
+                  username: topUsers.firstRank.username,
                   image: topUsers.firstRank.profile_image
                     ? base64Uri(topUsers.firstRank.profile_image)
                     : undefined,
                 }}
                 secondRank={{
                   name: topUsers.secondRank.name,
+                  username: topUsers.secondRank.username,
                   image: topUsers.secondRank.profile_image
                     ? base64Uri(topUsers.secondRank.profile_image)
                     : undefined,
                 }}
                 thirdRank={{
                   name: topUsers.thirdRank.name,
+                  username: topUsers.thirdRank.username,
                   image: topUsers.thirdRank.profile_image
                     ? base64Uri(topUsers.thirdRank.profile_image)
                     : undefined,

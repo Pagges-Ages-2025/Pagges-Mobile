@@ -2,6 +2,7 @@ import axiosInstance from "./axios-instance-singleton";
 
 export interface UserRanking {
   position: number;
+  username: string;
   name: string;
   profile_image: string | null;
   points: number;

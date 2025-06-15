@@ -7,7 +7,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
 import { base64Uri } from "../utils/imageUtils";
 import profileUser from "../assets/images/profile-user.png";
@@ -55,6 +54,13 @@ export default function GeneralRanking() {
       });
   }, []);
 
+  const handleUserPress = (username: string) => {
+    router.push({
+      pathname: "/screens/thirdPersonProfile",
+      params: { username },
+    });
+  };
+
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.Background }]}
@@ -76,28 +82,37 @@ export default function GeneralRanking() {
             <PodiumRanking
               firstRank={{
                 name: topUsers.firstRank.name,
+                username: topUsers.firstRank.username,
                 image: topUsers.firstRank.profile_image
                   ? base64Uri(topUsers.firstRank.profile_image)
                   : undefined,
               }}
               secondRank={{
                 name: topUsers.secondRank.name,
+                username: topUsers.secondRank.username,
                 image: topUsers.secondRank.profile_image
                   ? base64Uri(topUsers.secondRank.profile_image)
                   : undefined,
               }}
               thirdRank={{
                 name: topUsers.thirdRank.name,
+                username: topUsers.thirdRank.username,
                 image: topUsers.thirdRank.profile_image
                   ? base64Uri(topUsers.thirdRank.profile_image)
                   : undefined,
               }}
+              pressEnabled={true}
+              onUserPress={handleUserPress}
             />
           )}
 
           <View style={styles.rankingList}>
             {outros7.map((user) => (
-              <View style={styles.rankingItem} key={user.name}>
+              <TouchableOpacity
+                onPress={() => handleUserPress(user.username)}
+                style={styles.rankingItem}
+                key={user.name}
+              >
                 <RankingPlaceCard
                   position={user.position}
                   name={user.name}
@@ -107,7 +122,7 @@ export default function GeneralRanking() {
                       : Image.resolveAssetSource(profileUser).uri
                   }
                 />
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         </View>
