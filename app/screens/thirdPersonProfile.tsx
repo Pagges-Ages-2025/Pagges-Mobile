@@ -110,7 +110,7 @@ export default function ThirdPersonProfileScreen() {
             kmLidos={stats.readKms}
             livros={stats.readBooks}
             ranking={data?.ranking_position || 0}
-            seguidores={data?.friendsNumber || 0}
+            seguidores={offSetFollowers}
             onSeguidoresClick={() => {
               router.push({
                 pathname: "/screens/followers",
