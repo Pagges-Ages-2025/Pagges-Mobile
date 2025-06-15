@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Image, TouchableOpacity, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
@@ -50,8 +56,13 @@ export default function GeneralRanking() {
   }, []);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.Background }]}>
-      <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.Background }]}
+    >
+      <ScrollView
+        style={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.section}>
           <TouchableOpacity onPress={handleNavigation}>
             <Ionicons
@@ -63,9 +74,24 @@ export default function GeneralRanking() {
 
           {topUsers && (
             <PodiumRanking
-              firstRank={topUsers.firstRank}
-              secondRank={topUsers.secondRank}
-              thirdRank={topUsers.thirdRank}
+              firstRank={{
+                name: topUsers.firstRank.name,
+                image: topUsers.firstRank.profile_image
+                  ? base64Uri(topUsers.firstRank.profile_image)
+                  : undefined,
+              }}
+              secondRank={{
+                name: topUsers.secondRank.name,
+                image: topUsers.secondRank.profile_image
+                  ? base64Uri(topUsers.secondRank.profile_image)
+                  : undefined,
+              }}
+              thirdRank={{
+                name: topUsers.thirdRank.name,
+                image: topUsers.thirdRank.profile_image
+                  ? base64Uri(topUsers.thirdRank.profile_image)
+                  : undefined,
+              }}
             />
           )}
 
@@ -112,10 +138,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 24,
   },
-rankingList: {
-  gap: 14,
-  marginTop: 24,
-},
+  rankingList: {
+    gap: 14,
+    marginTop: 24,
+  },
   rankingItem: {
     alignItems: "center",
   },

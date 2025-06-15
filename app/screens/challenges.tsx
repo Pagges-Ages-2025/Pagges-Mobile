@@ -28,11 +28,10 @@ export default function Challenges() {
   const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const { theme } = useTheme();
-  const [top3, setTop3] = useState<UserRanking[]>([]);
   const router = useRouter();
 
   const handleNavigateToRanking = () => {
-    router.replace("/screens/generalRanking");
+    router.push("/screens/generalRanking");
   };
 
   const [topUsers, setTopUsers] = useState<{
@@ -41,16 +40,16 @@ export default function Challenges() {
     thirdRank: UserRanking;
   }>();
 
-
   const { fetchAndSplitRanking, getMyRanking } = RankingService();
-  const [myRankingPosition, setMyRankingPosition] = useState<number | null>(null);
-
+  const [myRankingPosition, setMyRankingPosition] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     fetchAndSplitRanking()
       .then(({ top3 }) => {
         if (top3.length >= 3) {
-          setTop3(top3);
+          console.log("top3 secondRank:", top3[1]);
           setTopUsers({
             firstRank: top3[0],
             secondRank: top3[1],
@@ -74,8 +73,8 @@ export default function Challenges() {
         console.error("Erro ao buscar ranking pessoal:", error);
       }
     };
-      fetchMyRanking();
-    }, []);
+    fetchMyRanking();
+  }, []);
 
   const animatePoints = (points: number) => {
     setEarnedPoints(points);
@@ -143,7 +142,8 @@ export default function Challenges() {
           />
           <View style={{ marginStart: 12, flex: 1 }}>
             <NunitoText style={styles.rankingLabel}>
-              {myRankingPosition !== null ? `${myRankingPosition}º` : "xº"} lugar ranking geral
+              {myRankingPosition !== null ? `${myRankingPosition}º` : "xº"}{" "}
+              lugar ranking geral
             </NunitoText>
             <View style={styles.pointsContainer}>
               <NunitoText style={[styles.points, { color: theme.primary }]}>
@@ -204,15 +204,32 @@ export default function Challenges() {
           </NunitoText>
 
           {topUsers && (
-            <TouchableOpacity onPress={handleNavigateToRanking} activeOpacity={0.8}>
+            <TouchableOpacity
+              onPress={handleNavigateToRanking}
+              activeOpacity={0.8}
+            >
               <PodiumRanking
-                firstRank={topUsers.firstRank}
-                secondRank={topUsers.secondRank}
-                thirdRank={topUsers.thirdRank}
+                firstRank={{
+                  name: topUsers.firstRank.name,
+                  image: topUsers.firstRank.profile_image
+                    ? base64Uri(topUsers.firstRank.profile_image)
+                    : undefined,
+                }}
+                secondRank={{
+                  name: topUsers.secondRank.name,
+                  image: topUsers.secondRank.profile_image
+                    ? base64Uri(topUsers.secondRank.profile_image)
+                    : undefined,
+                }}
+                thirdRank={{
+                  name: topUsers.thirdRank.name,
+                  image: topUsers.thirdRank.profile_image
+                    ? base64Uri(topUsers.thirdRank.profile_image)
+                    : undefined,
+                }}
               />
             </TouchableOpacity>
           )}
-
         </View>
       </ScrollView>
 
