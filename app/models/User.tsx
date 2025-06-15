@@ -3,6 +3,7 @@ import { Genre } from "./Genre";
 export class User {
   id: number;
   name: string;
+  username: string;
   biography: string;
   favoriteGenres: Genre[];
   readKm: number;
@@ -17,6 +18,7 @@ export class User {
   constructor() {
     this.id = 0;
     this.name = "";
+    this.username = "";
     this.biography = "";
     this.favoriteGenres = [];
     this.readKm = 0;

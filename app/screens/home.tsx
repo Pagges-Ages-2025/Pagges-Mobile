@@ -1,5 +1,5 @@
-import { router } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,8 +13,6 @@ import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
 import { Genre } from "../models/Genre";
 import BooksService from "../services/booksService";
-import { retriveUserGenres } from "../services/genres.service";
-import SearchAPI from "../services/googleAPIService";
 import { retriveAllGenres } from "../services/genres.service";
 import ModalBookDetails from "./bookDetails";
 
@@ -29,9 +27,7 @@ const Home: React.FC = () => {
   const { getTrendingBooks, getFavoriteBasedBooks } = BooksService();
   const [trendingBooks, setTradingBooks] = useState<Book[]>();
   const [genreBasedBook, setGenreBasedBook] = useState<Book[]>();
-  const [selectedBook, setSelectedBook] = useState<Book | null>(
-    null
-  );
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingGenreBasedBooks, setLoadingGenreBasedBooks] = useState(false);
@@ -89,22 +85,7 @@ const Home: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    setIsMounted(true);
-    fetchTrendingBooks();
-    fetchGenres();
-
-    return () => {
-      setIsMounted(false);
-    };
-  }, [fetchTrendingBooks, fetchGenres]);
-
-    const handleSelectFavoriteBasedBook = (book: Book) => {
-    setSelectedBook(book);
-    setModalVisible(true);
-  };
-
-    const fetchFavoriteBasedBooks = useCallback(async () => {
+  const fetchFavoriteBasedBooks = useCallback(async () => {
     setLoadingGenreBasedBooks(true);
     try {
       const results = await getFavoriteBasedBooks();
@@ -117,10 +98,23 @@ const Home: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    fetchTrendingBooks();
-    fetchFavoriteBasedBooks();
-  }, [fetchTrendingBooks, fetchFavoriteBasedBooks]);
+  useFocusEffect(
+    useCallback(() => {
+      setIsMounted(true);
+      fetchTrendingBooks();
+      fetchGenres();
+      fetchFavoriteBasedBooks();
+
+      return () => {
+        setIsMounted(false);
+      };
+    }, [fetchTrendingBooks, fetchGenres, fetchFavoriteBasedBooks])
+  );
+
+  const handleSelectFavoriteBasedBook = (book: Book) => {
+    setSelectedBook(book);
+    setModalVisible(true);
+  };
 
   return (
     <SafeAreaView
@@ -128,7 +122,10 @@ const Home: React.FC = () => {
     >
       <ScrollView>
         <View style={styles.content}>
-          <StaticSearchBar />
+          <StaticSearchBar 
+          toRoute="/screens/searchPage"
+          placeholder="Buscar Livro..."
+          />
 
           <View style={styles.carouselContainer}>
             <HomeCarouselSection route={"/screens/home"} cards={mockCards} />
@@ -215,31 +212,29 @@ const Home: React.FC = () => {
               <ActivityIndicator size="large" color={theme.primary} />
             </View>
           ) : genreBasedBook && genreBasedBook.length > 0 ? (
-            
-            
-          <CustomCarousel
-            isHorizontal
-            data={
-              genreBasedBook
-                ? genreBasedBook.map((book) => (
-                    <CustomBook
-                      size="small"
-                      key={book.id}
-                      bookId={book.id}
-                      photoPath={book.capa}
-                      title={book.titulo}
-                      author={book.autores.join(", ")}
-                      onPress={() => handleSelectFavoriteBasedBook(book)}
-                    />
-                  ))
-                : []
-            }
-          />
-        ) : (
-          <NunitoText style={{ color: theme.secondaryText }}>
-            Nenhum livro encontrado para os gêneros favoritos.
-          </NunitoText>
-        )}
+            <CustomCarousel
+              isHorizontal
+              data={
+                genreBasedBook
+                  ? genreBasedBook.map((book) => (
+                      <CustomBook
+                        size="small"
+                        key={book.id}
+                        bookId={book.id}
+                        photoPath={book.capa}
+                        title={book.titulo}
+                        author={book.autores.join(", ")}
+                        onPress={() => handleSelectFavoriteBasedBook(book)}
+                      />
+                    ))
+                  : []
+              }
+            />
+          ) : (
+            <NunitoText style={{ color: theme.secondaryText }}>
+              Nenhum livro encontrado para os gêneros favoritos.
+            </NunitoText>
+          )}
         </View>
 
         {selectedBook && (
@@ -250,29 +245,20 @@ const Home: React.FC = () => {
             pages={selectedBook.paginas || 0}
             synopsis={selectedBook.sinopse || "Sinopse não disponível"}
             review="Sem avaliações disponíveis ainda."
-            authors={
-              selectedBook.autores?.join(", ") || "Autor desconhecido"
-            }
+            authors={selectedBook.autores?.join(", ") || "Autor desconhecido"}
             year={
-              selectedBook.anoDePublicacao?.substring(0, 4) ||
-              "Desconhecido"
+              selectedBook.anoDePublicacao?.substring(0, 4) || "Desconhecido"
             }
             id={selectedBook.id?.toString() || "0"}
-            genre={
-              selectedBook.generos?.[0] || "Gênero não especificado"
-            }
+            genre={selectedBook.generos?.[0] || "Gênero não especificado"}
             google_image_url={selectedBook.capa || ""}
             onCreateReview={() =>
               console.log("Criar resenha para:", selectedBook.titulo)
             }
-            onShare={() =>
-              console.log("Compartilhar:", selectedBook.titulo)
-            }
+            onShare={() => console.log("Compartilhar:", selectedBook.titulo)}
             bookId={selectedBook.id}
           />
         )}
-
-
       </ScrollView>
     </SafeAreaView>
   );

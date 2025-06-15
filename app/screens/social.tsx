@@ -19,7 +19,10 @@ const Social: React.FC = () => {
       <ScrollView>
         <View style={styles.content}>
           <NunitoText style={[styles.title, { color: theme.primary }]}>Pagges</NunitoText>
-          <StaticSearchBar />
+          <StaticSearchBar
+          toRoute="/screens/searchSocialPage"
+          placeholder="Pesquisar leitores..."
+          />
           <View style={styles.selectionContainer}>
          <SelectionButton
             title="Para você"
