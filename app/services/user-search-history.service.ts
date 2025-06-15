@@ -8,7 +8,7 @@ const MAX_HISTORY_ITEMS = 5;
 export const saveUserSearchHistory = async (history: UserSearchResult[]): Promise<void> => {
   try {
     const limited = history.slice(0, MAX_HISTORY_ITEMS);
-    await AsyncStorage.setItem(USER_SEARCH_HISTORY_KEY, JSON.stringify([limited]));
+    await AsyncStorage.setItem(USER_SEARCH_HISTORY_KEY, JSON.stringify(limited));
   } catch (err) {
     console.error('Erro ao salvar histórico de usuários:', err);
   }
