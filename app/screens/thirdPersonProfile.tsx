@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import Biography from "../components/Biography/Biography";
 import ProfileHeader from "../components/Profile/ProfileHeader";
 import UserStats from "../components/UserStats/UserStats";
@@ -12,6 +12,7 @@ import { base64Uri } from "../utils/imageUtils";
 import Achievement from "../components/Achievements/Achievement";
 import { Genre } from "../models/Genre";
 import SocialAPI from "../services/socialService";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function ThirdPersonProfileScreen() {
   const [data, setData] = useState<User>();
@@ -89,6 +90,15 @@ export default function ThirdPersonProfileScreen() {
       style={[styles.container, { backgroundColor: theme.Background }]}
       showsVerticalScrollIndicator={false}
     >
+      <TouchableOpacity style={styles.backButton}>
+        <Ionicons
+          name="return-up-back-outline"
+          size={30}
+          color={theme.black}
+          onPress={router.back}
+        />
+      </TouchableOpacity>
+
       <View style={[styles.content, { backgroundColor: theme.Background }]}>
         <ProfileHeader
           marginStart={30}
@@ -135,6 +145,12 @@ export default function ThirdPersonProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+  backButton: {
+    position: "absolute",
+    left: 20,
+    top: 40,
+    zIndex: 1000,
+  },
   achievementContainer: {
     marginBottom: 20,
     marginHorizontal: 30,
