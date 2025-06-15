@@ -122,9 +122,9 @@ const Home: React.FC = () => {
     >
       <ScrollView>
         <View style={styles.content}>
-          <StaticSearchBar 
-          toRoute="/screens/searchPage"
-          placeholder="Buscar Livro..."
+          <StaticSearchBar
+            toRoute="/screens/searchPage"
+            placeholder="Buscar Livro..."
           />
 
           <View style={styles.carouselContainer}>
@@ -252,9 +252,33 @@ const Home: React.FC = () => {
             id={selectedBook.id?.toString() || "0"}
             genre={selectedBook.generos?.[0] || "Gênero não especificado"}
             google_image_url={selectedBook.capa || ""}
-            onCreateReview={() =>
-              console.log("Criar resenha para:", selectedBook.titulo)
-            }
+            onCreateReview={() => {
+              // Fecha o modal e depois navega para a tela de criação
+              handleCloseModal();
+
+              // Dados do livro para passar para a tela de criação
+              const bookData = {
+                bookId: selectedBook.id?.toString() || "0",
+                bookTitle: selectedBook.titulo,
+                bookAuthors:
+                  selectedBook.autores?.join(", ") || "Autor desconhecido",
+                bookCover: selectedBook.capa || "",
+              };
+
+              // Navega após um pequeno atraso para garantir que o modal foi fechado
+              setTimeout(() => {
+                console.log(
+                  "SearchPage - Navegando para criação de resenha com:",
+                  bookData
+                );
+
+                // Usar router.replace para garantir uma navegação limpa
+                router.replace({
+                  pathname: "/screens/createReviewComment",
+                  params: bookData,
+                });
+              }, 500);
+            }}
             onShare={() => console.log("Compartilhar:", selectedBook.titulo)}
             bookId={selectedBook.id}
           />

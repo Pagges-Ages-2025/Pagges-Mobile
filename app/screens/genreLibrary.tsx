@@ -132,7 +132,7 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
             styles.headerTitle,
             {
               color: theme.quinaryText,
-              zIndex: 1
+              zIndex: 1,
             },
           ]}
         >
@@ -228,18 +228,43 @@ const Library: React.FC<LibraryProps> = ({ onClose, pageIndex = 0 }) => {
                 review="Sem avaliações disponíveis ainda."
                 authors={selectedBook.authors || "Autor desconhecido"}
                 year={
-                  selectedBook.year ? String(selectedBook.year).substring(0,4) : "Desconhecido"
+                  selectedBook.year
+                    ? String(selectedBook.year).substring(0, 4)
+                    : "Desconhecido"
                 }
                 id={selectedBook.book_id?.toString() || "0"}
                 genre={
-                 Array.isArray(params.genreName)
+                  Array.isArray(params.genreName)
                     ? params.genreName[0]
                     : params.genreName || "Gênero não especificado"
                 }
                 google_image_url={selectedBook.google_image_url || ""}
-                onCreateReview={() =>
-                  console.log("Criar resenha para:", selectedBook.title)
-                }
+                onCreateReview={() => {
+                  // Fecha o modal e depois navega para a tela de criação
+                  handleCloseModal();
+
+                  // Dados do livro para passar para a tela de criação
+                  const bookData = {
+                    bookId: selectedBook.book_id?.toString() || "0",
+                    bookTitle: selectedBook.title,
+                    bookAuthors: selectedBook.authors || "Autor desconhecido",
+                    bookCover: selectedBook.google_image_url || "",
+                  };
+
+                  // Navega após um pequeno atraso para garantir que o modal foi fechado
+                  setTimeout(() => {
+                    console.log(
+                      "SearchPage - Navegando para criação de resenha com:",
+                      bookData
+                    );
+
+                    // Usar router.replace para garantir uma navegação limpa
+                    router.replace({
+                      pathname: "/screens/createReviewComment",
+                      params: bookData,
+                    });
+                  }, 500);
+                }}
                 onShare={() => console.log("Compartilhar:", selectedBook.title)}
                 bookId={selectedBook.book_id}
               />

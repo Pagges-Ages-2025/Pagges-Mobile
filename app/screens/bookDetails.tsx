@@ -258,7 +258,7 @@ export default function ModalBookDetails({
                   flexDirection: "row",
                   alignItems: "center",
                   width: "100%",
-                  marginBottom: 45
+                  marginBottom: 45,
                 }}
               >
                 <TouchableOpacity onPress={handleBackPress}>
@@ -268,20 +268,28 @@ export default function ModalBookDetails({
                     color={theme.white}
                   />
                 </TouchableOpacity>
-                <View style={{ flex: 1, flexDirection: "row", display: "flex", gap: 20, justifyContent: "flex-end" }} >
-                <CustomButton
-                  title="Criar Resenha"
-                  onPress={handleCreateReview}
-                  size="small"
-                  type={"primary"}
-                  fullWidth={false}
-                  width={"37%"}
-                  height={25}
-                />
-                <TouchableOpacity onPress={handleShare}>
-                  <AntDesign name="export" size={24} color={theme.white} />
-                </TouchableOpacity>
-              </View>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    display: "flex",
+                    gap: 20,
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  <CustomButton
+                    title="Criar Resenha"
+                    onPress={handleCreateReview}
+                    size="small"
+                    type={"primary"}
+                    fullWidth={false}
+                    width={"50%"}
+                    height={25}
+                  />
+                  <TouchableOpacity onPress={handleShare}>
+                    <AntDesign name="export" size={24} color={theme.white} />
+                  </TouchableOpacity>
+                </View>
               </View>
 
               <NunitoText style={[styles.title, { color: theme.white }]}>
