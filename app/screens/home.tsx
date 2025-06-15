@@ -128,7 +128,7 @@ const Home: React.FC = () => {
           />
 
           <View style={styles.carouselContainer}>
-            <HomeCarouselSection route={"/screens/home"} cards={mockCards} />
+            <HomeCarouselSection route={"/screens/challenges"} cards={mockCards} />
           </View>
 
           <NunitoText
