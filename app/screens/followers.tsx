@@ -13,8 +13,6 @@ import { UserFollower } from "../models/UserFollower";
 import SocialService from "../services/socialService";
 import { FlatList } from "react-native-gesture-handler";
 import { base64Uri } from "../utils/imageUtils";
-// tratar o botao no click - testar abrindo o perfil de outra pessoa.
-// abrir perfil do seguidor ao clicar nele?
 
 const Followers: React.FC = () => {
   const { otherUserId } = useLocalSearchParams();
