@@ -1,22 +1,22 @@
+import Strings from "@/app/constants/Strings";
+import { Genre } from "@/app/models/Genre";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
-  View,
-  StyleSheet,
   Image,
   ImageBackground,
+  StyleSheet,
   TextStyle,
   TouchableOpacity,
+  View,
 } from "react-native";
-import NunitoText from "../Texts/NunitoText";
-import { useTheme } from "../../context/ThemeContext";
-import VerifiedIcon from "../../assets/images/ic_verified.svg";
-import Strings from "@/app/constants/Strings";
-import DefaultProfileHeaderImage from "../../assets/images/default_profile_header_image.png";
-import { Ionicons } from "@expo/vector-icons";
-import profileUser from "../../assets/images/profile-user.png";
-import { Genre } from "@/app/models/Genre";
-import CustomButton from "../Buttons/CustomButton";
 import { SafeAreaView } from "react-native-safe-area-context";
+import DefaultProfileHeaderImage from "../../assets/images/default_profile_header_image.png";
+import VerifiedIcon from "../../assets/images/ic_verified.svg";
+import profileUser from "../../assets/images/profile-user.png";
+import { useTheme } from "../../context/ThemeContext";
+import CustomButton from "../Buttons/CustomButton";
+import NunitoText from "../Texts/NunitoText";
 interface ProfileHeaderProps {
   marginStart: number;
   profileImageUrl?: string;
@@ -53,7 +53,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   onPressCameraIcon,
   onPressEditGenres,
 }) => {
-  const { theme } = useTheme();
+  const { theme, themeName } = useTheme();
   const colorsBackground = ["#9E0E53AA", "#F4D06F", "#388383C7"];
   const colorsLabel = ["#FFFFFF", "#000000", "#FFFFFF"];
 
@@ -169,13 +169,77 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 </View>
               )}
             </TouchableOpacity>
-
+            <View
+              style={{
+                flex: 1,
+                marginLeft: 16,
+                marginTop: 134,
+                flexDirection: "row",
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              {isEditMode ? (
+                <View style={{ paddingLeft: 6 }}>
+                  <View
+                    style={{
+                      borderRadius: 30,
+                      height: 30,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingHorizontal: 8,
+                    }}
+                  >
+                    <CustomButton
+                      title={Strings.editGenres}
+                      onPress={onPressEditGenres}
+                      size="small"
+                      type={"primary"}
+                    />
+                  </View>
+                </View>
+              ) : (
+                genres?.map((genre, index) => {
+                  const firstWord = genre.genre_name.split(" ")[0];
+                  const backgroundColor =
+                    colorsBackground[index % colorsBackground.length];
+                  const colorsTitle = colorsLabel[index % colorsLabel.length];
+                  return (
+                    <View
+                      key={index}
+                      style={{ marginRight: 8, marginBottom: 8 }}
+                    >
+                      <View
+                        style={{
+                          backgroundColor,
+                          borderRadius: 30,
+                          height: 25,
+                          justifyContent: "center",
+                          alignItems: "center",
+                          paddingHorizontal: 12,
+                          pointerEvents: "none",
+                        }}
+                      >
+                        <NunitoText
+                          style={{
+                            color: colorsTitle,
+                            fontSize: 14,
+                            textAlign: "center",
+                          }}
+                        >
+                          {firstWord}
+                        </NunitoText>
+                      </View>
+                    </View>
+                  );
+                })
+              )}
+            </View>
             {bEdit && (
               <TouchableOpacity style={styles.editIcon} onPress={onPressEdit}>
                 <Ionicons name="create-outline" size={32} />
               </TouchableOpacity>
             )}
-
             {bConfig && (
               <TouchableOpacity
                 style={styles.configIcon}
@@ -184,73 +248,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 <Ionicons name="cog-outline" size={32} />
               </TouchableOpacity>
             )}
-
-            {
-              <View
-                style={{
-                  paddingLeft: 10,
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  paddingRight: 6,
-                }}
-              >
-                {isEditMode ? (
-                  <View style={{ paddingLeft: 6 }}>
-                    <View
-                      style={{
-                        borderRadius: 30,
-                        height: 30,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        paddingHorizontal: 8,
-                        top: "240%",
-                      }}
-                    >
-                      <CustomButton
-                        title={Strings.editGenres}
-                        onPress={onPressEditGenres}
-                        size="small"
-                        type={"primary"}
-                      />
-                    </View>
-                  </View>
-                ) : (
-                  genres?.map((genre, index) => {
-                    const firstWord = genre.genre_name.split(" ")[0];
-                    const backgroundColor =
-                      colorsBackground[index % colorsBackground.length];
-                    const colorsTitle = colorsLabel[index % colorsLabel.length];
-                    return (
-                      <View key={index} style={{ paddingLeft: 10 }}>
-                        <View
-                          style={{
-                            backgroundColor,
-                            borderRadius: 30,
-                            height: 25,
-                            maxWidth: 100,
-                            justifyContent: "center",
-                            alignItems: "center",
-                            paddingHorizontal: 8,
-                            pointerEvents: "none",
-                            top: "240%",
-                          }}
-                        >
-                          <NunitoText
-                            style={{
-                              color: colorsTitle,
-                              fontSize: 14,
-                              textAlign: "center",
-                            }}
-                          >
-                            {firstWord}
-                          </NunitoText>
-                        </View>
-                      </View>
-                    );
-                  })
-                )}
-              </View>
-            }
           </View>
         </ImageBackground>
       </View>
@@ -274,7 +271,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <TouchableOpacity onPress={onPressFollow}>
               <View
                 style={{
-                  backgroundColor: following ? theme.white : theme.primary,
+                  backgroundColor: following
+                    ? themeName === "dark"
+                      ? theme.Background
+                      : theme.white
+                    : theme.primary,
                   borderRadius: 30,
                   height: 25,
                   width: 80,
@@ -285,7 +286,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               >
                 <NunitoText
                   style={{
-                    color: following ? theme.primary : theme.white,
+                    color: following
+                      ? themeName === "dark"
+                        ? theme.white
+                        : theme.primary
+                      : theme.white,
                     fontSize: 14,
                     textAlign: "center",
                   }}

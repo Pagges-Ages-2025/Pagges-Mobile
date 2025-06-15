@@ -1,88 +1,94 @@
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import UserAPI from "../services/profileService";
-import { User } from "../models/User";
-import { useTheme } from "../context/ThemeContext";
-import { useLocalSearchParams } from "expo-router";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
-import ProfileHeader from "../components/Profile/ProfileHeader";
-import { base64Uri } from "../utils/imageUtils";
-import UserStats from "../components/UserStats/UserStats";
+import { ScrollView, StyleSheet, View } from "react-native";
 import Biography from "../components/Biography/Biography";
+import ProfileHeader from "../components/Profile/ProfileHeader";
+import UserStats from "../components/UserStats/UserStats";
+import { useTheme } from "../context/ThemeContext";
+import { User } from "../models/User";
+import UserAPI from "../services/profileService";
+import { base64Uri } from "../utils/imageUtils";
 
 import Achievement from "../components/Achievements/Achievement";
 import { Genre } from "../models/Genre";
 import SocialAPI from "../services/socialService";
 
 export default function ThirdPersonProfileScreen() {
-    const [ data, setData] = useState<User>();
-    const { theme } = useTheme();
-    const [isFollowing, setIsFollowing] = useState(false);
-    const [userGenres, setUserGenres] = useState<Genre[]>([]);
-    const { username } = useLocalSearchParams();
-    const thirdPersonUsername = useMemo(() =>Array.isArray(username) ? username[0] : username, [username]);
-    const [stats, setStats] = useState<{ readBooks: number; readKms: number }>({
-        readBooks: 0,
-        readKms: 0,
-    });
+  const [data, setData] = useState<User>();
+  const { theme } = useTheme();
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [userGenres, setUserGenres] = useState<Genre[]>([]);
+  const { username } = useLocalSearchParams();
+  const [offSetFollowers, setOffSetFollowers] = useState<number>(0);
+  const thirdPersonUsername = useMemo(
+    () => (Array.isArray(username) ? username[0] : username),
+    [username]
+  );
+  const [stats, setStats] = useState<{ readBooks: number; readKms: number }>({
+    readBooks: 0,
+    readKms: 0,
+  });
 
-    const onPressFollow = () => {
-        if(isFollowing){
-            SocialAPI()
-            .unfollowUser(thirdPersonUsername)
-            .then(() => {
-                setIsFollowing(!isFollowing);
-            })
-            .catch((error: any) => {
-                console.error("Error unfollowing user:", error);
-            });
-
-        } else{
-            SocialAPI()
-            .followUser(thirdPersonUsername)
-            .then(() => {
-                setIsFollowing(!isFollowing);
-            })
-            .catch((error: any) => {
-                console.error("Error following user:", error);
-            });
-        }
-    }
-
-    const fetchThirdPersonProfile = async () => {
-        UserAPI()
-        .getThirdPersonProfile(thirdPersonUsername)
-        .then((response: User) => {
-            setData(response);
-            setUserGenres(response.favoriteGenres);
-            setStats({
-                readBooks: response.readBooks,
-                readKms: response.readKm
-              });
+  const onPressFollow = () => {
+    if (isFollowing) {
+      SocialAPI()
+        .unfollowUser(thirdPersonUsername)
+        .then(() => {
+          const x = 1;
+          setIsFollowing(!isFollowing);
+          setOffSetFollowers((prev) => prev - 1);
         })
         .catch((error: any) => {
-            console.error("Erro ao buscar perfil:", error);
+          console.error("Error unfollowing user:", error);
         });
-    }; 
-
-    const fetchIsFollowingUser = async () => {
-        SocialAPI()
-        .isFollowing(thirdPersonUsername)
-        .then((response: boolean) => {
-            setIsFollowing(response);
+    } else {
+      SocialAPI()
+        .followUser(thirdPersonUsername)
+        .then(() => {
+          setIsFollowing(!isFollowing);
+          setOffSetFollowers((prev) => prev + 1);
         })
+        .catch((error: any) => {
+          console.error("Error following user:", error);
+        });
     }
+  };
 
-    useEffect(() => {
-        fetchThirdPersonProfile();
-        fetchIsFollowingUser();
-    }, [username]);
+  const fetchThirdPersonProfile = async () => {
+    UserAPI()
+      .getThirdPersonProfile(thirdPersonUsername)
+      .then((response: User) => {
+        setData(response);
+        setUserGenres(response.favoriteGenres);
+        setStats({
+          readBooks: response.readBooks,
+          readKms: response.readKm,
+        });
+        setOffSetFollowers(response?.friendsNumber ?? 0);
+      })
+      .catch((error: any) => {
+        console.error("Erro ao buscar perfil:", error);
+      });
+  };
 
-    return (
-        
+  const fetchIsFollowingUser = async () => {
+    SocialAPI()
+      .isFollowing(thirdPersonUsername)
+      .then((response: boolean) => {
+        setIsFollowing(response);
+      });
+  };
+
+  useEffect(() => {
+    fetchThirdPersonProfile();
+    fetchIsFollowingUser();
+  }, [username]);
+
+  return (
     <ScrollView
       style={[styles.container, { backgroundColor: theme.Background }]}
-      showsVerticalScrollIndicator={false}>
-        
+      showsVerticalScrollIndicator={false}
+    >
       <View style={[styles.content, { backgroundColor: theme.Background }]}>
         <ProfileHeader
           marginStart={30}
@@ -104,7 +110,13 @@ export default function ThirdPersonProfileScreen() {
             kmLidos={stats.readKms}
             livros={stats.readBooks}
             ranking={data?.ranking_position || 0}
-            amigos={data?.friendsNumber || 0}
+            seguidores={offSetFollowers}
+            onSeguidoresClick={() => {
+              router.push({
+                pathname: "/screens/followers",
+                params: { otherUserId: data?.id },
+              });
+            }}
           />
         </View>
         <View style={styles.biographyContainer}>
@@ -119,7 +131,7 @@ export default function ThirdPersonProfileScreen() {
         </View>
       </View>
     </ScrollView>
-    )
+  );
 }
 
 const styles = StyleSheet.create({
