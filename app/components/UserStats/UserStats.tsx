@@ -9,14 +9,16 @@ interface UserStatsProps {
   kmLidos: number;
   livros: number;
   ranking: number;
-  amigos: number;
+  seguidores: number;
+  onSeguidoresClick: () => void;
 }
 
 const UserStats: React.FC<UserStatsProps> = ({
   kmLidos,
   livros,
   ranking,
-  amigos,
+  seguidores,
+  onSeguidoresClick,
 }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
@@ -26,7 +28,7 @@ const UserStats: React.FC<UserStatsProps> = ({
     { label: "livros", value: livros },
     { label: "ranking", value: ranking },
   ];
-  function onPress() {}
+
   return (
     <View style={styles.container}>
       {stats.map((stat, index) => (
@@ -36,9 +38,12 @@ const UserStats: React.FC<UserStatsProps> = ({
         </View>
       ))}
 
-      <TouchableOpacity style={[styles.statContainer, {marginTop:3}]} onPress={onPress}>
-        <Text style={styles.value}>{amigos}</Text>
-        <NunitoText style={styles.label2}>amigos</NunitoText>
+      <TouchableOpacity
+        style={[styles.statContainer, { marginTop: 3 }]}
+        onPress={onSeguidoresClick}
+      >
+        <NunitoText style={styles.value}>{seguidores}</NunitoText>
+        <Text style={styles.label}>seguidores</Text>
       </TouchableOpacity>
     </View>
   );
