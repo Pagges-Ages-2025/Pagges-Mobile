@@ -10,6 +10,7 @@ import {
 } from "../services/user-search-history.service";
 import { SearchUserHistoryList } from "../components/searchUser/searchHistoryUserList";
 import { UserSearchResult } from "../models/UserSearchResult";
+import { router } from "expo-router";
 
 const SearchSocialPage: React.FC = () => {
   const { theme } = useTheme();
@@ -24,8 +25,13 @@ const SearchSocialPage: React.FC = () => {
   }, []);
 
   const handleSelectHistoryItem = async (user: UserSearchResult) => {
+    console.log("Item de histórico selecionado:", user);
     await handleSelectUser(user);
-    console.log("Item de histórico selecionado:",);
+    router.push({
+      pathname: "/screens/thirdPersonProfile",
+      params: { username: user.username },
+    });
+    console.log("Item de histórico selecionado:");
   };
 
   const handleSelectUser = async (user: UserSearchResult) => {
@@ -45,26 +51,19 @@ const SearchSocialPage: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.Background }]}>
-      <View style={{ paddingTop: 30 }}>
-
-        <UserSearch onSelectUser={handleSelectUser} onShowSuggestionsChange={setShowingResults} />
-
-        <View style={{paddingTop: 50}}>
-          {!showingResults && searchHistory.length > 0 ? (
-            <SearchUserHistoryList
-              history={searchHistory}
-              onSelectItem={handleSelectHistoryItem}
-              onDeleteItem={handleDeleteHistoryItem}
-              onClearHistory={handleClearSearchHistory}
-            />
-          ) : !showingResults ? (
-            <Text style={{ color: theme.primaryText, textAlign: "center", marginTop: 16 }}>
-              Nenhuma pesquisa recente
-            </Text>
-          ) : null}
-        </View> 
-
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.Background }]}
+    >
+      <View style={{ paddingTop: 30, flex: 1 }}>
+        <UserSearch
+          onSelectUser={handleSelectUser}
+          onShowSuggestionsChange={setShowingResults}
+          showingResults={showingResults}
+          searchHistory={searchHistory}
+          handleSelectHistoryItem={handleSelectHistoryItem}
+          handleDeleteHistoryItem={handleDeleteHistoryItem}
+          handleClearSearchHistory={handleClearSearchHistory}
+        />
       </View>
     </SafeAreaView>
   );

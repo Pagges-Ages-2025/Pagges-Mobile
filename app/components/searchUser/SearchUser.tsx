@@ -9,6 +9,8 @@ import {
   TouchableWithoutFeedback,
   View,
   ActivityIndicator,
+  Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
@@ -17,6 +19,7 @@ import { base64Uri } from "@/app/utils/imageUtils";
 import { searchUsers } from "@/app/services/search-user.service";
 import { UserSearchResult } from "@/app/models/UserSearchResult";
 import { router } from "expo-router";
+import { SearchUserHistoryList } from "./searchHistoryUserList";
 
 type SearchIconPosition = "right" | "left";
 type SearchColor = "primary" | "secondary";
@@ -31,6 +34,11 @@ interface UserSearchProps {
   isBottomSheet?: boolean;
   onSelectUser: (user: UserSearchResult) => void;
   onShowSuggestionsChange?: (show: boolean) => void;
+  showingResults: boolean;
+  searchHistory: UserSearchResult[];
+  handleSelectHistoryItem: (user: UserSearchResult) => void;
+  handleDeleteHistoryItem: (index: number) => void;
+  handleClearSearchHistory: () => void;
 }
 
 export default function UserSearch({
@@ -42,6 +50,11 @@ export default function UserSearch({
   isBottomSheet = false,
   onSelectUser,
   onShowSuggestionsChange = () => {},
+  showingResults = false,
+  searchHistory = [],
+  handleSelectHistoryItem,
+  handleDeleteHistoryItem,
+  handleClearSearchHistory,
 }: UserSearchProps) {
   const { theme } = useTheme();
   const inputRef = useRef<TextInput>(null);
@@ -61,8 +74,8 @@ export default function UserSearch({
       iconColor === "primary"
         ? theme.primary
         : iconColor === "secondary"
-        ? theme.secondary
-        : "#666",
+          ? theme.secondary
+          : "#666",
     iconPositionStyle: iconPosition === "left" ? { left: 18 } : { right: 18 },
     inputPaddingStyle:
       iconPosition === "left"
@@ -121,112 +134,145 @@ export default function UserSearch({
   };
 
   return (
-    <TouchableWithoutFeedback onPress={handlePressOutside}>
-      <View style={styles.outerContainer}>
-        <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
-          <View style={styles.container}>
-            <View
-              style={[
-                styles.searchContainer,
-                {
-                  height: dynamicStyles.height,
-                  borderColor: dynamicStyles.borderColor,
-                  borderWidth: dynamicStyles.borderWidth,
-                  borderRadius: dynamicStyles.borderRadius,
-                },
-              ]}
-            >
-              <TextInput
-                ref={inputRef}
-                style={[
-                  styles.input,
-                  dynamicStyles.inputPaddingStyle,
-                  {
-                    backgroundColor: theme.Background,
-                    color: theme.primaryText,
-                  },
-                ]}
-                value={query}
-                onChangeText={handleSearch}
-                placeholder={placeholder}
-                placeholderTextColor={theme.placeholder}
-                onFocus={() => {
-                  const show = query.trim().length > 0;
-                  setShowSuggestions(show);
-                  onShowSuggestionsChange(show);
-                }}
-              />
-
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={{ flex: 1 }}
+    >
+      <TouchableWithoutFeedback onPress={handlePressOutside}>
+        <View style={styles.outerContainer}>
+          <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+            <View style={styles.container}>
               <View
                 style={[
-                  styles.searchIconContainer,
-                  dynamicStyles.iconPositionStyle,
+                  styles.searchContainer,
+                  {
+                    height: dynamicStyles.height,
+                    borderColor: dynamicStyles.borderColor,
+                    borderWidth: dynamicStyles.borderWidth,
+                    borderRadius: dynamicStyles.borderRadius,
+                  },
                 ]}
               >
-                {query.length > 0 ? (
-                  <TouchableOpacity onPress={handleClearSearch}>
-                    <MaterialIcons
-                      name="cancel"
+                <TextInput
+                  ref={inputRef}
+                  style={[
+                    styles.input,
+                    dynamicStyles.inputPaddingStyle,
+                    {
+                      backgroundColor: theme.Background,
+                      color: theme.primaryText,
+                    },
+                  ]}
+                  value={query}
+                  onChangeText={handleSearch}
+                  placeholder={placeholder}
+                  placeholderTextColor={theme.placeholder}
+                  onFocus={() => {
+                    const show = query.trim().length > 0;
+                    setShowSuggestions(show);
+                    onShowSuggestionsChange(show);
+                  }}
+                />
+
+                <View
+                  style={[
+                    styles.searchIconContainer,
+                    dynamicStyles.iconPositionStyle,
+                  ]}
+                >
+                  {query.length > 0 ? (
+                    <TouchableOpacity onPress={handleClearSearch}>
+                      <MaterialIcons
+                        name="cancel"
+                        size={20}
+                        color={dynamicStyles.iconColor}
+                      />
+                    </TouchableOpacity>
+                  ) : (
+                    <Ionicons
+                      name="search"
                       size={20}
                       color={dynamicStyles.iconColor}
                     />
-                  </TouchableOpacity>
-                ) : (
-                  <Ionicons
-                    name="search"
-                    size={20}
-                    color={dynamicStyles.iconColor}
-                  />
-                )}
+                  )}
+                </View>
               </View>
-            </View>
 
-            {showSuggestions && (
-              <View style={styles.suggestionsContainer}>
-                {isLoading ? (
-                  <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="small" color={theme.primary} />
-                  </View>
-                ) : (
-                  <FlatList
-                    data={users}
-                    keyExtractor={(item) => String(item.id)}
-                    nestedScrollEnabled
-                    keyboardShouldPersistTaps="handled"
-                    renderItem={({ item }) => (
-                      <CustomUser
-                        name={item.name}
-                        username={item.username}
-                        profile_image={item.profile_image ? base64Uri(item.profile_image) : null}
-                        onPress={() => {
-                          onSelectUser(item);
-                          setQuery(item.username);
-                          setShowSuggestions(false);
-                          onShowSuggestionsChange(false);
-                          router.push({pathname : "/screens/thirdPersonProfile", params: {username : item.username}})
-                        }}
-                      />
-                    )}
-                    ListEmptyComponent={() => (
-                      <View style={styles.emptyContainer}>
-                        <Text
-                          style={[
-                            styles.emptyText,
-                            { color: theme.primaryText },
-                          ]}
-                        >
-                          Nenhum usuário encontrado
-                        </Text>
-                      </View>
-                    )}
+              <View>
+                {!showingResults && searchHistory.length > 0 ? (
+                  <SearchUserHistoryList
+                    history={searchHistory}
+                    onSelectItem={handleSelectHistoryItem}
+                    onDeleteItem={handleDeleteHistoryItem}
+                    onClearHistory={handleClearSearchHistory}
                   />
-                )}
+                ) : !showingResults ? (
+                  <Text
+                    style={{
+                      color: theme.primaryText,
+                      textAlign: "center",
+                      marginTop: 16,
+                    }}
+                  >
+                    Nenhuma pesquisa recente
+                  </Text>
+                ) : null}
               </View>
-            )}
-          </View>
-        </TouchableWithoutFeedback>
-      </View>
-    </TouchableWithoutFeedback>
+
+              {showSuggestions && (
+                <View style={styles.suggestionsContainer}>
+                  {isLoading ? (
+                    <View style={styles.loadingContainer}>
+                      <ActivityIndicator size="small" color={theme.primary} />
+                    </View>
+                  ) : (
+                    <FlatList
+                      data={users}
+                      keyExtractor={(item) => String(item.id)}
+                      nestedScrollEnabled
+                      keyboardShouldPersistTaps="handled"
+                      renderItem={({ item }) => (
+                        <CustomUser
+                          name={item.name}
+                          username={item.username}
+                          profile_image={
+                            item.profile_image
+                              ? base64Uri(item.profile_image)
+                              : null
+                          }
+                          onPress={() => {
+                            onSelectUser(item);
+                            setQuery(item.username);
+                            setShowSuggestions(false);
+                            onShowSuggestionsChange(false);
+                            router.push({
+                              pathname: "/screens/thirdPersonProfile",
+                              params: { username: item.username },
+                            });
+                          }}
+                        />
+                      )}
+                      ListEmptyComponent={() => (
+                        <View style={styles.emptyContainer}>
+                          <Text
+                            style={[
+                              styles.emptyText,
+                              { color: theme.primaryText },
+                            ]}
+                          >
+                            Nenhum usuário encontrado
+                          </Text>
+                        </View>
+                      )}
+                    />
+                  )}
+                </View>
+              )}
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -237,6 +283,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   container: {
+    flex: 1,
     width: "100%",
     zIndex: 1,
   },
@@ -254,17 +301,13 @@ const styles = StyleSheet.create({
   searchIconContainer: {
     height: "100%",
     justifyContent: "center",
-    position: "absolute",
     right: 16,
     width: 25,
   },
   suggestionsContainer: {
     borderRadius: 8,
-    maxHeight: 400,
     shadowRadius: 4,
-    position: "absolute",
     flexDirection: "column",
-    paddingVertical: 50,
     flex: 1,
   },
   emptyContainer: {
