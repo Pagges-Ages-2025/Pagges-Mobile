@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
-import UserAPI from "../services/profileService";
-import { User } from "../models/User";
-import { useTheme } from "../context/ThemeContext";
 import { router, useLocalSearchParams } from "expo-router";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
-import ProfileHeader from "../components/Profile/ProfileHeader";
-import { base64Uri } from "../utils/imageUtils";
-import UserStats from "../components/UserStats/UserStats";
+import { useEffect, useMemo, useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
 import Biography from "../components/Biography/Biography";
+import ProfileHeader from "../components/Profile/ProfileHeader";
+import UserStats from "../components/UserStats/UserStats";
+import { useTheme } from "../context/ThemeContext";
+import { User } from "../models/User";
+import UserAPI from "../services/profileService";
+import { base64Uri } from "../utils/imageUtils";
 
 import Achievement from "../components/Achievements/Achievement";
 import { Genre } from "../models/Genre";
@@ -19,6 +19,7 @@ export default function ThirdPersonProfileScreen() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [userGenres, setUserGenres] = useState<Genre[]>([]);
   const { username } = useLocalSearchParams();
+  const [offSetFollowers, setOffSetFollowers] = useState<number>(0);
   const thirdPersonUsername = useMemo(
     () => (Array.isArray(username) ? username[0] : username),
     [username]
@@ -33,7 +34,9 @@ export default function ThirdPersonProfileScreen() {
       SocialAPI()
         .unfollowUser(thirdPersonUsername)
         .then(() => {
+          const x = 1;
           setIsFollowing(!isFollowing);
+          setOffSetFollowers((prev) => prev - 1);
         })
         .catch((error: any) => {
           console.error("Error unfollowing user:", error);
@@ -43,6 +46,7 @@ export default function ThirdPersonProfileScreen() {
         .followUser(thirdPersonUsername)
         .then(() => {
           setIsFollowing(!isFollowing);
+          setOffSetFollowers((prev) => prev + 1);
         })
         .catch((error: any) => {
           console.error("Error following user:", error);
@@ -60,6 +64,7 @@ export default function ThirdPersonProfileScreen() {
           readBooks: response.readBooks,
           readKms: response.readKm,
         });
+        setOffSetFollowers(response?.friendsNumber ?? 0);
       })
       .catch((error: any) => {
         console.error("Erro ao buscar perfil:", error);
@@ -105,7 +110,7 @@ export default function ThirdPersonProfileScreen() {
             kmLidos={stats.readKms}
             livros={stats.readBooks}
             ranking={data?.ranking_position || 0}
-            seguidores={data?.friendsNumber || 0}
+            seguidores={offSetFollowers}
             onSeguidoresClick={() => {
               router.push({
                 pathname: "/screens/followers",
