@@ -95,18 +95,9 @@ export default function UserSearch({
   const fetchUsers = async (term: string) => {
     setIsLoading(true);
     try {
-      // const response = await axiosInstance.get(`/user-search/user`, {
-      //   params: { name: term },
-      // });
-      // const array = response.data as User[];
-      const array = await searchUsers(term);
-      const simplified = array.map((aux) => ({
-        id: aux.id,
-        name: aux.name,
-        username: aux.username,
-        profile_image: aux.profileImage ?? null,
-      }));
-      setUsers(simplified);
+      const users = await searchUsers(term);
+
+      setUsers(users);
     } catch (error) {
       console.error("Erro ao buscar usuários:", error);
       setUsers([]);
@@ -206,7 +197,6 @@ export default function UserSearch({
                       <CustomUser
                         name={item.name}
                         username={item.username}
-                        // profile_image={item.profile_image ?? ""}
                         profile_image={item.profile_image ? base64Uri(item.profile_image) : null}
                         onPress={() => {
                           onSelectUser(item);
