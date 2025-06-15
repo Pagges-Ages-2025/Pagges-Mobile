@@ -1,25 +1,19 @@
 import ProfileHeader from "@/app/components/Profile/ProfileHeader";
 import { User } from "@/app/models/User";
-import { useEffect, useState, useCallback } from "react";
 import UserAPI from "@/app/services/profileService";
-import axiosInstance from "../services/axios-instance-singleton";
-import {
-  ScrollView,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
+import Achievement from "../components/Achievements/Achievement";
+import Biography from "../components/Biography/Biography";
+import CustomButton from "../components/Buttons/CustomButton";
+import NunitoText from "../components/Texts/NunitoText";
 import UserStats from "../components/UserStats/UserStats";
 import { useTheme } from "../context/ThemeContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Biography from "../components/Biography/Biography";
-import Achievement from "../components/Achievements/Achievement";
-import { useRouter, useFocusEffect } from "expo-router";
-import { base64Uri } from "../utils/imageUtils";
-import NunitoText from "../components/Texts/NunitoText";
-import CustomButton from "../components/Buttons/CustomButton";
 import { Genre } from "../models/Genre";
+import axiosInstance from "../services/axios-instance-singleton";
+import { base64Uri } from "../utils/imageUtils";
 
 const getToken = async () => {
   const userToken = await AsyncStorage.getItem("userToken");
@@ -65,7 +59,6 @@ export default function ProfileScreen() {
       .catch((error: any) => {});
   };
 
-  // Atualiza dados quando a tela recebe foco
   useFocusEffect(
     useCallback(() => {
       fetchProfile();
@@ -73,12 +66,6 @@ export default function ProfileScreen() {
       fetchUserGenres();
     }, [])
   );
-
-  useEffect(() => {
-    fetchProfile();
-    fetchStats();
-    fetchUserGenres();
-  }, []);
 
   const handleEditProfile = async () => {
     const token = await getToken();
