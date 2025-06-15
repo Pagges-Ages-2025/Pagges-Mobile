@@ -76,11 +76,6 @@ export default function UserSearch({
         : iconColor === "secondary"
           ? theme.secondary
           : "#666",
-    iconPositionStyle: iconPosition === "left" ? { left: 18 } : { right: 18 },
-    inputPaddingStyle:
-      iconPosition === "left"
-        ? { paddingLeft: 35, paddingRight: 16 }
-        : { paddingRight: 35 },
   };
 
   useEffect(() => {
@@ -157,7 +152,6 @@ export default function UserSearch({
                   ref={inputRef}
                   style={[
                     styles.input,
-                    dynamicStyles.inputPaddingStyle,
                     {
                       backgroundColor: theme.Background,
                       color: theme.primaryText,
@@ -174,12 +168,7 @@ export default function UserSearch({
                   }}
                 />
 
-                <View
-                  style={[
-                    styles.searchIconContainer,
-                    dynamicStyles.iconPositionStyle,
-                  ]}
-                >
+                <View style={[styles.searchIconContainer]}>
                   {query.length > 0 ? (
                     <TouchableOpacity onPress={handleClearSearch}>
                       <MaterialIcons
@@ -242,7 +231,6 @@ export default function UserSearch({
                           }
                           onPress={() => {
                             onSelectUser(item);
-                            setQuery(item.username);
                             setShowSuggestions(false);
                             onShowSuggestionsChange(false);
                             router.push({
@@ -296,12 +284,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     height: "100%",
-    paddingRight: 40,
   },
   searchIconContainer: {
     height: "100%",
     justifyContent: "center",
-    right: 16,
+    alignItems: "flex-end",
     width: 25,
   },
   suggestionsContainer: {
