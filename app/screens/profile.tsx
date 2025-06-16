@@ -3,7 +3,7 @@ import { User } from "@/app/models/User";
 import UserAPI from "@/app/services/profileService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import Achievement from "../components/Achievements/Achievement";
 import Biography from "../components/Biography/Biography";
