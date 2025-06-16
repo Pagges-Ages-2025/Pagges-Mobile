@@ -1,5 +1,6 @@
 import { User } from "@/app/models/User";
-import React, { useEffect, useRef, useState } from "react";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Animated,
   Image,
@@ -10,21 +11,90 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import profileUser from "../assets/images/profile-user.png";
+import PodiumRanking from "../components/Podium/PodiumRanking";
 import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
-import { Challange } from "../models/Challanges";
 import ChallangesAPI from "../services/challanges";
 import UserAPI from "../services/profileService";
+import RankingService, { UserRanking } from "../services/rankingService";
 import { base64Uri } from "../utils/imageUtils";
-import DailyChallenge from "./DailyChallenge";
 
 export default function Challenges() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
   const [data, setData] = useState<User>();
-  const [showChallange, setShowChallange] = useState(false);
-  const [challangeData, setChallangeData] = useState<Challange>();
+  const [challangeData, setChallangeData] = useState<number>(0);
   const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const { theme } = useTheme();
+
+  const handleNavigateToRanking = () => {
+    router.push("/screens/generalRanking");
+  };
+
+  const [topUsers, setTopUsers] = useState<{
+    firstRank: UserRanking;
+    secondRank: UserRanking;
+    thirdRank: UserRanking;
+  }>();
+
+  const { fetchAndSplitRanking, getMyRanking } = RankingService();
+  const [myRankingPosition, setMyRankingPosition] = useState<number | null>(
+    null
+  );
+
+  // Handle earned points from navigation params
+  useFocusEffect(
+    useCallback(() => {
+      const earnedPointsParam = params.earnedPoints;
+      if (earnedPointsParam) {
+        const points = parseInt(earnedPointsParam as string);
+        if (!isNaN(points)) {
+          animatePoints(points);
+          // Clear the parameter after using it
+          router.setParams({ earnedPoints: undefined });
+        }
+      }
+    }, [params.earnedPoints])
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchAllData = async () => {
+        try {
+          // Fetch profile and correct answers
+          const [profileResponse, correctsResponse] = await Promise.all([
+            UserAPI().getProfile(),
+            ChallangesAPI().getUserCorrects(),
+          ]);
+          setData(profileResponse);
+          setChallangeData(correctsResponse);
+          console.log("RESPOSTAS CORRETAS:", correctsResponse);
+
+          // Fetch ranking data
+          const { top3 } = await fetchAndSplitRanking();
+          if (top3.length >= 3) {
+            console.log("top3 secondRank:", top3[1]);
+            setTopUsers({
+              firstRank: top3[0],
+              secondRank: top3[1],
+              thirdRank: top3[2],
+            });
+          } else {
+            console.error("Ranking precisa de ao menos 3 usuários.");
+          }
+
+          // Fetch personal ranking
+          const myRankingResponse = await getMyRanking();
+          setMyRankingPosition(myRankingResponse.position);
+        } catch (error) {
+          console.error("Erro ao carregar dados:", error);
+        }
+      };
+
+      fetchAllData();
+    }, [])
+  );
 
   const animatePoints = (points: number) => {
     setEarnedPoints(points);
@@ -51,26 +121,12 @@ export default function Challenges() {
     });
   };
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await UserAPI().getProfile();
-        setData(response);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      }
-    };
-    fetchProfile();
-  }, []);
-
-  const handleButtonPress = async () => {
-    try {
-      const response = await ChallangesAPI().getCurrentChallange();
-      setChallangeData(response);
-      setShowChallange(true);
-    } catch (error) {
-      console.error("Error fetching current daily challange:", error);
-    }
+  const handleButtonPress = () => {
+    router.push({
+      pathname: "/screens/trilha",
+      params: { correctAnswers: challangeData },
+    });
+    console.log("Button pressed");
   };
 
   return (
@@ -92,7 +148,8 @@ export default function Challenges() {
           />
           <View style={{ marginStart: 12, flex: 1 }}>
             <NunitoText style={styles.rankingLabel}>
-              {data?.ranking ? data.ranking : "xº"} lugar ranking geral
+              {myRankingPosition !== null ? `${myRankingPosition}º` : "xº"}{" "}
+              lugar no ranking geral
             </NunitoText>
             <View style={styles.pointsContainer}>
               <NunitoText style={[styles.points, { color: theme.primary }]}>
@@ -132,49 +189,50 @@ export default function Challenges() {
             <NunitoText
               style={[styles.dailyButtonText, { color: theme.white }]}
             >
-              Desafio diário
+              Perguntas Diárias
             </NunitoText>
           </TouchableOpacity>
         </View>
 
-        {/* We don't have information for the next two times, but when we do, just put it here. */}
-        <View style={styles.section}>
-          <NunitoText
-            style={[styles.sectionTitle, { color: theme.primaryText }]}
-          >
-            Perguntas Diárias
-          </NunitoText>
-        </View>
         <View style={styles.section}>
           <NunitoText
             style={[styles.sectionTitle, { color: theme.primaryText }]}
           >
             Rankings
           </NunitoText>
+
+          {topUsers && (
+            <TouchableOpacity
+              onPress={handleNavigateToRanking}
+              activeOpacity={0.8}
+            >
+              <PodiumRanking
+                firstRank={{
+                  name: topUsers.firstRank.name,
+                  username: topUsers.firstRank.username,
+                  image: topUsers.firstRank.profile_image
+                    ? base64Uri(topUsers.firstRank.profile_image)
+                    : undefined,
+                }}
+                secondRank={{
+                  name: topUsers.secondRank.name,
+                  username: topUsers.secondRank.username,
+                  image: topUsers.secondRank.profile_image
+                    ? base64Uri(topUsers.secondRank.profile_image)
+                    : undefined,
+                }}
+                thirdRank={{
+                  name: topUsers.thirdRank.name,
+                  username: topUsers.thirdRank.username,
+                  image: topUsers.thirdRank.profile_image
+                    ? base64Uri(topUsers.thirdRank.profile_image)
+                    : undefined,
+                }}
+              />
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
-
-      {challangeData && (
-        <DailyChallenge
-          visible={showChallange}
-          onClose={async (earnedPoints) => {
-            setShowChallange(false);
-            if (earnedPoints) {
-              animatePoints(earnedPoints);
-              try {
-                const response = await UserAPI().getProfile();
-                setData(response);
-              } catch (error) {
-                console.error("Error refreshing profile:", error);
-              }
-            }
-          }}
-          question={challangeData!.question}
-          alternatives={challangeData!.alternatives}
-          points={challangeData!.points}
-          challengeId={challangeData!.challenge_id}
-        ></DailyChallenge>
-      )}
     </SafeAreaView>
   );
 }

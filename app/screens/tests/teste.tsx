@@ -21,6 +21,7 @@ import AdditionalButtonsSection from "./sections/additionalButtonsSection";
 import PostCardSection from "./sections/postCardSection";
 import CheckboxSection from "./sections/checkboxSection";
 import GenreLabelSection from "./sections/genreLabelSection";
+import PodiumRanking from "@/app/components/Podium/PodiumRanking";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -33,6 +34,22 @@ export default function TestsScreen() {
     type: true,
     fontWeight: true,
   });
+
+    const mockUsers = {
+    firstRank: {
+      name: "Alice",
+
+    },
+    secondRank: {
+      name: "Bob",
+
+    },
+    thirdRank: {
+      name: "Carol",
+
+    },
+  };
+
 
   const toggle = (key: keyof typeof open) =>
     setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -90,6 +107,11 @@ export default function TestsScreen() {
           <PostCardSection />
           <CheckboxSection />
           <GenreLabelSection />
+          <PodiumRanking
+            firstRank={mockUsers.firstRank}
+            secondRank={mockUsers.secondRank}
+            thirdRank={mockUsers.thirdRank}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>

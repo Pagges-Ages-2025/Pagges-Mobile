@@ -1,34 +1,29 @@
-import React, { useState, useEffect, useCallback } from "react";
-import {
-  ScrollView,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
-import { useTheme } from "../context/ThemeContext";
 import CustomButton from "@/app/components/Buttons/CustomButton";
 import ProfileHeader from "@/app/components/Profile/ProfileHeader";
-import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTheme } from "../context/ThemeContext";
 import { User } from "../models/User";
-import { base64Uri } from "../utils/imageUtils";
 import UserAPI from "../services/profileService";
+import { base64Uri } from "../utils/imageUtils";
 
 export default function ConfigurationScreen() {
   const { theme, themeName, setThemeName } = useTheme();
   const router = useRouter();
   const [data, setData] = useState<User>();
-  
+
   const fetchProfile = async () => {
     UserAPI()
       .getProfile()
       .then((response: User) => {
         setData(response);
       })
-      .catch((error: any) => { });
+      .catch((error: any) => {});
   };
-  
+
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem("userToken");
@@ -38,25 +33,30 @@ export default function ConfigurationScreen() {
       console.error("Error during logout:", error);
     }
   };
-  
+
   const toggleTheme = () => {
     setThemeName(themeName === "dark" ? "light" : "dark");
   };
 
-    useFocusEffect(
-      useCallback(() => {
-        fetchProfile();
-      }, [])
-    );
-  
-    useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
       fetchProfile();
-    }, []);
+    }, [])
+  );
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
   return (
     <>
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Ionicons name="arrow-undo-circle" size={42} />
+      <TouchableOpacity style={styles.backButton}>
+        <Ionicons
+          name="return-up-back-outline"
+          size={30}
+          color={theme.black}
+          onPress={router.back}
+        />
       </TouchableOpacity>
       <ScrollView
         style={[styles.container, { backgroundColor: theme.Background }]}
@@ -71,13 +71,12 @@ export default function ConfigurationScreen() {
             name={data?.name.toString() || ""}
             isAuthor={false}
             isEditMode={false}
-            onPressEditGenres={() =>{}}
+            onPressEditGenres={() => {}}
           />
 
           <View style={styles.formContainer}>
             <CustomButton
-              //title={Strings.editGenres}
-              title={"Alterar modo " + themeName}
+              title={"Alterar Tema do Aplicativo"}
               onPress={toggleTheme}
               size="small"
               type={"primary"}

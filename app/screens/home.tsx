@@ -1,5 +1,5 @@
-import { router } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,24 +24,24 @@ const mockCards = [
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
-  const { getTrendingBooks } = BooksService();
+  const { getTrendingBooks, getFavoriteBasedBooks } = BooksService();
   const [trendingBooks, setTradingBooks] = useState<Book[]>();
-  const [selectedTrendingBook, setSelectedTrendingBook] = useState<Book | null>(
-    null
-  );
+  const [genreBasedBook, setGenreBasedBook] = useState<Book[]>();
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingGenreBasedBooks, setLoadingGenreBasedBooks] = useState(false);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [loadingGenres, setLoadingGenres] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   const handleCloseModal = () => {
     setModalVisible(false);
-    setSelectedTrendingBook(null);
+    setSelectedBook(null);
   };
 
   const handleSelectTrendingBook = (book: Book) => {
-    setSelectedTrendingBook(book);
+    setSelectedBook(book);
     setModalVisible(true);
   };
 
@@ -75,7 +75,7 @@ const Home: React.FC = () => {
     setLoadingGenres(true);
     try {
       const response = await retriveAllGenres();
-      console.log("response.data", response.data);
+      console.log("response.data genres", response.data);
       setGenres(response.data);
     } catch (error) {
       console.error("Erro ao buscar gêneros:", error);
@@ -85,15 +85,36 @@ const Home: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    setIsMounted(true);
-    fetchTrendingBooks();
-    fetchGenres();
+  const fetchFavoriteBasedBooks = useCallback(async () => {
+    setLoadingGenreBasedBooks(true);
+    try {
+      const results = await getFavoriteBasedBooks();
+      setGenreBasedBook(results);
+    } catch (error) {
+      console.error("Erro ao buscar livros baseados nos favoritos:", error);
+      setGenreBasedBook([]);
+    } finally {
+      setLoadingGenreBasedBooks(false);
+    }
+  }, []);
 
-    return () => {
-      setIsMounted(false);
-    };
-  }, [fetchTrendingBooks, fetchGenres]);
+  useFocusEffect(
+    useCallback(() => {
+      setIsMounted(true);
+      fetchTrendingBooks();
+      fetchGenres();
+      fetchFavoriteBasedBooks();
+
+      return () => {
+        setIsMounted(false);
+      };
+    }, [fetchTrendingBooks, fetchGenres, fetchFavoriteBasedBooks])
+  );
+
+  const handleSelectFavoriteBasedBook = (book: Book) => {
+    setSelectedBook(book);
+    setModalVisible(true);
+  };
 
   return (
     <SafeAreaView
@@ -101,10 +122,13 @@ const Home: React.FC = () => {
     >
       <ScrollView>
         <View style={styles.content}>
-          <StaticSearchBar />
+          <StaticSearchBar
+            toRoute="/screens/searchPage"
+            placeholder="Buscar Livro..."
+          />
 
           <View style={styles.carouselContainer}>
-            <HomeCarouselSection route={"/screens/home"} cards={mockCards} />
+            <HomeCarouselSection route={"/screens/challenges"} cards={mockCards} />
           </View>
 
           <NunitoText
@@ -173,35 +197,90 @@ const Home: React.FC = () => {
               </NunitoText>
             </View>
           )}
+
+          <NunitoText
+            style={[
+              styles.secondTitle,
+              { paddingBottom: 15, color: theme.primaryText },
+            ]}
+          >
+            Com base nos seus favoritos
+          </NunitoText>
+
+          {loadingGenreBasedBooks ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.primary} />
+            </View>
+          ) : genreBasedBook && genreBasedBook.length > 0 ? (
+            <CustomCarousel
+              isHorizontal
+              data={
+                genreBasedBook
+                  ? genreBasedBook.map((book) => (
+                      <CustomBook
+                        size="small"
+                        key={book.id}
+                        bookId={book.id}
+                        photoPath={book.capa}
+                        title={book.titulo}
+                        author={book.autores.join(", ")}
+                        onPress={() => handleSelectFavoriteBasedBook(book)}
+                      />
+                    ))
+                  : []
+              }
+            />
+          ) : (
+            <NunitoText style={{ color: theme.secondaryText }}>
+              Nenhum livro encontrado para os gêneros favoritos.
+            </NunitoText>
+          )}
         </View>
 
-        {selectedTrendingBook && (
+        {selectedBook && (
           <ModalBookDetails
             visible={modalVisible}
             onClose={handleCloseModal}
-            title={selectedTrendingBook.titulo || "Título não disponível"}
-            pages={selectedTrendingBook.paginas || 0}
-            synopsis={selectedTrendingBook.sinopse || "Sinopse não disponível"}
+            title={selectedBook.titulo || "Título não disponível"}
+            pages={selectedBook.paginas || 0}
+            synopsis={selectedBook.sinopse || "Sinopse não disponível"}
             review="Sem avaliações disponíveis ainda."
-            authors={
-              selectedTrendingBook.autores?.join(", ") || "Autor desconhecido"
-            }
+            authors={selectedBook.autores?.join(", ") || "Autor desconhecido"}
             year={
-              selectedTrendingBook.anoDePublicacao?.substring(0, 4) ||
-              "Desconhecido"
+              selectedBook.anoDePublicacao?.substring(0, 4) || "Desconhecido"
             }
-            id={selectedTrendingBook.id?.toString() || "0"}
-            genre={
-              selectedTrendingBook.generos?.[0] || "Gênero não especificado"
-            }
-            google_image_url={selectedTrendingBook.capa || ""}
-            onCreateReview={() =>
-              console.log("Criar resenha para:", selectedTrendingBook.titulo)
-            }
-            onShare={() =>
-              console.log("Compartilhar:", selectedTrendingBook.titulo)
-            }
-            bookId={selectedTrendingBook.id}
+            id={selectedBook.id?.toString() || "0"}
+            genre={selectedBook.generos?.[0] || "Gênero não especificado"}
+            google_image_url={selectedBook.capa || ""}
+            onCreateReview={() => {
+              // Fecha o modal e depois navega para a tela de criação
+              handleCloseModal();
+
+              // Dados do livro para passar para a tela de criação
+              const bookData = {
+                bookId: selectedBook.id?.toString() || "0",
+                bookTitle: selectedBook.titulo,
+                bookAuthors:
+                  selectedBook.autores?.join(", ") || "Autor desconhecido",
+                bookCover: selectedBook.capa || "",
+              };
+
+              // Navega após um pequeno atraso para garantir que o modal foi fechado
+              setTimeout(() => {
+                console.log(
+                  "SearchPage - Navegando para criação de resenha com:",
+                  bookData
+                );
+
+                // Usar router.replace para garantir uma navegação limpa
+                router.replace({
+                  pathname: "/screens/createReviewComment",
+                  params: bookData,
+                });
+              }, 500);
+            }}
+            onShare={() => console.log("Compartilhar:", selectedBook.titulo)}
+            bookId={selectedBook.id}
           />
         )}
       </ScrollView>
