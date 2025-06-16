@@ -27,6 +27,7 @@ interface PostCardProps {
   onPressRepost?: () => void;
   onPressLike?: () => void;
   onPressOptions?: () => void;
+  onPress?: () => void;
 }
 
 const fontWeightMap: Record<FontWeight, TextStyle["fontWeight"]> = {
@@ -50,6 +51,7 @@ const PostCard: React.FC<PostCardProps> = ({
   onPressRepost,
   onPressLike,
   onPressOptions,
+  onPress, 
 }) => {
   const { theme } = useTheme();
   const [bSpoiler, setBSpoiler] = useState(initialSpoiler);
@@ -76,114 +78,116 @@ const PostCard: React.FC<PostCardProps> = ({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.cardContainer}>
-        <Image style={styles.image} source={{ uri: bookcover }} />
-        <View style={[styles.bookInfoContainer, dynamicCardStyle]}>
-          {bSpoiler && (
-            <TouchableOpacity
-              onPress={() => setBSpoiler(false)}
-              style={[
-                styles.overlay,
-                { backgroundColor: spoilerBackgroundColor },
-              ]}
-            >
-              <View>
-                <NunitoText
-                  style={[styles.spoiler, { color: spoilerTextColor }]}
-                >
-                  {Strings.spoilerWarning}
-                </NunitoText>
-                <NunitoText
-                  style={[styles.spoiler, { color: spoilerTextColor }]}
-                >
-                  {Strings.spoilerWarningSecondary}
-                </NunitoText>
-              </View>
-            </TouchableOpacity>
-          )}
-          <View style={styles.topLine}>
-            <NunitoText numberOfLines={1} style={[textStyle, styles.titleBook]}>
-              {title}
-            </NunitoText>
-            <Ionicons
-              name="ellipsis-horizontal"
-              size={20}
-              color={iconDefaultColor}
-              onPress={onPressOptions}
-            />
-          </View>
-          <NunitoText
-            style={[styles.authorName, { color: secondaryTextColor }]}
-          >
-            {username}
-          </NunitoText>
-          <View style={[styles.line, { backgroundColor: lineColor }]} />
-
-          {subtitle.length > 100 ? (
-            <TouchableOpacity
-              onPress={() => setIsExpanded(!isExpanded)}
-              activeOpacity={0.7}
-            >
-              {isExpanded ? (
+    <TouchableOpacity activeOpacity={onPress ? 0.7 : 1} onPress={onPress} disabled={!onPress}>
+      <View style={styles.container}>
+        <View style={styles.cardContainer}>
+          <Image style={styles.image} source={{ uri: bookcover }} />
+          <View style={[styles.bookInfoContainer, dynamicCardStyle]}>
+            {bSpoiler && (
+              <TouchableOpacity
+                onPress={() => setBSpoiler(false)}
+                style={[
+                  styles.overlay,
+                  { backgroundColor: spoilerBackgroundColor },
+                ]}
+              >
                 <View>
-                  <NunitoText style={[textStyle, styles.subtitle]}>
-                    {subtitle}
-                  </NunitoText>
-                  <NunitoText style={[styles.readMore, textStyle]}>
-                    {Strings.readLess}
-                  </NunitoText>
-                </View>
-              ) : (
-                <View style={styles.subtitleExpand}>
                   <NunitoText
-                    numberOfLines={2}
-                    ellipsizeMode="tail"
-                    style={[textStyle, styles.subtitle]}
+                    style={[styles.spoiler, { color: spoilerTextColor }]}
                   >
-                    {subtitle.substring(0, 60).trim()}
+                    {Strings.spoilerWarning}
                   </NunitoText>
-                  <NunitoText style={[styles.readMore, textStyle]}>
-                    {Strings.readMore}
+                  <NunitoText
+                    style={[styles.spoiler, { color: spoilerTextColor }]}
+                  >
+                    {Strings.spoilerWarningSecondary}
                   </NunitoText>
                 </View>
-              )}
-            </TouchableOpacity>
-          ) : (
-            <NunitoText style={[textStyle, styles.subtitle]}>
-              {subtitle}
+              </TouchableOpacity>
+            )}
+            <View style={styles.topLine}>
+              <NunitoText numberOfLines={1} style={[textStyle, styles.titleBook]}>
+                {title}
+              </NunitoText>
+              <Ionicons
+                name="ellipsis-horizontal"
+                size={20}
+                color={iconDefaultColor}
+                onPress={onPressOptions}
+              />
+            </View>
+            <NunitoText
+              style={[styles.authorName, { color: secondaryTextColor }]}
+            >
+              {username}
             </NunitoText>
-          )}
+            <View style={[styles.line, { backgroundColor: lineColor }]} />
 
-          <View style={styles.interactionButtons}>
-            <IconButton
-              icon="chatbubble-outline"
-              label={comments}
-              color={iconDefaultColor}
-              onPress={onPressComment}
-              textStyle={textStyle}
-            />
-            <IconButton
-              icon="repeat-outline"
-              label={repost}
-              color={iconDefaultColor}
-              onPress={onPressRepost}
-              textStyle={textStyle}
-            />
-            <IconButton
-              icon={liked ? "heart" : "heart-outline"}
-              label={likes}
-              color={liked ? iconActiveColor : iconDefaultColor}
-              onPress={() => {
-                setLiked(!liked);
-                onPressLike?.();
-              }}
-              textStyle={textStyle}
-            />
+            {subtitle.length > 100 ? (
+              <TouchableOpacity
+                onPress={() => setIsExpanded(!isExpanded)}
+                activeOpacity={0.7}
+              >
+                {isExpanded ? (
+                  <View>
+                    <NunitoText style={[textStyle, styles.subtitle]}>
+                      {subtitle}
+                    </NunitoText>
+                    <NunitoText style={[styles.readMore, textStyle]}>
+                      {Strings.readLess}
+                    </NunitoText>
+                  </View>
+                ) : (
+                  <View style={styles.subtitleExpand}>
+                    <NunitoText
+                      numberOfLines={2}
+                      ellipsizeMode="tail"
+                      style={[textStyle, styles.subtitle]}
+                    >
+                      {subtitle.substring(0, 60).trim()}
+                    </NunitoText>
+                    <NunitoText style={[styles.readMore, textStyle]}>
+                      {Strings.readMore}
+                    </NunitoText>
+                  </View>
+                )}
+              </TouchableOpacity>
+            ) : (
+              <NunitoText style={[textStyle, styles.subtitle]}>
+                {subtitle}
+              </NunitoText>
+            )}
+
+            <View style={styles.interactionButtons}>
+              <IconButton
+                icon="chatbubble-outline"
+                label={comments}
+                color={iconDefaultColor}
+                onPress={onPressComment}
+                textStyle={textStyle}
+              />
+              <IconButton
+                icon="repeat-outline"
+                label={repost}
+                color={iconDefaultColor}
+                onPress={onPressRepost}
+                textStyle={textStyle}
+              />
+              <IconButton
+                icon={liked ? "heart" : "heart-outline"}
+                label={likes}
+                color={liked ? iconActiveColor : iconDefaultColor}
+                onPress={() => {
+                  setLiked(!liked);
+                  onPressLike?.();
+                }}
+                textStyle={textStyle}
+              />
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
