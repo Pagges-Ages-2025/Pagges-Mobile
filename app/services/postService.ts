@@ -42,7 +42,9 @@ export default function PostService() {
   ): Promise<Post[]> => {
     try {
       const response = await axiosInstance.get(`/posts/reviews/parentId/${parentId}`);
-      
+      if (!Array.isArray(response.data.data)) {
+        return [];
+      }
       const mappedPosts = response.data.data.map(
         (item: any) =>
           new Post({
@@ -99,7 +101,7 @@ export default function PostService() {
       return mappedPosts;
     } catch (error) {
       console.error("Erro ao buscar posts por perfil:", error);
-      throw error;
+      return [];
     }
   }
 
