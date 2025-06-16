@@ -13,6 +13,7 @@ export class Post {
     bookTitle?: string;
     username: string;
     likedBy: number;
+    comments: number;
     child?: Post[];
 
     constructor(
@@ -30,7 +31,8 @@ export class Post {
             googleImageUrl,
             bookTitle,
             username,
-            likedBy
+            likedBy,
+            comments
         } : {
             profileImage?: string,
             postId: number,
@@ -47,6 +49,7 @@ export class Post {
             username: string,
             likedBy: number
             child?: Post[]
+            comments: number
     }
     ) {
         this.postId = postId;
@@ -63,5 +66,6 @@ export class Post {
         this.bookTitle = bookTitle;
         this.username = username;
         this.likedBy = likedBy;
+        this.comments = comments;
     }
 }

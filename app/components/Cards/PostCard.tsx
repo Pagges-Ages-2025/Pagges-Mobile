@@ -27,7 +27,7 @@ interface PostCardProps {
   onPressRepost?: () => void;
   onPressLike?: () => void;
   onPressOptions?: () => void;
-  onPress?: () => void; // Adiciona onPress para o card inteiro
+  onPress?: () => void;
 }
 
 const fontWeightMap: Record<FontWeight, TextStyle["fontWeight"]> = {
@@ -51,7 +51,7 @@ const PostCard: React.FC<PostCardProps> = ({
   onPressRepost,
   onPressLike,
   onPressOptions,
-  onPress, // Novo
+  onPress, 
 }) => {
   const { theme } = useTheme();
   const [bSpoiler, setBSpoiler] = useState(initialSpoiler);

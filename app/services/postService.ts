@@ -1,6 +1,5 @@
 import axiosInstance from "./axios-instance-singleton";
 import { Post } from "../models/Post";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface CreatePostPayload {
   book_id: number;
@@ -28,6 +27,7 @@ export default function PostService() {
             profileImage: item.user.profile_image,
             username: item.user.username,
             likedBy: item._count.liked_by,
+            comments: item._count.comments,
           })
       );
       return mappedPosts;
@@ -60,13 +60,14 @@ export default function PostService() {
             bookTitle: item.livro.title,
             username: item.user.username,
             likedBy: item._count.liked_by,
+            comments: item._count.comments,
           })
       );
       return mappedPosts;
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao buscar posts por parentId:", error);
-      throw error;
+      return [];
     }
   }
 
@@ -74,6 +75,7 @@ export default function PostService() {
     console.log("Buscando posts recentes do usuário...");
     try {
       const response = await axiosInstance.get("/posts/user-recent-reviews");
+      if(response.data.length == 0) return [];
       const mappedPosts = response.data.map(
         (item: any) =>
           new Post({
@@ -90,7 +92,8 @@ export default function PostService() {
             googleImageUrl: item.livro.google_image_url,
             bookTitle: item.livro.title,
             username: item.user.username,
-            likedBy: item._count.liked_by
+            likedBy: item._count.liked_by,
+            comments: item._count.comments
           })
       );
       return mappedPosts;

@@ -45,9 +45,9 @@ export const ReviewComment = forwardRef(
       : profile;
     const textValue =
       comment && text.length > 100 ? text.substring(0, 100) : text;
-    const likesNumberValue = likesNumber || 1200;
-    const commentsNumberValue = commentsNumber || 34;
-    const repostNumberValue = repostNumber || 610;
+    const likesNumberValue = likesNumber || 0;
+    const commentsNumberValue = commentsNumber || 0;
+    const repostNumberValue = repostNumber || 0;
 
     const calculateDaysAgo = (datePost: string) => {
       const currentDate = new Date();
@@ -181,7 +181,7 @@ export const ReviewComment = forwardRef(
             </View>
           </View>
           <View
-            style={{ height: 1, backgroundColor: "rgba(217, 217, 217, 0.5)" }}
+            style={{ height: 1, backgroundColor: "rgba(217, 217, 217, 0.5)", width: "100%" }}
           />
         </View>
       </TouchableOpacity>
@@ -192,6 +192,7 @@ export const ReviewComment = forwardRef(
 const styles = StyleSheet.create({
   container: {
     paddingBottom: 15,
+    width: "100%",
   },
   authorInfosContainer: {
     flexDirection: "row",

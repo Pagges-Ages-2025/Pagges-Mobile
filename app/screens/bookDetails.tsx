@@ -139,7 +139,7 @@ export default function ModalBookDetails({
               : new Date(post.createdAt).toLocaleDateString()
           }
           repostNumber={0}
-          commentsNumber={0}
+          commentsNumber={post.comments}
           onPress={() => togglePostExpansion(post.postId)}
         />
         {expandedPosts.includes(post.postId) && (
@@ -506,7 +506,7 @@ export default function ModalBookDetails({
               {bookPosts
                 .filter((post) => !post.parentId)
                 .map((post) => (
-                  <View key={post.postId} style={{ backgroundColor: "#1a1919" }}>
+                  <View key={post.postId} style={{ width: "100%" }}>
                     <ReviewComment
                       text={post.text}
                       photoPostAuthor={post.profileImage}
@@ -518,11 +518,11 @@ export default function ModalBookDetails({
                           : new Date(post.createdAt).toLocaleDateString()
                       }
                       repostNumber={0}
-                      commentsNumber={bookPosts.filter(p => p.parentId === post.postId).length}
+                      commentsNumber={post.comments}
                       onPress={() => togglePostExpansion(post.postId)}
                     />
                     {expandedPosts.includes(post.postId) && (
-                      <View style={{ marginLeft: 20 }}>
+                      <View style={{ marginLeft: 20, width: "100%" }}>
                         {childPost(post.postId)}
                       </View>
                     )}

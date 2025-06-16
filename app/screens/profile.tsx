@@ -140,7 +140,6 @@ export default function ProfileScreen() {
       });
   };
 
-  // Função recursiva para buscar um post por ID em qualquer nível
   function findPostById(posts: Post[], postId: number): Post | undefined {
     for (const post of posts) {
       if (post.postId === postId) return post;
@@ -192,7 +191,7 @@ export default function ProfileScreen() {
               : new Date(post.createdAt).toLocaleDateString()
           }
           repostNumber={0}
-          commentsNumber={0}
+          commentsNumber={post.comments}
           onPress={() => togglePostExpansion(post.postId)}
         />
         {expandedPosts.includes(post.postId) && (
@@ -297,7 +296,7 @@ export default function ProfileScreen() {
                 bSpoiler={post.isSpoiler || false}
                 repost={0}
                 likes={post.likedBy}
-                comments={0}
+                comments={post.comments}
                 onPress={() => togglePostExpansion(post.postId)}
               />
               {expandedPosts.includes(post.postId) && (
