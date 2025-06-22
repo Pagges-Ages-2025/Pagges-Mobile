@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
-import Section from "../components/section";
+import { StyleSheet, View } from "react-native";
 import Achievement from "../../../components/Achievements/Achievement";
 import { useTheme } from "../../../context/ThemeContext";
+import Section from "../components/section";
 const AchievementsSection = () => {
   const { theme } = useTheme();
   const [open, setOpen] = useState({
@@ -26,10 +26,42 @@ const AchievementsSection = () => {
         onToggle={() => toggle("variations")}
       >
         <View style={styles.grid}>
-          <Achievement />
-          <Achievement color={theme.secondary} backgroundColor={theme.quaternary} />
-          <Achievement color={theme.tertiary} backgroundColor={theme.quaternary} />
-          <Achievement color={theme.primary} backgroundColor={theme.quaternary} />
+          <Achievement
+            icon="ribbon"
+            title="Conquista Básica"
+            color={theme.iconColor}
+            backgroundColor={theme.quaternary}
+          />
+          <Achievement
+            icon="book"
+            title="Primeiro Livro"
+            color={theme.secondary}
+            backgroundColor={theme.quaternary}
+          />
+          <Achievement
+            icon="trophy"
+            title="Campeão"
+            color={theme.tertiary}
+            backgroundColor={theme.quaternary}
+          />
+          <Achievement
+            icon="star"
+            title="Crítico"
+            color={theme.primary}
+            backgroundColor={theme.quaternary}
+          />
+          <Achievement
+            icon="flame"
+            title="Leitor Ávido"
+            color="#FF8C42"
+            backgroundColor={theme.quaternary}
+          />
+          <Achievement
+            icon="heart"
+            title="Amante dos Livros"
+            color="#E91E63"
+            backgroundColor={theme.quaternary}
+          />
         </View>
       </Section>
     </Section>
@@ -45,4 +77,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AchievementsSection; 
+export default AchievementsSection;

@@ -1,16 +1,23 @@
-import React from "react";
-import { TouchableOpacity, StyleSheet } from "react-native";
-import { useTheme } from "../../context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTheme } from "../../context/ThemeContext";
+import NunitoText from "../Texts/NunitoText";
 
-interface CustomButtonProps {
+interface AchievementProps {
   color?: string;
   backgroundColor?: string;
+  icon?: string;
+  title?: string;
+  size?: number;
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({
+const Achievement: React.FC<AchievementProps> = ({
   color,
   backgroundColor,
+  icon = "ribbon",
+  title,
+  size = 30,
 }) => {
   const { theme } = useTheme();
 
@@ -24,13 +31,25 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   });
 
   return (
-    <TouchableOpacity style={[styles.iconeArea, dynamicStyles()]}>
-      <Ionicons name="ribbon" size={30} style={dynamicIconStyles()}></Ionicons>
-    </TouchableOpacity>
+    <View style={styles.container}>
+      <TouchableOpacity style={[styles.iconeArea, dynamicStyles()]}>
+        <Ionicons name={icon as any} size={size} style={dynamicIconStyles()} />
+      </TouchableOpacity>
+      {title && (
+        <NunitoText style={[styles.title, { color: theme.primaryText }]}>
+          {title}
+        </NunitoText>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    alignItems: "center",
+    marginHorizontal: 8,
+    marginVertical: 4,
+  },
   iconeArea: {
     alignItems: "center",
     borderRadius: 60,
@@ -40,6 +59,12 @@ const styles = StyleSheet.create({
     padding: 10,
     width: 60,
   },
+  title: {
+    fontSize: 12,
+    marginTop: 4,
+    textAlign: "center",
+    maxWidth: 80,
+  },
 });
 
-export default CustomButton;
+export default Achievement;

@@ -1,5 +1,6 @@
 import Strings from "@/app/constants/Strings";
 import { useTheme } from "@/app/context/ThemeContext";
+import { getBookWithRegisteredId } from "@/app/screens/bookDetails";
 import SearchAPI from "@/app/services/googleAPIService";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, {
@@ -18,7 +19,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CustomBook from "../Book/CustomBook";
 import BookSearch, { Book } from "../SearchBar/SearchBar";
 import NunitoText from "../Texts/NunitoText";
-import { getBookWithRegisteredId } from "@/app/screens/bookDetails";
 
 // Interface estendida para suportar ambos os formatos de livro
 interface ExtendedBook extends Book {
@@ -62,21 +62,31 @@ const SelectBook = forwardRef(
     };
 
     const handleSelectBook = async (book: ExtendedBook) => {
-      getBookWithRegisteredId(book, (bookWithRegisteredId) => {
+      try {
+        const bookWithRegisteredId = await getBookWithRegisteredId(book);
         setSelectedBook(bookWithRegisteredId);
+        onSelectBook?.(bookWithRegisteredId);
+      } catch (error) {
+        console.error("Error handling book selection:", error);
+        // Fallback to the original book if registration fails
+        setSelectedBook(book);
+        onSelectBook?.(book);
+      } finally {
         setButtonVisible(true);
         bottomSheetRef.current?.close();
-        onSelectBook && onSelectBook(bookWithRegisteredId);
-      });
+      }
     };
 
     const handleSearch = async (term: string) => {
       setLoading(true);
       try {
         const results = await searchBooks(term);
-        setBooks(results as ExtendedBook[]);
+        // Ensure books is always an array, even if the API returns undefined
+        setBooks(Array.isArray(results) ? (results as ExtendedBook[]) : []);
       } catch (error) {
         console.error("Erro ao buscar livros:", error);
+        // Set empty array on error to prevent undefined
+        setBooks([]);
       } finally {
         setLoading(false);
       }
@@ -145,7 +155,7 @@ const SelectBook = forwardRef(
                         color="#000"
                         style={{ marginLeft: 10, marginTop: 20 }}
                       />
-                    ) : books.length === 0 ? (
+                    ) : !Array.isArray(books) || books.length === 0 ? (
                       <NunitoText
                         style={{ textAlign: "center", marginTop: 20 }}
                       >

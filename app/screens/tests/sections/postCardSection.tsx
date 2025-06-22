@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
-import Section from "../components/section";
+import { StyleSheet, View } from "react-native";
 import PostCard from "../../../components/Cards/PostCard";
 import { useTheme } from "../../../context/ThemeContext";
+import Section from "../components/section";
 
 const PostCardSection = () => {
   const { theme } = useTheme();
-  
+
   const [open, setOpen] = useState({
     cards: false,
     normal: true,
@@ -44,10 +44,10 @@ const PostCardSection = () => {
             comments={8}
             bSpoiler={false}
             fontWeight="regular"
-            onPressComment={handlePress}
             onPressRepost={handlePress}
             onPressLike={handlePress}
             onPressOptions={handlePress}
+            onPressUser={handlePress}
           />
         </View>
       </Section>
@@ -68,10 +68,10 @@ const PostCardSection = () => {
             comments={67}
             bSpoiler={true}
             fontWeight="semibold"
-            onPressComment={handlePress}
             onPressRepost={handlePress}
             onPressLike={handlePress}
             onPressOptions={handlePress}
+            onPressUser={handlePress}
           />
         </View>
       </Section>
@@ -92,10 +92,10 @@ const PostCardSection = () => {
             comments={34}
             bSpoiler={false}
             fontWeight="bold"
-            onPressComment={handlePress}
             onPressRepost={handlePress}
             onPressLike={handlePress}
             onPressOptions={handlePress}
+            onPressUser={handlePress}
           />
         </View>
       </Section>
@@ -110,4 +110,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PostCardSection; 
+export default PostCardSection;

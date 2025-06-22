@@ -1,5 +1,11 @@
 import React, { useEffect, useRef } from "react";
-import { View, FlatList, Dimensions, NativeSyntheticEvent, NativeScrollEvent } from "react-native";
+import {
+  Dimensions,
+  FlatList,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  View,
+} from "react-native";
 
 interface CarouselProps {
   data: React.ReactNode[];
@@ -11,11 +17,17 @@ const { width } = Dimensions.get("window");
 const cardWidth = width * 0.9;
 const itemSpacing = 5;
 
-const CustomHomeCarousel: React.FC<CarouselProps> = ({ data, isHorizontal, onIndexChange }) => {
+const CustomHomeCarousel: React.FC<CarouselProps> = ({
+  data,
+  isHorizontal,
+  onIndexChange,
+}) => {
   const flatListRef = useRef<FlatList>(null);
   const currentIndexRef = useRef(0);
 
-  const handleMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleMomentumScrollEnd = (
+    event: NativeSyntheticEvent<NativeScrollEvent>
+  ) => {
     const offsetX = event.nativeEvent.contentOffset.x;
     const index = Math.round(offsetX / (cardWidth + itemSpacing));
     currentIndexRef.current = index;

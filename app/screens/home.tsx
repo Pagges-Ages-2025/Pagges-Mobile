@@ -1,5 +1,5 @@
 import { router, useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,14 +13,16 @@ import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
 import { Genre } from "../models/Genre";
 import BooksService from "../services/booksService";
+import ChallangesAPI from "../services/challanges";
 import { retriveAllGenres } from "../services/genres.service";
+import UserAPI from "../services/profileService";
 import ModalBookDetails from "./bookDetails";
 
-const mockCards = [
-  { id: "1", title: "Desafio Diário" },
-  { id: "2", title: "Desafio Diário" },
-  { id: "3", title: "Desafio Diário" },
-];
+// Import background images
+import communityBg from "../assets/images/community-bg.png";
+import dailyChallengeBg from "../assets/images/daily-challenge-background.png";
+import libraryBg from "../assets/images/library-bg.png";
+import rankingBg from "../assets/images/ranking-bg.png";
 
 const Home: React.FC = () => {
   const { theme } = useTheme();
@@ -33,7 +35,53 @@ const Home: React.FC = () => {
   const [loadingGenreBasedBooks, setLoadingGenreBasedBooks] = useState(false);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [loadingGenres, setLoadingGenres] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+
+  // User statistics and challenge data
+  const [userStats, setUserStats] = useState<{
+    readBooks: number;
+    readKms: number;
+  } | null>(null);
+  const [correctAnswers, setCorrectAnswers] = useState<number>(0);
+  const [loadingStats, setLoadingStats] = useState(false);
+
+  // Ref to track if data has been loaded
+  const dataLoadedRef = useRef(false);
+
+  // Dynamic carousel cards with real data
+  const [homeCarouselCards, setHomeCarouselCards] = useState([
+    {
+      id: "1",
+      title: "Desafio Diário",
+      subtitle: "Ganhe pontos respondendo perguntas sobre livros",
+      route: "/screens/challenges",
+      icon: "🎯",
+      backgroundImage: dailyChallengeBg,
+    },
+    {
+      id: "2",
+      title: "Comunidade",
+      subtitle: "Conecte-se com outros leitores",
+      route: "/screens/social",
+      icon: "👥",
+      backgroundImage: communityBg,
+    },
+    {
+      id: "3",
+      title: "Ranking",
+      subtitle: "Veja quem está no topo",
+      route: "/screens/generalRanking",
+      icon: "🏆",
+      backgroundImage: rankingBg,
+    },
+    {
+      id: "4",
+      title: "Minha Biblioteca",
+      subtitle: "Acesse seus livros favoritos",
+      route: "/screens/personalLibrary",
+      icon: "📚",
+      backgroundImage: libraryBg,
+    },
+  ]);
 
   const handleCloseModal = () => {
     setModalVisible(false);
@@ -41,21 +89,57 @@ const Home: React.FC = () => {
   };
 
   const handleSelectTrendingBook = (book: Book) => {
+    console.log("Selected trending book:", book);
+    console.log("Book genres:", book.generos);
     setSelectedBook(book);
     setModalVisible(true);
   };
 
   const handleGenrePressButton = useCallback(
     (genreId: number, genreName: string) => {
-      if (isMounted) {
-        router.push({
-          pathname: "/screens/genreLibrary",
-          params: { selectedGenreId: genreId, genreName: genreName },
-        });
-      }
+      router.push({
+        pathname: "/screens/genreLibrary",
+        params: { selectedGenreId: genreId, genreName: genreName },
+      });
     },
-    [isMounted]
+    []
   );
+
+  const fetchUserStats = useCallback(async () => {
+    setLoadingStats(true);
+    try {
+      const [statsResponse, correctAnswersResponse] = await Promise.all([
+        UserAPI().getUserStatistics(),
+        ChallangesAPI().getUserCorrects(),
+      ]);
+
+      setUserStats(statsResponse);
+      setCorrectAnswers(correctAnswersResponse);
+
+      // Update carousel cards with real data
+      setHomeCarouselCards((prevCards) =>
+        prevCards.map((card) => {
+          if (card.id === "1") {
+            return {
+              ...card,
+              subtitle: `${correctAnswersResponse} respostas corretas • Ganhe mais pontos!`,
+            };
+          }
+          if (card.id === "4") {
+            return {
+              ...card,
+              subtitle: `${statsResponse.readBooks} livros lidos • ${statsResponse.readKms}km percorridos`,
+            };
+          }
+          return card;
+        })
+      );
+    } catch (error) {
+      console.error("Erro ao buscar estatísticas do usuário:", error);
+    } finally {
+      setLoadingStats(false);
+    }
+  }, []);
 
   const fetchTrendingBooks = useCallback(async () => {
     setLoading(true);
@@ -69,7 +153,7 @@ const Home: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [getTrendingBooks]);
 
   const fetchGenres = useCallback(async () => {
     setLoadingGenres(true);
@@ -96,19 +180,40 @@ const Home: React.FC = () => {
     } finally {
       setLoadingGenreBasedBooks(false);
     }
-  }, []);
+  }, [getFavoriteBasedBooks]);
 
   useFocusEffect(
     useCallback(() => {
-      setIsMounted(true);
-      fetchTrendingBooks();
-      fetchGenres();
-      fetchFavoriteBasedBooks();
+      let mounted = true;
+
+      // Only fetch data if not already loaded
+      if (!dataLoadedRef.current) {
+        const fetchData = async () => {
+          try {
+            await Promise.all([
+              fetchTrendingBooks(),
+              fetchGenres(),
+              fetchFavoriteBasedBooks(),
+              fetchUserStats(),
+            ]);
+          } catch (error) {
+            console.error("Error fetching home data:", error);
+          }
+        };
+
+        fetchData();
+        dataLoadedRef.current = true;
+      }
 
       return () => {
-        setIsMounted(false);
+        mounted = false;
       };
-    }, [fetchTrendingBooks, fetchGenres, fetchFavoriteBasedBooks])
+    }, [
+      fetchTrendingBooks,
+      fetchGenres,
+      fetchFavoriteBasedBooks,
+      fetchUserStats,
+    ])
   );
 
   const handleSelectFavoriteBasedBook = (book: Book) => {
@@ -128,7 +233,7 @@ const Home: React.FC = () => {
           />
 
           <View style={styles.carouselContainer}>
-            <HomeCarouselSection route={"/screens/challenges"} cards={mockCards} />
+            <HomeCarouselSection cards={homeCarouselCards} />
           </View>
 
           <NunitoText
@@ -250,7 +355,11 @@ const Home: React.FC = () => {
               selectedBook.anoDePublicacao?.substring(0, 4) || "Desconhecido"
             }
             id={selectedBook.id?.toString() || "0"}
-            genre={selectedBook.generos?.[0] || "Gênero não especificado"}
+            genre={
+              selectedBook.generos && selectedBook.generos.length > 0
+                ? selectedBook.generos[0]
+                : "Gênero não especificado"
+            }
             google_image_url={selectedBook.capa || ""}
             onCreateReview={() => {
               // Fecha o modal e depois navega para a tela de criação

@@ -5,19 +5,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import Achievement from "../components/Achievements/Achievement";
+import AchievementsGrid from "../components/Achievements/AchievementsGrid";
 import Biography from "../components/Biography/Biography";
 import CustomButton from "../components/Buttons/CustomButton";
+import PostCard from "../components/Cards/PostCard";
+import { ReviewComment } from "../components/review-comments/review-comments";
 import NunitoText from "../components/Texts/NunitoText";
 import UserStats from "../components/UserStats/UserStats";
 import { useTheme } from "../context/ThemeContext";
 import { Genre } from "../models/Genre";
-import axiosInstance from "../services/axios-instance-singleton";
-import { base64Uri } from "../utils/imageUtils";
 import { Post } from "../models/Post";
+import axiosInstance from "../services/axios-instance-singleton";
 import PostService from "../services/postService";
-import PostCard from "../components/Cards/PostCard";
-import { ReviewComment } from "../components/review-comments/review-comments";
+import { base64Uri } from "../utils/imageUtils";
 
 const getToken = async () => {
   const userToken = await AsyncStorage.getItem("userToken");
@@ -182,9 +182,7 @@ export default function ProfileScreen() {
           onPress={() => togglePostExpansion(post.postId)}
         />
         {expandedPosts.includes(post.postId) && (
-          <View style={{ marginLeft: 20 }}>
-            {childPost(post.postId)}
-          </View>
+          <View style={{ marginLeft: 20 }}>{childPost(post.postId)}</View>
         )}
       </View>
     ));
@@ -276,28 +274,34 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.achievementContainer}>
-          <Achievement />
+          <NunitoText
+            style={[styles.achievementTitle, { color: theme.primaryText }]}
+          >
+            Conquistas
+          </NunitoText>
+          <AchievementsGrid />
         </View>
-        
-        <View>
-          {profilePosts.map((post) => (
-            <View key={post.postId}>
+
+        <View style={styles.postsContainer}>
+          <NunitoText style={[styles.postsTitle, { color: theme.primaryText }]}>
+            Meus Posts
+          </NunitoText>
+          {profilePosts.map((post, index) => (
+            <View key={post.postId} style={styles.postItem}>
               <PostCard
                 title={post.title ? post.title : ""}
                 subtitle={post.text}
                 bookcover={post.googleImageUrl}
-                username={post.username}
+                username={data?.name || "Usuário"}
+                profileImage={data?.profileImage}
                 bSpoiler={post.isSpoiler || false}
                 repost={0}
                 likes={post.likedBy}
                 comments={post.comments}
-                onPress={() => togglePostExpansion(post.postId)}
+                onPressUser={() => {
+                  // This is the user's own profile, so no navigation needed
+                }}
               />
-              {expandedPosts.includes(post.postId) && (
-                <View style={{ marginLeft: 20 }}>
-                  {childPost(post.postId)}
-                </View>
-              )}
             </View>
           ))}
         </View>
@@ -308,9 +312,14 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   achievementContainer: {
-    marginBottom: 20,
+    marginBottom: 15,
     marginHorizontal: 30,
-    marginTop: 20,
+    marginTop: 10,
+  },
+  achievementTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 15,
   },
   biographyContainer: {
     marginHorizontal: 30,
@@ -323,7 +332,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   libraryButtonsContainer: {
-    marginBottom: 30,
+    marginBottom: 15,
     marginHorizontal: 30,
     marginTop: 10,
   },
@@ -345,7 +354,21 @@ const styles = StyleSheet.create({
   },
   libraryTitle: {
     fontSize: 18,
+    fontWeight: "600",
     marginBottom: 15,
+  },
+  postsContainer: {
+    marginHorizontal: 30,
+    marginTop: 10,
+    marginBottom: 30,
+  },
+  postsTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 15,
+  },
+  postItem: {
+    marginBottom: 20,
   },
   statsContainer: {
     marginHorizontal: 30,
