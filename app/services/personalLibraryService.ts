@@ -13,9 +13,16 @@ export default function PersonalLibraryService() {
           new Book({
             id: item.book.book_id,
             title: item.book.title,
-            photoPath: item.book.google_image_url || item.book.cover, // Usando google_image_url ou cover como fallback
-            author: item.book.authors, // Adicionando o autor para exibição
+            photoPath: item.book.google_image_url || item.book.cover,
+            author: item.book.authors,
             size: "small" as const,
+            pages: item.book.pages,
+            synopsis: item.book.synopsis,
+            genre: item.book.genre,
+            year: item.book.year,
+            google_image_url: item.book.google_image_url,
+            isbn: item.book.isbn,
+            cover: item.book.cover,
           })
       );
 

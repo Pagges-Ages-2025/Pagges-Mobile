@@ -9,10 +9,14 @@ import { User } from "../models/User";
 import UserAPI from "../services/profileService";
 import { base64Uri } from "../utils/imageUtils";
 
-import Achievement from "../components/Achievements/Achievement";
-import { Genre } from "../models/Genre";
-import SocialAPI from "../services/socialService";
 import { Ionicons } from "@expo/vector-icons";
+import AchievementsGrid from "../components/Achievements/AchievementsGrid";
+import PostCard from "../components/Cards/PostCard";
+import NunitoText from "../components/Texts/NunitoText";
+import { Genre } from "../models/Genre";
+import { Post } from "../models/Post";
+import PostService from "../services/postService";
+import SocialAPI from "../services/socialService";
 
 export default function ThirdPersonProfileScreen() {
   const [data, setData] = useState<User>();
@@ -21,6 +25,9 @@ export default function ThirdPersonProfileScreen() {
   const [userGenres, setUserGenres] = useState<Genre[]>([]);
   const { username } = useLocalSearchParams();
   const [offSetFollowers, setOffSetFollowers] = useState<number>(0);
+  const [profilePosts, setProfilePosts] = useState<Post[]>([]);
+  const PostAPI = PostService();
+
   const thirdPersonUsername = useMemo(
     () => (Array.isArray(username) ? username[0] : username),
     [username]
@@ -80,9 +87,19 @@ export default function ThirdPersonProfileScreen() {
       });
   };
 
+  const fetchProfilePosts = async () => {
+    try {
+      const response = await PostAPI.getPostsByUsername(thirdPersonUsername);
+      setProfilePosts(response);
+    } catch (error) {
+      console.error("Erro ao buscar posts do perfil:", error);
+    }
+  };
+
   useEffect(() => {
     fetchThirdPersonProfile();
     fetchIsFollowingUser();
+    fetchProfilePosts();
   }, [username]);
 
   return (
@@ -137,7 +154,31 @@ export default function ThirdPersonProfileScreen() {
         </View>
 
         <View style={styles.achievementContainer}>
-          <Achievement />
+          <AchievementsGrid />
+        </View>
+
+        <View style={styles.postsContainer}>
+          <NunitoText style={[styles.postsTitle, { color: theme.primaryText }]}>
+            Posts de {data?.name || "Usuário"}
+          </NunitoText>
+          {profilePosts.map((post, index) => (
+            <View key={post.postId} style={styles.postItem}>
+              <PostCard
+                title={post.title ? post.title : ""}
+                subtitle={post.text}
+                bookcover={post.googleImageUrl}
+                username={data?.name || "Usuário"}
+                profileImage={data?.profileImage}
+                bSpoiler={post.isSpoiler || false}
+                repost={0}
+                likes={post.likedBy}
+                comments={post.comments}
+                onPressUser={() => {
+                  // This is already the user's profile page, so no navigation needed
+                }}
+              />
+            </View>
+          ))}
         </View>
       </View>
     </ScrollView>
@@ -152,9 +193,9 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   achievementContainer: {
-    marginBottom: 20,
+    marginBottom: 15,
     marginHorizontal: 30,
-    marginTop: 20,
+    marginTop: 10,
   },
   biographyContainer: {
     marginHorizontal: 30,
@@ -173,6 +214,19 @@ const styles = StyleSheet.create({
   libraryTitle: {
     fontSize: 18,
     marginBottom: 15,
+  },
+  postsContainer: {
+    marginHorizontal: 30,
+    marginTop: 10,
+    marginBottom: 30,
+  },
+  postsTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 15,
+  },
+  postItem: {
+    marginBottom: 20,
   },
   statsContainer: {
     marginHorizontal: 30,

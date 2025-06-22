@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { View, FlatList, Dimensions, Animated } from "react-native";
+import { Animated, Dimensions, FlatList, View } from "react-native";
 
 interface CarouselProps {
   data: React.ReactNode[];
@@ -19,19 +19,27 @@ const CustomCarousel: React.FC<CarouselProps> = ({ data, isHorizontal }) => {
   );
 
   const handleMomentumScrollEnd = (event: any) => {
-    const index = Math.round(event.nativeEvent.contentOffset.x / width);
-    setCurrentIndex(index);
+    if (isHorizontal) {
+      const index = Math.round(event.nativeEvent.contentOffset.x / 120); // Approximate item width
+      setCurrentIndex(index);
+    }
   };
 
   return (
-    <View style={{paddingLeft: 18}}>
+    <View style={{ paddingLeft: 18 }}>
       <FlatList
         ref={flatListRef}
         data={data}
         horizontal={isHorizontal}
-        pagingEnabled
         showsHorizontalScrollIndicator={false}
         keyExtractor={(_, index) => index.toString()}
+        contentContainerStyle={
+          isHorizontal
+            ? {
+                paddingRight: 18, // Add right padding to allow scrolling to last items
+              }
+            : undefined
+        }
         renderItem={({ item }) => (
           <View
             style={{

@@ -1,24 +1,23 @@
-import React, { useEffect, useState, useRef } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
+  Animated,
+  BackHandler,
+  Dimensions,
+  Modal,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  Modal,
-  BackHandler,
-  Animated,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import NunitoText from "../components/Texts/NunitoText";
 import CustomBook from "../components/Book/CustomBook";
+import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
-import ModalBookDetails from "./bookDetails";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Book, BookCategory } from "../models/PersonalLibrary";
 import personalLibraryService from "../services/personalLibraryService";
+import ModalBookDetails from "./bookDetails";
 const { width } = Dimensions.get("window");
 
 interface LibraryProps {
@@ -399,11 +398,13 @@ const Library: React.FC<LibraryProps> = ({
         <ModalBookDetails
           visible={modalBookVisible}
           onClose={handleCloseModal}
-          title={selectedBook.title}
+          title={selectedBook.title || selectedBook.titulo}
           pages={selectedBook.pages}
           synopsis={selectedBook.synopsis}
-          authors={selectedBook.authors}
-          google_image_url={selectedBook.google_image_url}
+          authors={selectedBook.authors || selectedBook.author}
+          google_image_url={
+            selectedBook.google_image_url || selectedBook.photoPath
+          }
           genre={selectedBook.genre}
           year={selectedBook.year}
           review={selectedBook.review}
@@ -416,16 +417,19 @@ const Library: React.FC<LibraryProps> = ({
             // Dados do livro para passar para a tela de criação
             const bookData = {
               bookId: selectedBook.id?.toString() || "0",
-              bookTitle: selectedBook.titulo,
+              bookTitle: selectedBook.title || selectedBook.titulo || "",
               bookAuthors:
-                selectedBook.autores?.join(", ") || "Autor desconhecido",
-              bookCover: selectedBook.capa || "",
+                selectedBook.authors ||
+                selectedBook.author ||
+                "Autor desconhecido",
+              bookCover:
+                selectedBook.google_image_url || selectedBook.photoPath || "",
             };
 
             // Navega após um pequeno atraso para garantir que o modal foi fechado
             setTimeout(() => {
               console.log(
-                "SearchPage - Navegando para criação de resenha com:",
+                "PersonalLibrary - Navegando para criação de resenha com:",
                 bookData
               );
 
@@ -446,11 +450,13 @@ const Library: React.FC<LibraryProps> = ({
         <ModalBookDetails
           visible={modalBookVisible}
           onClose={handleCloseModal}
-          title={selectedBook.title}
+          title={selectedBook.title || selectedBook.titulo}
           pages={selectedBook.pages}
           synopsis={selectedBook.synopsis}
-          authors={selectedBook.authors}
-          google_image_url={selectedBook.google_image_url}
+          authors={selectedBook.authors || selectedBook.author}
+          google_image_url={
+            selectedBook.google_image_url || selectedBook.photoPath
+          }
           genre={selectedBook.genre}
           year={selectedBook.year}
           review={selectedBook.review}
@@ -463,16 +469,19 @@ const Library: React.FC<LibraryProps> = ({
             // Dados do livro para passar para a tela de criação
             const bookData = {
               bookId: selectedBook.id?.toString() || "0",
-              bookTitle: selectedBook.titulo,
+              bookTitle: selectedBook.title || selectedBook.titulo || "",
               bookAuthors:
-                selectedBook.autores?.join(", ") || "Autor desconhecido",
-              bookCover: selectedBook.capa || "",
+                selectedBook.authors ||
+                selectedBook.author ||
+                "Autor desconhecido",
+              bookCover:
+                selectedBook.google_image_url || selectedBook.photoPath || "",
             };
 
             // Navega após um pequeno atraso para garantir que o modal foi fechado
             setTimeout(() => {
               console.log(
-                "SearchPage - Navegando para criação de resenha com:",
+                "PersonalLibrary - Navegando para criação de resenha com:",
                 bookData
               );
 

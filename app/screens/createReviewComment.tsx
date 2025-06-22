@@ -1,14 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
-import { StyleSheet, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useMemo, useState } from "react";
+import { Alert, StyleSheet, View } from "react-native";
 import CheckBoxOptions from "../components/checkbox/CheckBoxOptions";
 import CancelPostButtons from "../components/review-comments/cancel-post-buttons";
 import SelectBook from "../components/review-comments/select-book";
 import ReviewTextField from "../components/ReviewTextField/ReviewTextField";
 import { Book } from "../components/SearchBar/SearchBar";
 import { useTheme } from "../context/ThemeContext";
-import PostService from "../services/postService";
 import { User } from "../models/User";
+import PostService from "../services/postService";
 import UserAPI from "../services/profileService";
 import { base64Uri } from "../utils/imageUtils";
 
@@ -39,12 +39,8 @@ export default function CreateReviewCommentScreen() {
       .catch((error: any) => {});
   };
 
-  console.log("CreateReviewCommentScreen renderizada");
-
   // Usar useMemo para processar o livro a partir dos parâmetros apenas quando params mudar
   const bookFromParams = useMemo(() => {
-    console.log("Processando parâmetros do livro");
-
     if (!params.bookId || !params.bookTitle) {
       return null;
     }
@@ -68,7 +64,6 @@ export default function CreateReviewCommentScreen() {
   // Definir o livro selecionado apenas uma vez quando bookFromParams mudar
   useEffect(() => {
     if (bookFromParams && !selectedBook) {
-      console.log("Definindo livro selecionado a partir dos parâmetros");
       setSelectedBook(bookFromParams);
     }
     fetchProfile();
@@ -93,8 +88,17 @@ export default function CreateReviewCommentScreen() {
       setIsReviewChecked(false);
       setIsSpoilerChecked(false);
 
-      // Navega para a tela home após o post ser publicado com sucesso
-      router.replace("/screens/home");
+      // Show success alert instead of modal for testing
+      Alert.alert(
+        "Resenha Publicada!",
+        "Sua resenha foi publicada com sucesso e agora está visível no seu perfil.",
+        [
+          {
+            text: "Ver Perfil",
+            onPress: () => router.push("/screens/profile"),
+          },
+        ]
+      );
     } catch (error) {
       console.error("Erro ao criar post:", error);
     } finally {

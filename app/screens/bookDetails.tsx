@@ -3,7 +3,7 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ImageBackground,
   Modal,
@@ -16,17 +16,19 @@ import CustomBook from "../components/Book/CustomBook";
 import { SinopseExpandable } from "../components/Book/sinopseExpandable";
 import CustomButton from "../components/Buttons/CustomButton";
 import CustomCarousel from "../components/Carousel/CustomHomeCarousel";
+import SuccessModal from "../components/Modals/SuccessModal";
 import RatingModal from "../components/RatingModal/RatingModal";
 import { ReviewComment } from "../components/review-comments/review-comments";
 import { Book } from "../components/SearchBar/SearchBar";
 import StaticStars from "../components/StaticStars/StaticStars";
 import NunitoText from "../components/Texts/NunitoText";
 import { useTheme } from "../context/ThemeContext";
+import { Post } from "../models/Post";
 import BooksService from "../services/booksService";
 import { registerBookInDatabase } from "../services/handle-select-book.service";
 import PersonalLibraryService from "../services/personalLibraryService";
-import { Post } from "../models/Post";
 import PostService from "../services/postService";
+
 interface ModalBookDetailsProps {
   visible: boolean;
   onClose: () => void;
@@ -66,20 +68,30 @@ export default function ModalBookDetails({
 }: ModalBookDetailsProps) {
   const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [successModalData, setSuccessModalData] = useState({
+    title: "",
+    description: "",
+  });
   const [averageRating, setAverageRating] = useState(0);
   const [bookPosts, setBookPosts] = useState<Post[]>([]);
   const [expandedPosts, setExpandedPosts] = useState<number[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState<number[]>([]);
   const PostAPI = PostService();
 
   useEffect(() => {
     const fetchBookPosts = async () => {
-      PostAPI.fetchBookPosts(id).then((response: Post[]) => {
+      try {
+        const response = await PostAPI.fetchBookPosts(id);
         setBookPosts(response);
-      });
+      } catch (error) {
+        console.error("Erro ao buscar posts do livro:", error);
+        setBookPosts([]);
+      }
     };
     fetchBookPosts();
   }, [id]);
-  
+
   function findPostById(posts: Post[], postId: number): Post | undefined {
     for (const post of posts) {
       if (post.postId === postId) return post;
@@ -91,61 +103,120 @@ export default function ModalBookDetails({
     return undefined;
   }
 
-  const togglePostExpansion = async (postId: number) => {
-    console.log("togglePostExpansion called with postId:", postId);
-    const post = findPostById(bookPosts, postId);
-    console.log("Found post:", post);
-    if (post && !post.child) {
-      console.log("Fetching children for postId:", post.postId);
-      const response = await PostAPI.getPostsByParentId(post.postId);
-      console.log("Fetched children:", response);
-      function updatePostChildren(posts: Post[]): Post[] {
-        return posts.map((p) => {
-          if (p.postId === postId) {
-            return { ...p, child: response };
-          } else if (p.child) {
-            return { ...p, child: updatePostChildren(p.child) };
-          } else {
-            return p;
-          }
-        });
-      }
-      setBookPosts((prevPosts) => updatePostChildren(prevPosts));
-    }
-    setExpandedPosts((prev) =>
-      prev.includes(postId)
-        ? prev.filter((id) => id !== postId)
-        : [...prev.filter((id) => id !== postId), postId]
-    );
-  };
+  const togglePostExpansion = useCallback(
+    async (postId: number) => {
+      console.log("togglePostExpansion called with postId:", postId);
+      const post = findPostById(bookPosts, postId);
+      console.log("Found post:", post);
 
-  const childPost = (parentId: number) => {
-    const parent = findPostById(bookPosts, parentId);
-    if (!parent || !parent.child) return null;
-    return parent.child.map((post: Post) => (
-      <View key={post.postId}>
-        <ReviewComment
-          text={post.text}
-          photoPostAuthor={post.googleImageUrl}
-          fullNamePostAuthor={post.username}
-          likesNumber={post.likedBy}
-          datePost={
-            typeof post.createdAt === "string"
-              ? post.createdAt
-              : new Date(post.createdAt).toLocaleDateString()
-          }
-          repostNumber={0}
-          commentsNumber={post.comments}
-          onPress={() => togglePostExpansion(post.postId)}
-        />
-        {expandedPosts.includes(post.postId) && (
-          <View>
-            {childPost(post.postId)}
-          </View>
-        )}
-      </View>
-    ));
-  };
+      if (!post) {
+        console.log(`Post with ID ${postId} not found`);
+        return;
+      }
+
+      // If already loading, don't do anything
+      if (loadingPosts.includes(postId)) {
+        return;
+      }
+
+      if (post.child && post.child.length > 0) {
+        console.log(
+          `Post ${postId} already has ${post.child.length} children, toggling expansion`
+        );
+        setExpandedPosts((prev) =>
+          prev.includes(postId)
+            ? prev.filter((id) => id !== postId)
+            : [...prev.filter((id) => id !== postId), postId]
+        );
+        return;
+      }
+
+      console.log("Fetching children for postId:", post.postId);
+
+      // Add to loading state
+      setLoadingPosts((prev) => [...prev, postId]);
+
+      try {
+        const response = await PostAPI.getPostsByParentId(post.postId);
+        console.log("Fetched children:", response);
+
+        if (response.length === 0) {
+          console.log(`No children found for post ${post.postId}`);
+          // Still toggle expansion to show that there are no children
+          setExpandedPosts((prev) =>
+            prev.includes(postId)
+              ? prev.filter((id) => id !== postId)
+              : [...prev.filter((id) => id !== postId), postId]
+          );
+          return;
+        }
+
+        function updatePostChildren(posts: Post[]): Post[] {
+          return posts.map((p) => {
+            if (p.postId === postId) {
+              return { ...p, child: response };
+            } else if (p.child) {
+              return { ...p, child: updatePostChildren(p.child) };
+            } else {
+              return p;
+            }
+          });
+        }
+        setBookPosts((prevPosts) => updatePostChildren(prevPosts));
+
+        setExpandedPosts((prev) =>
+          prev.includes(postId)
+            ? prev.filter((id) => id !== postId)
+            : [...prev.filter((id) => id !== postId), postId]
+        );
+      } catch (error) {
+        console.error(
+          `Error fetching children for post ${post.postId}:`,
+          error
+        );
+        // Don't toggle expansion on error
+      } finally {
+        // Remove from loading state
+        setLoadingPosts((prev) => prev.filter((id) => id !== postId));
+      }
+    },
+    [bookPosts, loadingPosts, PostAPI]
+  );
+
+  const childPost = useCallback(
+    (parentId: number) => {
+      const parent = findPostById(bookPosts, parentId);
+      if (!parent || !parent.child) return null;
+      return parent.child.map((post: Post) => (
+        <View
+          key={`child-${post.postId}-${expandedPosts.includes(post.postId)}`}
+          style={styles.childCommentContainer}
+        >
+          <ReviewComment
+            text={post.text}
+            photoPostAuthor={post.profileImage}
+            fullNamePostAuthor={post.username}
+            likesNumber={post.likedBy}
+            datePost={
+              typeof post.createdAt === "string"
+                ? post.createdAt
+                : new Date(post.createdAt).toLocaleDateString()
+            }
+            repostNumber={0}
+            commentsNumber={post.comments}
+            onPress={() => togglePostExpansion(post.postId)}
+            loading={loadingPosts.includes(post.postId)}
+          />
+          {expandedPosts.includes(post.postId) && (
+            <View style={styles.nestedChildContainer}>
+              {childPost(post.postId)}
+            </View>
+          )}
+        </View>
+      ));
+    },
+    [bookPosts, expandedPosts, loadingPosts, togglePostExpansion]
+  );
 
   const updateAverageRating = () => {
     try {
@@ -178,6 +249,27 @@ export default function ModalBookDetails({
             data: response.data,
           }
         );
+
+        // Show success modal with appropriate message based on state
+        let modalTitle = "Sucesso!";
+        let description = "";
+
+        switch (state) {
+          case "READ":
+            description = `"${title}" foi adicionado à sua lista de livros já lidos!`;
+            break;
+          case "READING":
+            description = `"${title}" foi adicionado à sua lista de livros em leitura!`;
+            break;
+          case "TO_BE_READ":
+            description = `"${title}" foi adicionado à sua lista de livros para ler!`;
+            break;
+          default:
+            description = `Livro atualizado com sucesso!`;
+        }
+
+        setSuccessModalData({ title: modalTitle, description });
+        setSuccessModalVisible(true);
       }
     } catch (error) {
       console.log(`Erro ao adicionar livro (${state}):`, error);
@@ -412,6 +504,7 @@ export default function ModalBookDetails({
             </View>
           </View>
           <ScrollView
+            key={`scroll-${expandedPosts.length}`}
             style={{
               flex: 2,
               flexGrow: 2,
@@ -420,6 +513,12 @@ export default function ModalBookDetails({
               paddingEnd: 24,
               borderTopLeftRadius: 20,
               borderTopRightRadius: 20,
+            }}
+            showsVerticalScrollIndicator={false}
+            removeClippedSubviews={false}
+            maintainVisibleContentPosition={{
+              minIndexForVisible: 0,
+              autoscrollToTopThreshold: 10,
             }}
           >
             <View style={styles.bookNumbersContainer}>
@@ -451,11 +550,10 @@ export default function ModalBookDetails({
 
             <View style={styles.statusBookContainer}>
               {bookActions.map((action, index) => (
-                <View style={{ flex: 1 }}>
+                <View key={index} style={{ flex: 1 }}>
                   <CustomButton
                     size="small"
                     containerStyle={{ flex: 1 }}
-                    key={index}
                     title={action.label}
                     onPress={action.onPress}
                   />
@@ -479,31 +577,53 @@ export default function ModalBookDetails({
               >
                 Principais Resenhas e Comentários
               </NunitoText>
-              {bookPosts
-                .filter((post) => !post.parentId)
-                .map((post) => (
-                  <View key={post.postId} style={{ width: "100%" }}>
-                    <ReviewComment
-                      text={post.text}
-                      photoPostAuthor={post.profileImage}
-                      fullNamePostAuthor={post.username}
-                      likesNumber={post.likedBy}
-                      datePost={
-                        typeof post.createdAt === "string"
-                          ? post.createdAt
-                          : new Date(post.createdAt).toLocaleDateString()
-                      }
-                      repostNumber={0}
-                      commentsNumber={post.comments}
-                      onPress={() => togglePostExpansion(post.postId)}
-                    />
-                    {expandedPosts.includes(post.postId) && (
-                      <View style={{ marginLeft: 20, width: "100%" }}>
-                        {childPost(post.postId)}
-                      </View>
-                    )}
-                  </View>
-                ))}
+
+              {bookPosts.length === 0 ? (
+                <View
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingVertical: 40,
+                    paddingHorizontal: 20,
+                  }}
+                >
+                  <NunitoText
+                    style={[styles.noPostsText, { color: theme.secondaryText }]}
+                  >
+                    Este livro ainda não tem publicações
+                  </NunitoText>
+                </View>
+              ) : (
+                bookPosts
+                  .filter((post) => !post.parentId)
+                  .map((post) => (
+                    <View
+                      key={`post-${post.postId}-${expandedPosts.includes(post.postId)}`}
+                      style={{ width: "100%" }}
+                    >
+                      <ReviewComment
+                        text={post.text}
+                        photoPostAuthor={post.profileImage}
+                        fullNamePostAuthor={post.username}
+                        likesNumber={post.likedBy}
+                        datePost={
+                          typeof post.createdAt === "string"
+                            ? post.createdAt
+                            : new Date(post.createdAt).toLocaleDateString()
+                        }
+                        repostNumber={0}
+                        commentsNumber={post.comments}
+                        onPress={() => togglePostExpansion(post.postId)}
+                        loading={loadingPosts.includes(post.postId)}
+                      />
+                      {expandedPosts.includes(post.postId) && (
+                        <View style={styles.nestedChildContainer}>
+                          {childPost(post.postId)}
+                        </View>
+                      )}
+                    </View>
+                  ))
+              )}
             </View>
 
             <NunitoText
@@ -561,22 +681,28 @@ export default function ModalBookDetails({
       onRequestClose={onClose || router.replace("/screens/searchPage")}
     >
       <BookContent />
+      <SuccessModal
+        visible={successModalVisible}
+        onClose={() => setSuccessModalVisible(false)}
+        title={successModalData.title}
+        description={successModalData.description}
+      />
     </Modal>
   );
 }
 
-export async function getBookWithRegisteredId(
-  book: Book,
-  callback: (book: Book) => void
-) {
-  const registerdBook = await registerBookInDatabase(book);
-
-  const bookWithRegisteredId = {
-    ...book,
-    id: registerdBook.book_id,
-  };
-
-  callback(bookWithRegisteredId);
+export async function getBookWithRegisteredId(book: Book): Promise<Book> {
+  try {
+    const registeredBook = await registerBookInDatabase(book);
+    return {
+      ...book,
+      id: registeredBook.book_id,
+    };
+  } catch (error) {
+    console.error("Error registering book in database:", error);
+    // Return the original book if registration fails
+    return book;
+  }
 }
 
 const styles = StyleSheet.create({
@@ -680,5 +806,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingTop: 30,
     paddingBottom: 20,
+  },
+  noPostsText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  childCommentContainer: {
+    width: "100%",
+    paddingHorizontal: 10,
+  },
+  nestedChildContainer: {
+    marginLeft: 20,
+    width: "90%",
+    alignSelf: "flex-start",
+    flex: 1,
   },
 });

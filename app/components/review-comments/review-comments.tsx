@@ -1,12 +1,19 @@
-import React, { forwardRef, LegacyRef } from "react";
-import { View, StyleSheet, Text, Image, TextInputProps, TouchableOpacity } from "react-native";
-import NunitoText from "../Texts/NunitoText";
-import { useTheme } from "../../context/ThemeContext";
+import { base64Uri } from "@/app/utils/imageUtils";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import Feather from "@expo/vector-icons/Feather";
+import React, { forwardRef } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  TextInputProps,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import profile from "../../assets/images/profile.png";
-import { base64Uri } from "@/app/utils/imageUtils";
+import { useTheme } from "../../context/ThemeContext";
+import NunitoText from "../Texts/NunitoText";
 
 type Props = TextInputProps & {
   comment?: boolean;
@@ -15,7 +22,8 @@ type Props = TextInputProps & {
   datePost: string;
   text: string;
   photoPostAuthor?: string;
-  onPress?: () => void; 
+  onPress?: () => void;
+  loading?: boolean;
 };
 interface BookPageProps {
   likesNumber?: number;
@@ -37,7 +45,8 @@ export const ReviewComment = forwardRef(
       likesNumber,
       commentsNumber,
       repostNumber,
-      onPress, 
+      onPress,
+      loading = false,
     } = props;
     const { theme } = useTheme();
     const photo = photoPostAuthor
@@ -77,7 +86,11 @@ export const ReviewComment = forwardRef(
     };
 
     return (
-      <TouchableOpacity activeOpacity={onPress ? 1 : 1} onPress={onPress} disabled={!onPress}>
+      <TouchableOpacity
+        activeOpacity={onPress ? 1 : 1}
+        onPress={onPress}
+        disabled={!onPress}
+      >
         <View style={styles.container}>
           {byAuthor && (
             <View
@@ -110,9 +123,12 @@ export const ReviewComment = forwardRef(
               </NunitoText>
             )}
           </View>
-          <View style={{ paddingLeft: 45, paddingBottom: 15 }}>
+          <View
+            style={{ paddingLeft: 45, paddingBottom: 15, paddingRight: 15 }}
+          >
             <NunitoText
               style={[styles.textPost, { color: theme.textColorReview }]}
+              numberOfLines={comment ? 3 : undefined}
             >
               {textValue}
             </NunitoText>
@@ -160,6 +176,11 @@ export const ReviewComment = forwardRef(
               >
                 {commentsNumberValue}
               </NunitoText>
+              {loading && (
+                <View style={{ marginLeft: 5 }}>
+                  <ActivityIndicator size="small" color="gray" />
+                </View>
+              )}
             </View>
             <View
               style={{
@@ -181,7 +202,11 @@ export const ReviewComment = forwardRef(
             </View>
           </View>
           <View
-            style={{ height: 1, backgroundColor: "rgba(217, 217, 217, 0.5)", width: "100%" }}
+            style={{
+              height: 1,
+              backgroundColor: "rgba(217, 217, 217, 0.5)",
+              width: "100%",
+            }}
           />
         </View>
       </TouchableOpacity>
@@ -193,6 +218,7 @@ const styles = StyleSheet.create({
   container: {
     paddingBottom: 15,
     width: "100%",
+    flex: 1,
   },
   authorInfosContainer: {
     flexDirection: "row",
@@ -214,6 +240,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "justify",
     fontWeight: "light",
+    flexWrap: "wrap",
   },
   datePost: {
     color: "gray",
