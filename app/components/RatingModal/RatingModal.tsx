@@ -60,7 +60,7 @@ const RatingModal: React.FC<RatingModalProps> = ({
             Sua avaliação será somada com as demais na nota do livro
           </Text>
 
-          <TouchableOpacity style={styles.button} onPress={async () => {
+          <TouchableOpacity style={rating === 0 ? styles.disabledButton : styles.button} disabled={rating === 0} onPress={async () => {
             try {
               await handleRate(bookId, rating);
               onClose();
@@ -131,6 +131,13 @@ const getStyles = (theme: Theme) =>
       fontSize: 20,
       color: "#aaa",
     },
+    disabledButton: {
+      backgroundColor: "grey",
+      paddingVertical: 10,
+      paddingHorizontal: 100,
+      borderRadius: 15,
+      marginTop: 10,
+    }
   });
 
 export default RatingModal;

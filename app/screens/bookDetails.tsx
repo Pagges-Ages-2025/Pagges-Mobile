@@ -5,14 +5,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   ImageBackground,
   Modal,
-  Platform,
   ScrollView,
   StyleSheet,
-  Text,
-  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -29,8 +25,6 @@ import { useTheme } from "../context/ThemeContext";
 import BooksService from "../services/booksService";
 import { registerBookInDatabase } from "../services/handle-select-book.service";
 import PersonalLibraryService from "../services/personalLibraryService";
-import { Post } from "../models/Post";
-import PostService from "../services/postService";
 interface ModalBookDetailsProps {
   visible: boolean;
   onClose: () => void;
@@ -71,85 +65,6 @@ export default function ModalBookDetails({
   const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
-  const [bookPosts, setBookPosts] = useState<Post[]>([]);
-  const [expandedPosts, setExpandedPosts] = useState<number[]>([]);
-  const PostAPI = PostService();
-
-  useEffect(() => {
-    const fetchBookPosts = async () => {
-      PostAPI.fetchBookPosts(id).then((response: Post[]) => {
-        setBookPosts(response);
-      });
-    };
-    fetchBookPosts();
-  }, [id]);
-  
-  function findPostById(posts: Post[], postId: number): Post | undefined {
-    for (const post of posts) {
-      if (post.postId === postId) return post;
-      if (post.child) {
-        const found = findPostById(post.child, postId);
-        if (found) return found;
-      }
-    }
-    return undefined;
-  }
-
-  const togglePostExpansion = async (postId: number) => {
-    console.log("togglePostExpansion called with postId:", postId);
-    const post = findPostById(bookPosts, postId);
-    console.log("Found post:", post);
-    if (post && !post.child) {
-      console.log("Fetching children for postId:", post.postId);
-      const response = await PostAPI.getPostsByParentId(post.postId);
-      console.log("Fetched children:", response);
-      function updatePostChildren(posts: Post[]): Post[] {
-        return posts.map((p) => {
-          if (p.postId === postId) {
-            return { ...p, child: response };
-          } else if (p.child) {
-            return { ...p, child: updatePostChildren(p.child) };
-          } else {
-            return p;
-          }
-        });
-      }
-      setBookPosts((prevPosts) => updatePostChildren(prevPosts));
-    }
-    setExpandedPosts((prev) =>
-      prev.includes(postId)
-        ? prev.filter((id) => id !== postId)
-        : [...prev.filter((id) => id !== postId), postId]
-    );
-  };
-
-  const childPost = (parentId: number) => {
-    const parent = findPostById(bookPosts, parentId);
-    if (!parent || !parent.child) return null;
-    return parent.child.map((post: Post) => (
-      <View key={post.postId}>
-        <ReviewComment
-          text={post.text}
-          photoPostAuthor={post.googleImageUrl}
-          fullNamePostAuthor={post.username}
-          likesNumber={post.likedBy}
-          datePost={
-            typeof post.createdAt === "string"
-              ? post.createdAt
-              : new Date(post.createdAt).toLocaleDateString()
-          }
-          repostNumber={0}
-          commentsNumber={0}
-          onPress={() => togglePostExpansion(post.postId)}
-        />
-        {expandedPosts.includes(post.postId) && (
-          <View>
-            {childPost(post.postId)}
-          </View>
-        )}
-      </View>
-    ));
-  };
 
   const updateAverageRating = () => {
     try {
@@ -175,44 +90,16 @@ export default function ModalBookDetails({
         bookId,
         state
       );
-
-      if (response.status === 200) {
-        console.log(`Adicionado a ${state} da biblioteca pessoal`);
-        if (Platform.OS === "android") {
-          ToastAndroid.show(
-            `Livro adicionado com sucesso à sua biblioteca`,
-            ToastAndroid.SHORT
-          );
-        } else {
-          Alert.alert(
-            "Sucesso",
-            `Livro adicionado com sucesso à sua biblioteca`
-          );
-        }
-      } else {
-        console.error(`Erro ao adicionar livro com estado ${state}:`);
-        if (Platform.OS === "android") {
-          ToastAndroid.show(
-            "Erro ao adicionar livro à biblioteca",
-            ToastAndroid.SHORT
-          );
-        } else {
-          Alert.alert(
-            "Erro",
-            "Não foi possível adicionar o livro à biblioteca"
-          );
-        }
+      if (response.status === 201) {
+        console.log(
+          `Atualizado o estado dolivro para ${state} da biblioteca pessoal`,
+          {
+            data: response.data,
+          }
+        );
       }
     } catch (error) {
-      console.error(`Erro ao adicionar livro (${state}):`, error);
-      if (Platform.OS === "android") {
-        ToastAndroid.show(
-          "Erro ao adicionar livro à biblioteca",
-          ToastAndroid.SHORT
-        );
-      } else {
-        Alert.alert("Erro", "Não foi possível adicionar o livro à biblioteca");
-      }
+      console.log(`Erro ao adicionar livro (${state}):`, error);
     }
   };
 
@@ -339,7 +226,7 @@ export default function ModalBookDetails({
                   flexDirection: "row",
                   alignItems: "center",
                   width: "100%",
-                  marginBottom: 45
+                  marginBottom: 45,
                 }}
               >
                 <TouchableOpacity onPress={handleBackPress}>
@@ -349,20 +236,28 @@ export default function ModalBookDetails({
                     color={theme.white}
                   />
                 </TouchableOpacity>
-                <View style={{ flex: 1, flexDirection: "row", display: "flex", gap: 20, justifyContent: "flex-end" }} >
-                <CustomButton
-                  title="Criar Resenha"
-                  onPress={handleCreateReview}
-                  size="small"
-                  type={"primary"}
-                  fullWidth={false}
-                  width={"37%"}
-                  height={25}
-                />
-                <TouchableOpacity onPress={handleShare}>
-                  <AntDesign name="export" size={24} color={theme.white} />
-                </TouchableOpacity>
-              </View>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    display: "flex",
+                    gap: 20,
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  <CustomButton
+                    title="Criar Resenha"
+                    onPress={handleCreateReview}
+                    size="small"
+                    type={"primary"}
+                    fullWidth={false}
+                    width={"50%"}
+                    height={25}
+                  />
+                  <TouchableOpacity onPress={handleShare}>
+                    <AntDesign name="export" size={24} color={theme.white} />
+                  </TouchableOpacity>
+                </View>
               </View>
 
               <NunitoText style={[styles.title, { color: theme.white }]}>
@@ -503,32 +398,38 @@ export default function ModalBookDetails({
               >
                 Principais Resenhas e Comentários
               </NunitoText>
-              {bookPosts
-                .filter((post) => !post.parentId)
-                .map((post) => (
-                  <View key={post.postId} style={{ backgroundColor: "#1a1919" }}>
-                    <ReviewComment
-                      text={post.text}
-                      photoPostAuthor={post.profileImage}
-                      fullNamePostAuthor={post.username}
-                      likesNumber={post.likedBy}
-                      datePost={
-                        typeof post.createdAt === "string"
-                          ? post.createdAt
-                          : new Date(post.createdAt).toLocaleDateString()
-                      }
-                      repostNumber={0}
-                      commentsNumber={bookPosts.filter(p => p.parentId === post.postId).length}
-                      onPress={() => togglePostExpansion(post.postId)}
-                    />
-                    {expandedPosts.includes(post.postId) && (
-                      <View style={{ marginLeft: 20 }}>
-                        {childPost(post.postId)}
-                      </View>
-                    )}
-                  </View>
-                ))}
+
+              <ReviewComment
+                comment={true}
+                byAuthor={true}
+                datePost={"30/01/2025"}
+                text={
+                  "Amei o livro, muito bom mesmo! Recomendo muito. A história é envolvente e os personagens são bem desenvolvidos."
+                }
+                fullNamePostAuthor={"Monica Alvarenga"}
+              />
+
+              <ReviewComment
+                comment={false}
+                byAuthor={false}
+                fullNamePostAuthor={"Monica Alvarenga"}
+                datePost={"22/08/2024"}
+                text={
+                  "Memórias da Meia-Noite é um romance de Sidney Sheldon que mistura mistério, drama e uma boa dose de suspense. A história gira em torno de Katherine, uma mulher marcada por tragédias pessoais e uma vida cheia de reviravoltas. Ela se vê envolvida em uma trama que desafia sua compreensão de confiança, vingança e sobrevivência, enquanto tenta descobrir os segredos obscuros de seu passado e lidar com as consequências de suas escolhas.Com o estilo característico de Sheldon, a narrativa é envolvente e cheia de surpresas, mantendo o leitor na expectativa até o final. A trama é recheada de personagens complexos e dilemas emocionais, explorando temas como o perdão, a vingança e os jogos de poder. A escrita é fluída, o ritmo é rápido e as reviravoltas são sempre inesperadas. É uma história que prende o leitor até a última página, com um final impactante."
+                }
+              />
             </View>
+
+            <View style={{ alignItems: "center", justifyContent: "center" }}>
+              <CustomButton
+                title="Acessar mais"
+                onPress={() => {}}
+                size="small"
+                type={"primary"}
+              />
+            </View>
+
+            <View style={{ marginBottom: 30 }}></View>
 
             <NunitoText
               style={[
@@ -665,11 +566,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     paddingTop: 30,
+    paddingLeft: 30,
     paddingBottom: 10,
   },
   sinopseText: {
     fontSize: 14,
     fontWeight: "regular",
+    paddingLeft: 30,
     paddingRight: 35,
     textAlign: "justify",
   },

@@ -2,6 +2,7 @@ import axios from "axios";
 import { Book } from "../components/SearchBar/SearchBar";
 import { DatabaseBookModel } from "../models/DatabaseBook.model";
 import axiosInstance from "./axios-instance-singleton";
+import { retriveUserGenres } from "../services/genres.service";;
 
 export default function BooksService() {
   const getTrendingBooks = async () => {
@@ -71,8 +72,36 @@ export default function BooksService() {
     return dabataseBooks;
   };
 
+  const getFavoriteBasedBooks = async (): Promise<Book[]> => {
+    try {
+      const response = await axiosInstance.get("books/favorites");
+
+      const books = response.data;
+
+      const formattedBooks = Array.isArray(books)
+        ? books.map((data: any) => ({
+          id: data.book_id,
+          titulo: data.title,
+          autores: data.authors?.split(",").map((a: string) => a.trim()) || [],
+          capa: data.google_image_url || data.cover || "",
+          paginas: data.pages,
+          anoDePublicacao: String(data.year),
+          generos: data.BookGenre?.map((g: any) => g.genre.genre_name) || [],
+          synopsis: data.synopsis,
+          avgRating: data.averageRating || 1,
+        }))
+        : [];
+
+          return formattedBooks;
+        } catch (error) {
+            console.error("Erro ao buscar livros baseados nos favoritos:", error);
+            throw error;
+        }
+    };
+
   return {
     getTrendingBooks,
+    getFavoriteBasedBooks,
     getAverageRating,
     RateBook: rateBook,
     getBooksByGenre,

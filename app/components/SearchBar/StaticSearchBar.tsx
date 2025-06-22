@@ -6,13 +6,21 @@ import { useRouter } from "expo-router";
 import { useTheme } from "../../context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 
-const StaticSearchBar = () => {
+type StaticSearchBarRoute = "/screens/searchSocialPage" | "/screens/searchPage";
+interface StaticSearchBarProps {
+    toRoute: StaticSearchBarRoute;
+    placeholder?: string;
+}
+export default function StaticSearchBar ({
+    toRoute,
+    placeholder,
+  }: StaticSearchBarProps) {
     const router = useRouter();
     const { theme } = useTheme();
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity onPress={() => router.push("/screens/searchPage")}>
+            <TouchableOpacity onPress={() => router.push(toRoute)}>
                 <View
                     style={[
                         styles.searchContainer,
@@ -26,7 +34,7 @@ const StaticSearchBar = () => {
                     ]}
                 >
                     <View style={styles.input}>
-                        <Text style={{ color: theme.placeholder }}>Buscar Livro...</Text>
+                        <Text style={{ color: theme.placeholder }}>{placeholder}</Text>
                     </View>
                     <View
                         style={styles.searchIconContainer}
@@ -39,7 +47,7 @@ const StaticSearchBar = () => {
     );
 };
 
-export default StaticSearchBar;
+// export default StaticSearchBar;
 
 const styles = StyleSheet.create({
     container: {

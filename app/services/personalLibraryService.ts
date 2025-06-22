@@ -28,13 +28,10 @@ export default function PersonalLibraryService() {
 
   const addBookToLibrary = async (bookId: number, state: string) => {
     try {
-      const response = await axiosInstance.post(
-        `/personal-library/addBookToBookshelf`,
-        {
-          book_id: bookId,
-          state: state,
-        }
-      );
+      const response = await axiosInstance.post(`/personal-library/addBook`, {
+        bookId: bookId,
+        state: state,
+      });
       return response;
     } catch (error) {
       console.error(`Erro ao livro à biblioteca`);
