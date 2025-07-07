@@ -1,21 +1,23 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { useRouter } from "expo-router";
+import LottieView from "lottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
   Animated,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  GestureResponderEvent,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import LottieView from "lottie-react-native";
 import CustomButton from "../components/Buttons/CustomButton";
 import NunitoText from "../components/Texts/NunitoText";
+import { PaggesTextInput } from "../components/Inputs/TextInput";
+import Strings from "../constants/Strings";
+import AuthAPI from "../services/auth";
+import { useTheme } from "../context/ThemeContext";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -25,6 +27,41 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const lottieRef = useRef<LottieView>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { theme } = useTheme();
+
+  const handleSubmitLoginButton = async () => {
+    if (!email || !password) {
+      setError("Por favor, preencha todos os campos");
+      return;
+    }
+
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const responseData = await AuthAPI().executeLoginUserRequest({
+        email,
+        password,
+      });
+
+      await AsyncStorage.setItem("userToken", responseData.accessToken);
+      await AsyncStorage.setItem("userEmail", email);
+
+      router.replace("/screens/home");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(
+          error.status === 401
+            ? "Usuário ou senha inválido"
+            : "Falha ao fazer login"
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     Animated.parallel([
@@ -63,7 +100,10 @@ export default function LoginScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer} scrollEnabled={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContainer, { backgroundColor: theme.Background }]}
+        scrollEnabled={false}
+      >
         <View style={styles.container}>
           <Animated.View
             style={[
@@ -75,7 +115,9 @@ export default function LoginScreen() {
             ]}
           >
             <NunitoText style={styles.title}>Pagges</NunitoText>
-            <NunitoText style={styles.subtitle}>Bem-vindo de volta, leitor(a)!</NunitoText>
+            <NunitoText style={styles.subtitle}>
+              Bem-vindo de volta, leitor(a)!
+            </NunitoText>
 
             <LottieView
               ref={lottieRef}
@@ -84,61 +126,54 @@ export default function LoginScreen() {
               autoPlay={true}
               loop={true}
             />
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="person-outline"
-                size={20}
-                color="#A9A8A9"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="E-mail ou nome de usuário"
-                placeholderTextColor="#999"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-              />
-            </View>
 
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={20}
-                color="#A9A8A9"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Senha"
-                placeholderTextColor="#999"
-                secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={setPassword}
-              />
-              <TouchableOpacity
-                style={styles.eyeIcon}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons
-                  name={showPassword ? "eye-outline" : "eye-off-outline"}
-                  size={20}
-                  color="#A9A8A9"
-                />
-              </TouchableOpacity>
-            </View>
+            <PaggesTextInput
+              style={styles.inputContainer}
+              placeholder={Strings.emailOrUsernamePlaceholder}
+              value={email}
+              onChangeText={setEmail}
+              leftIconName="person-outline"
+            />
+
+            <PaggesTextInput
+              style={styles.inputContainer}
+              placeholder={Strings.passwordPlaceholder}
+              value={password}
+              onChangeText={setPassword}
+              leftIconName="lock-closed-outline"
+              rightIconName={showPassword ? "eye-outline" : "eye-off-outline"}
+              isRightIconEnabled={true}
+              isSecureTextEntry={!showPassword}
+              onRightIconClick={() => setShowPassword(!showPassword)}
+            />
 
             <TouchableOpacity style={styles.forgotPassword}>
-              <NunitoText style={styles.forgotPasswordText}>Esqueceu a senha?</NunitoText>
+              <NunitoText style={styles.forgotPasswordText}>
+                {Strings.forgotPassword}
+              </NunitoText>
             </TouchableOpacity>
 
-            <CustomButton title={"Entrar"} onPress={() => {}} />
+            {error && (
+              <NunitoText
+                style={{ color: "red", marginBottom: 16, textAlign: "center" }}
+              >
+                {error}
+              </NunitoText>
+            )}
+
+            <CustomButton
+              title={isLoading ? "Entrando..." : "Entrar"}
+              onPress={handleSubmitLoginButton}
+              isDisabled={isLoading}
+            />
 
             <TouchableOpacity
               style={styles.registerLink}
               onPress={() => navigateTo("register")}
             >
-              <NunitoText style={styles.registerLinkText}>Não possui uma conta?</NunitoText>
+              <NunitoText style={styles.registerLinkText}>
+                Não possui uma conta?
+              </NunitoText>
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -148,64 +183,31 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
+  button: {
+    alignItems: "center",
+    backgroundColor: "#9C0F5F",
+    borderRadius: 30,
+    height: 56,
+    justifyContent: "center",
+    marginBottom: 16,
+    width: "100%",
   },
-  lottie: {
-    width: 300,
-    height: 300,
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
   container: {
-    flex: 1,
-    backgroundColor: "white",
-    justifyContent: "center",
     alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
     padding: 20,
   },
   content: {
-    width: "100%",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 40,
-  },
-  title: {
-    fontSize: 48,
-    fontWeight: "bold",
-    color: "#9C0F5F",
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: "#333",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  illustration: {
-    width: 200,
-    height: 150,
-    marginBottom: 30,
-  },
-
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
     width: "100%",
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#A9A8A9",
-    borderRadius: 15,
-    marginBottom: 16,
-    paddingHorizontal: 16,
-  },
-  inputIcon: {
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
-    height: "100%",
-    color: "#333",
-    fontSize: 16,
-    fontFamily: "Nunito"
   },
   eyeIcon: {
     padding: 10,
@@ -218,19 +220,27 @@ const styles = StyleSheet.create({
     color: "#666",
     fontSize: 14,
   },
-  button: {
-    backgroundColor: "#9C0F5F",
-    borderRadius: 30,
-    height: 56,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
+  illustration: {
+    height: 150,
+    marginBottom: 30,
+    width: 200,
+  },
+  input: {
+    color: "#333",
+    flex: 1,
+    fontFamily: "Nunito",
+    fontSize: 16,
+    height: "100%",
+  },
+  inputContainer: {
     marginBottom: 16,
   },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
+  inputIcon: {
+    marginRight: 10,
+  },
+  lottie: {
+    height: 300,
+    width: 300,
   },
   registerLink: {
     marginTop: 10,
@@ -238,5 +248,20 @@ const styles = StyleSheet.create({
   registerLinkText: {
     color: "#666",
     fontSize: 14,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+  },
+  subtitle: {
+    color: "#333",
+    fontSize: 18,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  title: {
+    color: "#9C0F5F",
+    fontSize: 48,
+    fontWeight: "bold",
+    marginBottom: 10,
   },
 });

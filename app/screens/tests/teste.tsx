@@ -1,15 +1,27 @@
+import { useTheme } from "@/app/context/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  StyleSheet,
-  ScrollView,
   Animated,
+  ScrollView,
+  StyleSheet,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme } from "@/app/context/ThemeContext";
+import AnimationSection from "./sections/animationsSection";
+import BooksSection from "./sections/booksSection";
 import ButtonSection from "./sections/buttonsSection";
+import CarouselSection from "./sections/carouselSection";
+import ColorsSection from "./sections/colorsSection";
+import ErrorsModalsSection from "./sections/ErrorsModalsSection";
+import SearchBarSection from "./sections/searchbarSection";
+import AchievementsSection from "./sections/achievementsSection";
+import AdditionalButtonsSection from "./sections/additionalButtonsSection";
+import PostCardSection from "./sections/postCardSection";
+import CheckboxSection from "./sections/checkboxSection";
+import GenreLabelSection from "./sections/genreLabelSection";
+import PodiumRanking from "@/app/components/Podium/PodiumRanking";
 
 export default function TestsScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -22,6 +34,22 @@ export default function TestsScreen() {
     type: true,
     fontWeight: true,
   });
+
+    const mockUsers = {
+    firstRank: {
+      name: "Alice",
+
+    },
+    secondRank: {
+      name: "Bob",
+
+    },
+    thirdRank: {
+      name: "Carol",
+
+    },
+  };
+
 
   const toggle = (key: keyof typeof open) =>
     setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -46,7 +74,10 @@ export default function TestsScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.Background }} edges={["top"]}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: theme.Background }}
+      edges={["top"]}
+    >
       <ScrollView contentContainerStyle={styles.scroll}>
         {/* Botão de troca de tema */}
         <View style={styles.themeToggleContainer}>
@@ -64,10 +95,24 @@ export default function TestsScreen() {
 
         {/* Seções */}
         <View style={styles.container}>
-        <ButtonSection />
+          <ColorsSection />
+          <ButtonSection />
+          <AnimationSection />
+          <SearchBarSection />
+          <BooksSection />
+          <CarouselSection />
+          <ErrorsModalsSection />
+          <AchievementsSection />
+          <AdditionalButtonsSection />
+          <PostCardSection />
+          <CheckboxSection />
+          <GenreLabelSection />
+          <PodiumRanking
+            firstRank={mockUsers.firstRank}
+            secondRank={mockUsers.secondRank}
+            thirdRank={mockUsers.thirdRank}
+          />
         </View>
-
-
       </ScrollView>
     </SafeAreaView>
   );

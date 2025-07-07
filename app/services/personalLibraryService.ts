@@ -1,0 +1,53 @@
+import { Book, BookCategory } from "../models/PersonalLibrary";
+import axiosInstance from "./axios-instance-singleton";
+
+export default function PersonalLibraryService() {
+  const fetchBooksByArray = async (category: BookCategory): Promise<Book[]> => {
+    try {
+      const response = await axiosInstance.get(
+        `/personal-library/getBookshelfByState?category=${category}`
+      );
+
+      const mappedBooks = response.data.map(
+        (item: any) =>
+          new Book({
+            id: item.book.book_id,
+            title: item.book.title,
+            photoPath: item.book.google_image_url || item.book.cover,
+            author: item.book.authors,
+            size: "small" as const,
+            pages: item.book.pages,
+            synopsis: item.book.synopsis,
+            genre: item.book.genre,
+            year: item.book.year,
+            google_image_url: item.book.google_image_url,
+            isbn: item.book.isbn,
+            cover: item.book.cover,
+          })
+      );
+
+      return mappedBooks;
+    } catch (error) {
+      console.error(`Erro ao buscar livros da categoria ${category}:`, error);
+      throw error;
+    }
+  };
+
+  const addBookToLibrary = async (bookId: number, state: string) => {
+    try {
+      const response = await axiosInstance.post(`/personal-library/addBook`, {
+        bookId: bookId,
+        state: state,
+      });
+      return response;
+    } catch (error) {
+      console.error(`Erro ao livro à biblioteca`);
+      throw error;
+    }
+  };
+
+  return {
+    fetchBooksByArray,
+    addBookToLibrary,
+  };
+}

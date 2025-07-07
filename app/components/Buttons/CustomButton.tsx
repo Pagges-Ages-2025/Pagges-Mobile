@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from "react";
 import {
   TouchableOpacity,
@@ -10,18 +11,27 @@ import {
 import NunitoText from "../Texts/NunitoText";
 import { useTheme } from "../../context/ThemeContext";
 
-type ButtonType = "primary" | "outlined" | "secondary";
+// Tipos de variações do botão
+type ButtonType = "primary" | "outlined" | "secondary" | "outlinedSecondary" | "tertiary" | "outlinedTertiary";
 type ButtonSize = "small" | "medium" | "large";
 type FontWeight = "light" | "regular" | "semibold" | "bold";
 
 interface CustomButtonProps {
   type?: ButtonType;
   size?: ButtonSize;
+  isDisabled?: boolean;
+  fullWidth?: boolean;
   fontWeight?: FontWeight;
   title: string;
   onPress: (event: GestureResponderEvent) => void;
   containerStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
+  /**
+   * ✅ Propriedades opcionais que permitem definir
+   *    a largura e a altura do botão manualmente.
+   */
+  width?: number | string;
+  height?: number;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -32,15 +42,21 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   onPress,
   containerStyle,
   textStyle,
+  isDisabled = false,
+  fullWidth = true,
+  width,
+  height,
 }) => {
   const { theme, themeName } = useTheme();
 
-
-  // Tipos de botão
+  // Verifica o tipo do botão
   const isOutlined = type === "outlined";
   const isSecondary = type === "secondary";
+  const isOutlinedSecondary = type === "outlinedSecondary";
+  const isTertiary = type === "tertiary";
+  const isOutlinedTertiary = type === "outlinedTertiary"; 
 
-  // Tamanho do Botão
+  // Define estilos para cada tamanho
   const sizeStyles = {
     small: {
       height: 40,
@@ -59,7 +75,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     },
   }[size];
 
-  // Fontes do botão
+  // Mapeia o fontWeight para valores de fontWeight do React Native
   const fontWeightMap: Record<FontWeight, TextStyle["fontWeight"]> = {
     light: "300",
     regular: "500",
@@ -67,34 +83,69 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     bold: "900",
   };
 
-  // Estilos dinâmicos do botão
+  // Estilo dinâmico do botão
   const dynamicButtonStyle: ViewStyle = {
     backgroundColor: isOutlined
+      ? "transparent"
+      : isOutlinedSecondary
+      ? "transparent"
+      : isTertiary
+      ? theme.Background
+      : isOutlinedTertiary
       ? "transparent"
       : isSecondary
       ? theme.secondary
       : theme.primary,
-    borderColor: isOutlined ? theme.primary : undefined,
-    borderWidth: isOutlined ? 2 : undefined,
-    height: sizeStyles.height,
+    borderColor: isOutlined
+      ? theme.primary
+      : isOutlinedSecondary
+      ? theme.secondary
+      : isTertiary
+      ? theme.Background
+      : isOutlinedTertiary
+      ? "transparent"
+      : undefined,
+    borderWidth: isOutlined || isOutlinedSecondary || isOutlinedTertiary ? 2 : undefined,
+    /**
+     * ✅ Se 'height' não for fornecido, usa a altura definida
+     *    pela prop 'size'. Caso contrário, substitui pela prop 'height'.
+     */
+    height: height ?? sizeStyles.height,
     paddingHorizontal: sizeStyles.paddingHorizontal,
   };
 
+  // Estilo dinâmico do texto
   const dynamicTextStyle: TextStyle = {
     color: isOutlined
       ? themeName === "dark"
         ? theme.primaryText
         : theme.primary
+      : isOutlinedSecondary
+      ? themeName === "dark"
+        ? theme.primaryText
+        : theme.secondary
+      : isTertiary
+      ? theme.primaryText
+      : isOutlinedTertiary
+      ? theme.primary
       : "white",
     fontSize: sizeStyles.fontSize,
     fontWeight: fontWeightMap[fontWeight],
   };
-  
 
   return (
     <TouchableOpacity
-      style={[styles.baseButton, dynamicButtonStyle, containerStyle]}
+      style={[
+        styles.baseButton,
+        dynamicButtonStyle,
+        containerStyle,
+        {
+          width: width ?? (fullWidth ? "100%" : "30%") as any,
+          opacity: isDisabled ? 0.5 : 1,
+        },
+      ]}
       onPress={onPress}
+      disabled={isDisabled}
       activeOpacity={0.8}
     >
       <NunitoText style={[styles.baseText, dynamicTextStyle, textStyle]}>
@@ -109,7 +160,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
-    width: "100%",
   },
   baseText: {
     textAlign: "center",

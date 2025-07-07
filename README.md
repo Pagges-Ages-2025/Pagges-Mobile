@@ -43,6 +43,110 @@ Pagges mobile repository
    - On Android, use **Expo Go > Scan QR**.
    - On iOS, use the default camera app.
 
+#ESLint
+
+## Required Extensions
+
+- Install the `ESLint` extension in VSCode
+
+## How to Run ESLint
+
+1. To check for linting errors in your code:
+
+   ```bash
+   npx eslint path/to/file
+   ```
+
+   So if you want to run the ESLint for the entire project you can run from root:
+
+   ```bash
+   npx eslint app
+   ```
+
+2. To automatically fix linting errors:
+
+   ```bash
+   npx eslint --fix
+   ```
+
+Note: ESLint will automatically run when you save files if you have the ESLint extension installed in VSCode.
+
+# Prettier
+
+## Required Extensions
+
+- Install the `Prettier` extension in VSCode
+
+- Open the Command Pallete (Ctrl + Shift + P) and search for "Preferences: Open User Settings (JSON)"
+
+- Enable "Format on Save" in your VSCode by adding this to the settings:
+
+{
+...
+"editor.formatOnSave": true,
+"editor.defaultFormatter": "esbenp.prettier-vscode"
+}
+
+Now Prettier will automatically format your code when you save files (Ctrl + S) if you have the Prettier extension installed in VSCode.
+
+# Running the Expo App on an Android Emulator (Android Studio)
+
+This project can be tested using an Android emulator via Android Studio. Follow the steps below to install and configure everything properly:
+
+---
+
+### 1. Install Android Studio
+
+1. Go to: https://developer.android.com/studio
+2. Download and install Android Studio.
+3. During installation, **make sure "Android Virtual Device" is selected**.
+
+---
+
+### 2. Set Up the Environment
+
+After installation:
+
+1. Open Android Studio.
+2. Go to **More Actions > Virtual Device Manager**.
+3. Click **Create Device**.
+4. Choose a lightweight device such as `Pixel 3` and click **Next**.
+5. Select a system image:
+   - **API 30: Android 11 (Google APIs x86_64)**.
+   - Download if needed, then click **Next**.
+
+---
+
+### 3. Optimize Performance (optional, but recommended)
+
+On the **"Verify Configuration"** screen, click **"Show Advanced Settings"** and set:
+
+- **CPU cores:** `2`
+- **RAM:** `1024 MB (1 GB)`
+- **VM Heap:** `256 MB`
+- **Internal Storage:** `2 GB`
+- **Graphics Acceleration:** `Automatic`
+
+Click **Finish** when done.
+
+---
+
+### 4. Start the Emulator
+
+1. In the Virtual Device Manager, click the ▶️ button to launch the emulator.
+2. Wait until the Android home screen is fully loaded.
+
+---
+
+### 5. Run the Expo Project on the Emulator
+
+In your terminal, from the project root, run:
+
+```bash
+npx expo start
+```
+Once the Expo CLI opens, press: `a`
+
 # Branch Naming Convention
 
 ## Format
